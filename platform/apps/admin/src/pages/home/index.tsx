@@ -17,7 +17,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { ArrowBack, AutoAwesome, MapOutlined, Refresh } from '@mui/icons-material';
+import { ArrowBack, AutoAwesome, CalendarMonth, MapOutlined, Refresh } from '@mui/icons-material';
 import { overviewFn, refreshFn } from '@/api/admin/maintenance/cloudflare-usage';
 import { classifyApiFailure } from '@/api/config';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -225,6 +225,9 @@ function UsageHomePage({ summaryOnly }: { summaryOnly: boolean }) {
               {t('home.usage.summary.back')}
             </Button>
           )}
+          <Button component={RouterLink} to="/calendar" startIcon={<CalendarMonth />} size="small">
+            {t('calendar.open')}
+          </Button>
           <Button
             component={RouterLink}
             to="/home?view=map"

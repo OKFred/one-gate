@@ -13,6 +13,7 @@ import { base } from './base';
 import { voice } from './voice';
 import { mobile } from './mobile';
 import { map } from './map';
+import { calendar } from './calendar';
 
 /**
  * admin app zh-CN 翻译聚合入口
@@ -22,6 +23,7 @@ export default {
   ...system,
   ...mobile,
   ...map,
+  ...calendar,
   ...home,
   ...mail,
   ...maintenance,

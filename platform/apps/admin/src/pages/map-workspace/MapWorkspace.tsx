@@ -223,13 +223,6 @@ export default function MapWorkspace() {
           </Alert>
         )}
         <Box
-          ref={container}
-          data-testid="tianditu-map"
-          data-map-state={phase}
-          role="region"
-          aria-label={t('map.canvas')}
-          aria-describedby="tianditu-keyboard-help"
-          tabIndex={0}
           sx={{
             display: showCanvas ? 'block' : 'none',
             height: 'clamp(360px, calc(100dvh - 260px), 760px)',
@@ -249,7 +242,19 @@ export default function MapWorkspace() {
               borderColor: 'divider',
             },
           }}
-        />
+        >
+          {/* Leaflet owns this element's classes; keep MUI's generated classes on the wrapper. */}
+          <div
+            ref={container}
+            data-testid="tianditu-map"
+            data-map-state={phase}
+            role="region"
+            aria-label={t('map.canvas')}
+            aria-describedby="tianditu-keyboard-help"
+            tabIndex={0}
+            style={{ width: '100%', height: '100%' }}
+          />
+        </Box>
       </Paper>
       {showCanvas && (
         <Typography id="tianditu-keyboard-help" variant="caption" color="text.secondary">

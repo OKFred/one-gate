@@ -356,6 +356,8 @@ export async function installCloudflareHomeFixture(
     let result: unknown = [];
     if (path.endsWith('/auth/gate/status')) result = { verified: true, expiresAtUtc: null };
     else if (path.endsWith('/auth/check')) result = true;
+    else if (path.endsWith('/personal/calendar/due'))
+      result = { list: [], hasMore: false, nextReminderTimeUtc: null, serverTimeUtc: Date.now() };
     else if (path.endsWith('/auth/getButtonPermission'))
       result = {
         permissions: state.permissions.map((code, index) => ({

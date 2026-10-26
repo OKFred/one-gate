@@ -84,6 +84,25 @@ describe.skipIf(!configured)(
       }
       await enter();
     }
+    async function installUsageSchema() {
+      await installLegacySchema();
+      await client.query("BEGIN");
+      try {
+        await client.query(`SET LOCAL search_path TO "${schema}", pg_catalog`);
+        const migration = postgresMigrations[1];
+        await client.query(migration.sql);
+        const fingerprint = await postgresCatalogFingerprint(client, schema);
+        await client.query(
+          "INSERT INTO _one_gate_pg_migrations VALUES($1,$2,$3,$4)",
+          [migration.id, migration.checksum, fingerprint, 2000]
+        );
+        await client.query("COMMIT");
+      } catch (error: unknown) {
+        await client.query("ROLLBACK");
+        throw error;
+      }
+      await enter();
+    }
     async function counts() {
       await enter();
       const { rows } = await client.query<{
@@ -184,7 +203,7 @@ describe.skipIf(!configured)(
       const markers = (
         await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
       ).rows;
-      expect(markers).toHaveLength(2);
+      expect(markers).toHaveLength(postgresMigrations.length);
       expect(markers[0]).toEqual(prior);
       expect(markers[1]).toMatchObject({
         id: "0002_cloudflare_usage",
@@ -227,6 +246,123 @@ describe.skipIf(!configured)(
       } finally {
         await peer.end();
       }
+    });
+    it("adds calendar to a 0002 schema without changing existing data, sequence or prior markers", async () => {
+      await installUsageSchema();
+      const prior = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows;
+      await client.query(
+        "INSERT INTO base_sys_config(namespace,config_key,is_enabled,is_primary,config_value,creator_id,create_time_utc) VALUES('synthetic','calendar-retained',TRUE,TRUE,'{}',1,1)"
+      );
+      await client.query(
+        "SELECT setval(pg_get_serial_sequence('base_sys_config','id'),900000,TRUE)"
+      );
+      expect(await migratePostgres(client, { schema })).toBe("pending");
+      expect(await migratePostgres(client, { schema, apply: true })).toBe(
+        "applied"
+      );
+      expect(await migratePostgres(client, { schema, apply: true })).toBe(
+        "already_applied"
+      );
+      await enter();
+      const markers = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows;
+      expect(markers.slice(0, 2)).toEqual(prior);
+      expect(markers[2]).toMatchObject({
+        id: "0003_personal_calendar",
+        checksum: postgresMigrations[2].checksum,
+      });
+      expect(
+        (
+          await client.query(
+            "SELECT count(*)::text AS n FROM personal_calendar_event"
+          )
+        ).rows[0].n
+      ).toBe("0");
+      expect(
+        (
+          await client.query(
+            "SELECT config_key FROM base_sys_config WHERE namespace='synthetic'"
+          )
+        ).rows
+      ).toEqual([{ config_key: "calendar-retained" }]);
+      expect(
+        (
+          await client.query(
+            "SELECT last_value::text FROM base_sys_config_id_seq"
+          )
+        ).rows[0].last_value
+      ).toBe("900000");
+      expect(
+        (
+          await client.query(
+            "SELECT column_default FROM information_schema.columns WHERE table_schema=$1 AND table_name='personal_calendar_event' AND column_default IS NOT NULL",
+            [schema]
+          )
+        ).rows
+      ).toEqual([]);
+    });
+    it("rolls back a failed 0003 upgrade and retries without replacing the 0002 ledger", async () => {
+      await installUsageSchema();
+      const prior = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows;
+      await client.query(
+        "CREATE VIEW personal_calendar_event AS SELECT 7 AS synthetic"
+      );
+      await expect(
+        migratePostgres(client, { schema, apply: true })
+      ).rejects.toThrow();
+      await enter();
+      expect(
+        (
+          await client.query(
+            "SELECT * FROM _one_gate_pg_migrations ORDER BY id"
+          )
+        ).rows
+      ).toEqual(prior);
+      expect(
+        (await client.query("SELECT synthetic FROM personal_calendar_event"))
+          .rows[0].synthetic
+      ).toBe(7);
+      expect(
+        (
+          await client.query(
+            "SELECT count(*)::text AS n FROM pg_indexes WHERE schemaname=$1 AND indexname LIKE 'personal_calendar_event_%'",
+            [schema]
+          )
+        ).rows[0].n
+      ).toBe("0");
+      await client.query("DROP VIEW personal_calendar_event");
+      expect(await migratePostgres(client, { schema, apply: true })).toBe(
+        "applied"
+      );
+    });
+    it("fails closed on calendar index drift without changing its successful ledger", async () => {
+      await migratePostgres(client, { schema, apply: true });
+      await enter();
+      const prior = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows;
+      await client.query(
+        "DROP INDEX personal_calendar_event_owner_reminder_idx"
+      );
+      await client.query(
+        "CREATE INDEX personal_calendar_event_owner_reminder_idx ON personal_calendar_event(owner_user_id,reminder_time_utc,id)"
+      );
+      await expect(
+        migratePostgres(client, { schema, apply: true })
+      ).rejects.toThrow("fingerprint mismatch");
+      await enter();
+      expect(
+        (
+          await client.query(
+            "SELECT * FROM _one_gate_pg_migrations ORDER BY id"
+          )
+        ).rows
+      ).toEqual(prior);
     });
     it("rejects drift in a 0001-only schema before creating any 0002 table or marker", async () => {
       await installLegacySchema();

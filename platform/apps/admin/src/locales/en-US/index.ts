@@ -13,6 +13,7 @@ import { base } from './base';
 import { voice } from './voice';
 import { mobile } from './mobile';
 import { map } from './map';
+import { calendar } from './calendar';
 
 export default {
   ...system,
@@ -30,4 +31,5 @@ export default {
   ...voice,
   ...mobile,
   ...map,
+  ...calendar,
 } as const satisfies Record<string, string>;

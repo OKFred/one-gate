@@ -88,6 +88,7 @@ jobs:
           pnpm exec tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ESNext --types node scripts/generate-enterprise-assets.ts
           pnpm run db:generate:assets
           pnpm run db:generate:cloudflare-usage
+          pnpm run db:generate:calendar
         working-directory: server
       - name: Create isolated Worker test configuration
         working-directory: server/apps/server
@@ -107,7 +108,7 @@ jobs:
         run: pnpm exec vitest run --config vitest.config.node.mts --maxWorkers=2
         working-directory: server/apps/server
       - name: Worker and D1 retention and enterprise isolation regression
-        run: pnpm exec vitest run --config vitest.config.workers.mts recycle-bin soft-delete department-cleanup undo.integration tenant-isolation enterprise-http asset access-metadata disabled-role-auth cloudflare-usage ai/chat --maxWorkers=1
+        run: pnpm exec vitest run --config vitest.config.workers.mts recycle-bin soft-delete department-cleanup undo.integration tenant-isolation enterprise-http asset access-metadata disabled-role-auth cloudflare-usage ai/chat calendar --maxWorkers=1
         working-directory: server/apps/server
       - name: Backend application types
         run: pnpm exec tsc --noEmit -p apps/server/tsconfig.json
@@ -151,7 +152,7 @@ jobs:
         run: pnpm exec playwright install --with-deps --no-shell chromium
         working-directory: platform
       - name: Mocked auth, recycle bin, undo and enterprise isolation tests
-        run: pnpm exec playwright test auth/auth-ui.spec.ts recycle-bin/recycle-bin.spec.ts delete-undo/ enterprise-assets/ api-token/ cloudflare-home/ --project=chromium
+        run: pnpm exec playwright test auth/auth-ui.spec.ts recycle-bin/recycle-bin.spec.ts delete-undo/ enterprise-assets/ api-token/ cloudflare-home/ calendar/ --project=chromium
         working-directory: platform
 
   secrets:

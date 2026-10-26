@@ -75,6 +75,8 @@ export const BUSINESS = {
   "executive.workflow": "executive.workflow",
   /** 个人中心 */
   personal: "personal",
+  /** 私人日历 */
+  "personal.calendar": "personal.calendar",
 
   /** 个人中心-账号配置 */
   "personal.base": "personal.base",
