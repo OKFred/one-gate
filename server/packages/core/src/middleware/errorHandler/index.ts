@@ -8,6 +8,12 @@ import { StatusCodes } from "http-status-codes";
 import { BusinessError } from "./businessError/index.js";
 import { toHttpException } from "./businessError";
 import { convertSqlErrorToBusinessError } from "./sqlError";
+import {
+  classifyCloudflareLimit,
+  cloudflareLimitMessage,
+  CLOUDFLARE_LIMIT_PRESENTATIONS,
+  isCloudflareLimitCode,
+} from "./cloudflare-limit";
 
 function readBusinessErrorCode(error: unknown): string | undefined {
   if (!(error instanceof HTTPException)) return undefined;
@@ -80,7 +86,14 @@ export default function errorHandler(app: App) {
 
   app.onError(async (err, c: Context) => {
     let e = err;
-    const sqlError = convertSqlErrorToBusinessError(e);
+    // Preserve intentional business/HTTP errors; their metadata can contain input.
+    const platformCode =
+      e instanceof BusinessError || e instanceof HTTPException
+        ? null
+        : classifyCloudflareLimit(e);
+    const sqlError = platformCode
+      ? new BusinessError(platformCode)
+      : convertSqlErrorToBusinessError(e);
     if (sqlError) {
       e = toHttpException(sqlError);
     }
@@ -90,6 +103,9 @@ export default function errorHandler(app: App) {
 
     const status = e instanceof HTTPException ? e.status : 500;
     const businessCode = readBusinessErrorCode(e);
+    const platformLimit = isCloudflareLimitCode(businessCode)
+      ? CLOUDFLARE_LIMIT_PRESENTATIONS[businessCode]
+      : undefined;
     const requestId = c.get("requestId") || crypto.randomUUID();
     const errorEvent = {
       timestamp: new Date().toISOString(),
@@ -102,6 +118,9 @@ export default function errorHandler(app: App) {
       status,
       code:
         businessCode ?? (status < 500 ? `HTTP_${status}` : "INTERNAL_ERROR"),
+      ...(platformLimit
+        ? { provider: "cloudflare", resource: platformLimit.resource }
+        : {}),
     };
     if (c.var.logger) {
       c.var.logger[errorEvent.level](errorEvent);
@@ -115,17 +134,39 @@ export default function errorHandler(app: App) {
     }
     c.header("x-request-id", requestId);
 
+    if (isCloudflareLimitCode(businessCode)) {
+      // Error translation must not access the unavailable D1/KV dependency again.
+      const language =
+        c.get("userObj")?.langCode ||
+        c.req.header("locale") ||
+        c.req.header("Accept-Language") ||
+        getEnv("LOCALE");
+      c.header("Cache-Control", "private, no-store");
+      return c.json<ResJson>(
+        {
+          ok: false,
+          message: cloudflareLimitMessage(businessCode, language),
+          data: { code: businessCode, details: [] },
+        },
+        CLOUDFLARE_LIMIT_PRESENTATIONS[businessCode].status
+      );
+    }
+
     const t = await getTranslator(c);
     if (e instanceof HTTPException) {
       const is500 = e.status >= 500;
       const causeObj = e.cause as
         | {
-            params?: any;
+            params?: {
+              message?: unknown;
+              type?: unknown;
+              params?: Record<string, unknown>;
+            };
             error?: { code?: unknown };
             details?: {
               type: string;
               message: string;
-              params?: Record<string, any>;
+              params?: Record<string, unknown>;
             }[];
           }
         | undefined;
@@ -133,7 +174,7 @@ export default function errorHandler(app: App) {
       let rawDetails: {
         type: string;
         message: string;
-        params?: Record<string, any>;
+        params?: Record<string, unknown>;
       }[] = [];
       if (!is500 && causeObj) {
         if (Array.isArray(causeObj.details)) {
@@ -144,7 +185,10 @@ export default function errorHandler(app: App) {
         ) {
           rawDetails = [
             {
-              type: causeObj.params.type || "detail_error",
+              type:
+                typeof causeObj.params.type === "string"
+                  ? causeObj.params.type
+                  : "detail_error",
               message: causeObj.params.message,
               params: causeObj.params.params,
             },
