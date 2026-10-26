@@ -45,4 +45,22 @@ export const common = {
   'error.requestFailed': '请求失败',
   'error.sessionExpired': '登录已过期，请重新登录',
   'error.networkError': '网络错误',
+  'error.networkOrServiceUnavailable':
+    '网络或服务暂不可用，请稍后重试；若持续发生，请联系管理员检查平台额度和服务状态。',
+  'error.serverUnavailable': '服务暂不可用，请稍后重试；若持续发生，请联系管理员。',
+  'error.requestRateLimited': '请求过于频繁，请稍后手动重试；若持续发生，请联系管理员。',
+  'error.cloudflareD1DailyReadLimit':
+    'Cloudflare D1 今日读取额度已用尽，服务暂不可用。请在 UTC 00:00 额度重置后重试，或联系管理员调整套餐。',
+  'error.cloudflareD1DailyWriteLimit':
+    'Cloudflare D1 今日写入额度已用尽，服务暂不可用。请在 UTC 00:00 额度重置后重试，或联系管理员调整套餐。',
+  'error.cloudflareD1StorageLimit':
+    'Cloudflare D1 存储容量已达上限，服务暂不可用，请联系管理员检查数据库容量。',
+  'error.cloudflareKvQuotaExceeded':
+    'Cloudflare KV 额度已用尽，相关服务暂不可用，请联系管理员检查额度和套餐。',
+  'error.cloudflareKvRateLimited':
+    'Cloudflare KV 请求受到限流，请稍后手动重试；若持续发生，请联系管理员。',
+  'error.cloudflareWorkersDailyLimit':
+    'Cloudflare Workers 今日请求额度已用尽，服务暂不可用，请在额度重置后重试，或联系管理员调整套餐。',
+  'error.cloudflareWorkersResourceLimit':
+    'Cloudflare Workers 本次运行超出 CPU 或内存限制，请稍后手动重试；若持续发生，请联系管理员。',
 } as const satisfies Record<string, string>;

@@ -1,11 +1,17 @@
 import type { TranslationInputItem } from "@hodor/core/db/initTranslation";
 import type { BusinessKey } from "@hodor/core/types/business";
+import { CLOUDFLARE_LIMIT_PRESENTATIONS } from "../../middleware/errorHandler/cloudflare-limit";
 
 export const sharedTranslations = {
   "business.type": [],
   components: [],
   common: [],
   "business.exception": [
+    ...Object.values(CLOUDFLARE_LIMIT_PRESENTATIONS).map((presentation) => ({
+      application: "backend" as const,
+      tKey: presentation.i18nKey,
+      langCodes: presentation.messages,
+    })),
     {
       application: "backend",
       tKey: "errorHandler.databaseBusy",

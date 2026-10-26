@@ -21,6 +21,7 @@ import { createTranslator } from '@/hooks/useTranslation';
 import { loginPath } from '@/routes';
 import { RequestQueueManager } from './queue';
 import { readErrorCode } from './failure';
+import { resolveApiErrorMessage } from './platform-errors';
 export { classifyApiFailure, type ApiFailure } from './failure';
 
 const requestQueueManager = new RequestQueueManager();
@@ -155,7 +156,7 @@ function setupInterceptors(service: AxiosInstance) {
           const langCode = authUtils.getUserInfo()?.langCode;
           const t = createTranslator(langCode);
           if (config.errorPresentation !== 'local' && config.shouldPresentError?.() !== false) {
-            handleErrorResponse(response.data, t('error.requestFailed'));
+            handleErrorResponse(response.data, t('error.requestFailed'), response);
           }
           return Promise.reject(response);
         }
@@ -182,7 +183,11 @@ function setupInterceptors(service: AxiosInstance) {
           requestQueueManager.abortAllRequests();
           window.dispatchEvent(new Event(TOTP_GATE_REQUIRED_EVENT));
         } else {
-          handleErrorResponse(axiosError?.response?.data, errorMessage || t('error.requestFailed'));
+          handleErrorResponse(
+            axiosError?.response?.data,
+            errorMessage || t('error.requestFailed'),
+            axiosError?.response,
+          );
         }
         return Promise.reject(error);
       }
@@ -214,7 +219,11 @@ function setupInterceptors(service: AxiosInstance) {
 
       // 其他业务错误：优先展示后端 message
       if (config?.errorPresentation !== 'local' && config?.shouldPresentError?.() !== false) {
-        handleErrorResponse(axiosError?.response?.data, errorMessage || t('error.networkError'));
+        handleErrorResponse(
+          axiosError?.response?.data,
+          errorMessage || t('error.networkError'),
+          axiosError?.response,
+        );
       }
       return Promise.reject(error);
     },
@@ -243,15 +252,21 @@ export function readApiErrorReference(error: unknown): ApiErrorReference | null 
 }
 
 function handleErrorResponse(
-  data: { message?: string; data?: unknown } | null | undefined,
+  data: unknown,
   fallbackMessage: string,
+  response?: Pick<AxiosResponse, 'status' | 'headers'>,
 ) {
-  const message = data?.message || fallbackMessage;
+  const langCode = authUtils.getUserInfo()?.langCode;
+  const message = resolveApiErrorMessage({
+    data,
+    status: response?.status,
+    headers: response?.headers,
+    hasResponse: response !== undefined,
+    langCode,
+    translate: createTranslator(langCode),
+    fallbackMessage,
+  });
   showSnackbar({ message, type: 'error' });
-
-  if (import.meta.env.MODE !== 'production' && data?.data) {
-    console.error('[API Error Details]:', data.data);
-  }
 }
 
 // 初始化拦截器
