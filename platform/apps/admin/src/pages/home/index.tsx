@@ -17,7 +17,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { AutoAwesome, MapOutlined, Refresh } from '@mui/icons-material';
+import { ArrowBack, AutoAwesome, MapOutlined, Refresh } from '@mui/icons-material';
 import { overviewFn, refreshFn } from '@/api/admin/maintenance/cloudflare-usage';
 import { classifyApiFailure } from '@/api/config';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -27,6 +27,7 @@ import type { Overview, UsageDays } from './usage-types';
 import { dateText, hasQuota, metricName, warningKey } from './usage-format';
 import { MetricDetailsDialog, UsageCosts, UsageDetails, UsageMetricCard } from './UsagePanels';
 import UsageTrend from './UsageTrend';
+import UsageSummary from './UsageSummary';
 
 const MapWorkspace = lazy(() => import('../map-workspace/MapWorkspace'));
 
@@ -48,10 +49,10 @@ export default function HomePage() {
     );
   }
 
-  return <UsageHomePage />;
+  return <UsageHomePage summaryOnly={searchParams.get('view') !== 'usage'} />;
 }
 
-function UsageHomePage() {
+function UsageHomePage({ summaryOnly }: { summaryOnly: boolean }) {
   const t = useTranslation();
   const { permissionCodes, loading: permissionsLoading } = usePermission();
   const allowed = permissionCodes.has(permissions.admin.maintenance.cloudflare_usage.read);
@@ -72,6 +73,11 @@ function UsageHomePage() {
   const refreshLock = useRef(false);
   const refreshController = useRef<AbortController | null>(null);
   const unknown = t('home.usage.unknown');
+  const requestDays = summaryOnly ? 1 : days;
+
+  useEffect(() => {
+    if (summaryOnly) setDetailId(null);
+  }, [summaryOnly]);
 
   useEffect(() => {
     const requestGeneration = ++generation.current;
@@ -87,7 +93,7 @@ function UsageHomePage() {
     setLoading(true);
     setError(undefined);
     void overviewFn({
-      data: { days },
+      data: { days: requestDays },
       signal: abort.signal,
       ignoreAbort: true,
       errorPresentation: 'local',
@@ -130,7 +136,7 @@ function UsageHomePage() {
       refreshController.current?.abort();
       unsubscribe();
     };
-  }, [allowed, days, revision, t]);
+  }, [allowed, requestDays, revision, t]);
 
   const refresh = async () => {
     if (!mayRefresh || refreshLock.current) return;
@@ -187,7 +193,10 @@ function UsageHomePage() {
   const stale = metrics.some((metric) => metric.status === 'stale');
 
   return (
-    <Stack spacing={2} sx={{ maxWidth: 1500, mx: 'auto', minWidth: 0, color: 'text.primary' }}>
+    <Stack
+      spacing={2}
+      sx={{ maxWidth: summaryOnly ? 960 : 1500, mx: 'auto', minWidth: 0, color: 'text.primary' }}
+    >
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={1.5}
@@ -195,9 +204,9 @@ function UsageHomePage() {
       >
         <Box sx={{ minWidth: 0 }}>
           <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
-            {allowed ? t('home.usage.title') : t('home.title')}
+            {allowed && !summaryOnly ? t('home.usage.title') : t('home.title')}
           </Typography>
-          {allowed && data && (
+          {allowed && data && !summaryOnly && (
             <Typography variant="caption" color="text.secondary" sx={{ overflowWrap: 'anywhere' }}>
               {data.account?.name ?? data.account?.id ?? t('home.usage.noAccount')}
               {' · '}
@@ -211,6 +220,11 @@ function UsageHomePage() {
           useFlexGap
           sx={{ alignItems: 'center', flexShrink: 0, flexWrap: 'wrap', maxWidth: '100%' }}
         >
+          {!summaryOnly && (
+            <Button component={RouterLink} to="/home" startIcon={<ArrowBack />} size="small">
+              {t('home.usage.summary.back')}
+            </Button>
+          )}
           <Button
             component={RouterLink}
             to="/home?view=map"
@@ -229,7 +243,7 @@ function UsageHomePage() {
               {t('home.openChat')}
             </Button>
           )}
-          {mayRefresh && (
+          {mayRefresh && !summaryOnly && (
             <Button
               variant="outlined"
               size="small"
@@ -268,158 +282,169 @@ function UsageHomePage() {
               {error}
             </Alert>
           )}
-          {refreshMessage && <Alert severity="info">{refreshMessage}</Alert>}
-          {data && (
-            <>
-              {data.configuration !== 'configured' && (
-                <Alert severity="info">{t('home.usage.configuration.' + data.configuration)}</Alert>
-              )}
-              <Stack
-                direction="row"
-                spacing={1}
-                useFlexGap
-                sx={{ flexWrap: 'wrap', alignItems: 'center' }}
-              >
-                <Chip
-                  size="small"
-                  label={t('home.usage.sync.' + data.sync.state)}
-                  color={
-                    data.sync.state === 'failed'
-                      ? 'error'
-                      : data.sync.state === 'partial'
-                        ? 'warning'
-                        : 'default'
-                  }
-                />
-                <Typography variant="caption" color="text.secondary">
-                  {t('home.usage.verifiedQuotas', {
-                    count: knownQuotaCount,
-                    total: metrics.length,
-                  })}
-                </Typography>
-                {highUsageCount > 0 && (
+          {refreshMessage && !summaryOnly && <Alert severity="info">{refreshMessage}</Alert>}
+          {data &&
+            (summaryOnly ? (
+              <UsageSummary data={data} onSelect={setMetricId} />
+            ) : (
+              <>
+                {data.configuration !== 'configured' && (
+                  <Alert severity="info">
+                    {t('home.usage.configuration.' + data.configuration)}
+                  </Alert>
+                )}
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  useFlexGap
+                  sx={{ flexWrap: 'wrap', alignItems: 'center' }}
+                >
                   <Chip
                     size="small"
-                    color="warning"
-                    label={t('home.usage.attentionCount', { count: highUsageCount })}
+                    label={t('home.usage.sync.' + data.sync.state)}
+                    color={
+                      data.sync.state === 'failed'
+                        ? 'error'
+                        : data.sync.state === 'partial'
+                          ? 'warning'
+                          : 'default'
+                    }
                   />
-                )}
-              </Stack>
-              {(data.sync.state === 'failed' || stale) && (
-                <Alert severity="warning">
-                  {t(
-                    data.sync.state === 'failed'
-                      ? 'home.usage.syncFailedShort'
-                      : 'home.usage.staleShort',
-                  )}
-                </Alert>
-              )}
-              <UsageCosts data={data} />
-              <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 }, minWidth: 0 }}>
-                <Stack spacing={1.5}>
-                  <Stack
-                    direction={{ xs: 'column', md: 'row' }}
-                    spacing={1.5}
-                    sx={{ justifyContent: 'space-between', alignItems: { md: 'center' } }}
-                  >
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                        {t('home.usage.trend')}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('home.usage.rangeHelp')}
-                      </Typography>
-                    </Box>
-                    <Stack
-                      direction={{ xs: 'column', sm: 'row' }}
-                      spacing={1.5}
-                      sx={{ minWidth: 0, alignItems: { sm: 'center' } }}
-                    >
-                      {selectedMetric && (
-                        <FormControl
-                          size="small"
-                          sx={{ minWidth: { xs: 0, sm: 200 }, maxWidth: { xs: '100%', sm: 340 } }}
-                        >
-                          <InputLabel id="trend-metric-label">{t('home.usage.metric')}</InputLabel>
-                          <Select
-                            labelId="trend-metric-label"
-                            label={t('home.usage.metric')}
-                            value={selectedMetric.id}
-                            onChange={(event) => setMetricId(event.target.value)}
-                          >
-                            {metrics.map((metric) => (
-                              <MenuItem value={metric.id} key={metric.id}>
-                                {metric.product} · {metricName(metric, t)} ({metric.unit})
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      )}
-                      <ToggleButtonGroup
-                        exclusive
-                        value={days}
-                        size="small"
-                        aria-label={t('home.usage.range')}
-                        onChange={(_, value: UsageDays | null) => {
-                          if (value !== null) setDays(value);
-                        }}
-                        sx={{ flexShrink: 0, alignSelf: { xs: 'flex-start', sm: 'auto' } }}
-                      >
-                        {([1, 3, 7, 30] as const).map((value) => (
-                          <ToggleButton key={value} value={value}>
-                            {t('home.usage.days' + value)}
-                          </ToggleButton>
-                        ))}
-                      </ToggleButtonGroup>
-                    </Stack>
-                  </Stack>
-                  {selectedMetric ? (
-                    <UsageTrend
-                      metric={selectedMetric}
-                      history={data.history.filter((point) => point.metricId === selectedMetric.id)}
-                      days={days}
+                  <Typography variant="caption" color="text.secondary">
+                    {t('home.usage.verifiedQuotas', {
+                      count: knownQuotaCount,
+                      total: metrics.length,
+                    })}
+                  </Typography>
+                  {highUsageCount > 0 && (
+                    <Chip
+                      size="small"
+                      color="warning"
+                      label={t('home.usage.attentionCount', { count: highUsageCount })}
                     />
-                  ) : (
-                    <Typography color="text.secondary">{t('home.usage.noHistory')}</Typography>
                   )}
                 </Stack>
-              </Paper>
-              <Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                  {t('home.usage.allMetrics')}
-                </Typography>
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: {
-                      xs: '1fr',
-                      sm: 'repeat(2, minmax(0, 1fr))',
-                      lg: 'repeat(3, minmax(0, 1fr))',
-                      xl: 'repeat(4, minmax(0, 1fr))',
-                    },
-                    gap: 1.5,
-                  }}
-                >
-                  {metrics.map((metric) => (
-                    <UsageMetricCard
-                      key={metric.id}
-                      metric={metric}
-                      selected={selectedMetric?.id === metric.id}
-                      onSelect={() => setMetricId(metric.id)}
-                      onDetails={() => setDetailId(metric.id)}
-                    />
-                  ))}
+                {(data.sync.state === 'failed' || stale) && (
+                  <Alert severity="warning">
+                    {t(
+                      data.sync.state === 'failed'
+                        ? 'home.usage.syncFailedShort'
+                        : 'home.usage.staleShort',
+                    )}
+                  </Alert>
+                )}
+                <UsageCosts data={data} />
+                <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 }, minWidth: 0 }}>
+                  <Stack spacing={1.5}>
+                    <Stack
+                      direction={{ xs: 'column', md: 'row' }}
+                      spacing={1.5}
+                      sx={{ justifyContent: 'space-between', alignItems: { md: 'center' } }}
+                    >
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                          {t('home.usage.trend')}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('home.usage.rangeHelp')}
+                        </Typography>
+                      </Box>
+                      <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={1.5}
+                        sx={{ minWidth: 0, alignItems: { sm: 'center' } }}
+                      >
+                        {selectedMetric && (
+                          <FormControl
+                            size="small"
+                            sx={{ minWidth: { xs: 0, sm: 200 }, maxWidth: { xs: '100%', sm: 340 } }}
+                          >
+                            <InputLabel id="trend-metric-label">
+                              {t('home.usage.metric')}
+                            </InputLabel>
+                            <Select
+                              labelId="trend-metric-label"
+                              label={t('home.usage.metric')}
+                              value={selectedMetric.id}
+                              onChange={(event) => setMetricId(event.target.value)}
+                            >
+                              {metrics.map((metric) => (
+                                <MenuItem value={metric.id} key={metric.id}>
+                                  {metric.product} · {metricName(metric, t)} ({metric.unit})
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
+                        <ToggleButtonGroup
+                          exclusive
+                          value={days}
+                          size="small"
+                          aria-label={t('home.usage.range')}
+                          onChange={(_, value: UsageDays | null) => {
+                            if (value !== null) setDays(value);
+                          }}
+                          sx={{ flexShrink: 0, alignSelf: { xs: 'flex-start', sm: 'auto' } }}
+                        >
+                          {([1, 3, 7, 30] as const).map((value) => (
+                            <ToggleButton key={value} value={value}>
+                              {t('home.usage.days' + value)}
+                            </ToggleButton>
+                          ))}
+                        </ToggleButtonGroup>
+                      </Stack>
+                    </Stack>
+                    {selectedMetric ? (
+                      <UsageTrend
+                        metric={selectedMetric}
+                        history={data.history.filter(
+                          (point) => point.metricId === selectedMetric.id,
+                        )}
+                        days={days}
+                      />
+                    ) : (
+                      <Typography color="text.secondary">{t('home.usage.noHistory')}</Typography>
+                    )}
+                  </Stack>
+                </Paper>
+                <Box>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                    {t('home.usage.allMetrics')}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: {
+                        xs: '1fr',
+                        sm: 'repeat(2, minmax(0, 1fr))',
+                        lg: 'repeat(3, minmax(0, 1fr))',
+                        xl: 'repeat(4, minmax(0, 1fr))',
+                      },
+                      gap: 1.5,
+                    }}
+                  >
+                    {metrics.map((metric) => (
+                      <UsageMetricCard
+                        key={metric.id}
+                        metric={metric}
+                        selected={selectedMetric?.id === metric.id}
+                        onSelect={() => setMetricId(metric.id)}
+                        onDetails={() => setDetailId(metric.id)}
+                      />
+                    ))}
+                  </Box>
+                  {metrics.length === 0 && (
+                    <Alert severity="info">{t('home.usage.noMetrics')}</Alert>
+                  )}
                 </Box>
-                {metrics.length === 0 && <Alert severity="info">{t('home.usage.noMetrics')}</Alert>}
-              </Box>
-              <UsageDetails
-                data={data}
-                coverageExpanded={coverageExpanded}
-                onCoverageChange={setCoverageExpanded}
-              />
-              <MetricDetailsDialog metric={detailMetric} onClose={() => setDetailId(null)} />
-            </>
-          )}
+                <UsageDetails
+                  data={data}
+                  coverageExpanded={coverageExpanded}
+                  onCoverageChange={setCoverageExpanded}
+                />
+                <MetricDetailsDialog metric={detailMetric} onClose={() => setDetailId(null)} />
+              </>
+            ))}
         </>
       )}
     </Stack>

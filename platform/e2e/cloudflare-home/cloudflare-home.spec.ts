@@ -173,6 +173,11 @@ test('homepage stays available without usage permission and sends no usage reque
   expect(fixture.overviewRequests).toHaveLength(0);
   expect(fixture.modelRequests).toBe(0);
   await expect(page.getByRole('button', { name: 'Request refresh' })).toHaveCount(0);
+  await page.goto('/#/home?view=usage');
+  await expect(page.getByRole('heading', { name: 'Welcome', exact: true })).toBeVisible();
+  await expect(page.getByTestId('usage-summary')).toHaveCount(0);
+  await expect(page.getByTestId('usage-trend')).toHaveCount(0);
+  expect(fixture.overviewRequests).toHaveLength(0);
 });
 
 test('compact overview keeps important risks and cost groups visible while diagnostics start collapsed', async ({
@@ -180,7 +185,7 @@ test('compact overview keeps important risks and cost groups visible while diagn
 }, testInfo) => {
   await page.clock.setFixedTime(new Date(usageFixtureNow));
   const fixture = await installCloudflareHomeFixture(page);
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await expect(page.getByText(/Fixture account/)).toBeVisible();
   const cards = page.getByTestId('usage-card');
   await expect(cards).toHaveCount(4);
@@ -220,7 +225,7 @@ test('technical details are available through keyboard disclosures and an access
 }) => {
   await page.clock.setFixedTime(new Date(usageFixtureNow));
   await installCloudflareHomeFixture(page);
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   const coverage = page.getByRole('button', { name: 'Coverage and limitations', exact: true });
   await coverage.press('Enter');
   await expect(coverage).toHaveAttribute('aria-expanded', 'true');
@@ -247,7 +252,7 @@ test('daily trend preserves gaps, shows both thresholds and keeps above-limit po
 }) => {
   await page.clock.setFixedTime(new Date(usageFixtureNow));
   await installCloudflareHomeFixture(page, { overview: dailyUsageOverview() });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await expect(
     page.getByRole('img', { name: 'Daily usage (requests)', exact: true }),
   ).toBeVisible();
@@ -271,7 +276,7 @@ test('one and three day filters request UTC windows without changing the current
 }) => {
   await page.clock.setFixedTime(new Date(usageFixtureNow));
   const fixture = await installCloudflareHomeFixture(page, { overview: dailyUsageOverview() });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await expect(page.getByTestId('usage-trend-point')).toHaveCount(5);
   await chooseUsageRange(page, 1);
   await expect.poll(() => fixture.overviewRequests.at(-1)?.days).toBe(1);
@@ -294,7 +299,7 @@ test('billing-cycle trend uses observed cumulative points without adding daily o
 }) => {
   await page.clock.setFixedTime(new Date(usageFixtureNow));
   await installCloudflareHomeFixture(page, { overview: cumulativeUsageOverview() });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await chooseUsageRange(page, 30);
   await expect(
     page.getByRole('img', { name: 'Cumulative usage (requests)', exact: true }),
@@ -319,7 +324,7 @@ test('a billing metric without observations starts at its known current total in
     (point) => !point.source.startsWith('quota-observation:'),
   );
   await installCloudflareHomeFixture(page, { overview });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await expect(
     page.getByRole('img', { name: 'Cumulative usage (requests)', exact: true }),
   ).toBeVisible();
@@ -334,7 +339,7 @@ test('current capacity stays a current point and is not accumulated from histori
 }) => {
   await page.clock.setFixedTime(new Date(usageFixtureNow));
   await installCloudflareHomeFixture(page, { overview: capacityUsageOverview() });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await expect(page.getByRole('img', { name: 'Current capacity (GB)', exact: true })).toBeVisible();
   await expect(page.getByTestId('usage-trend-point')).toHaveCount(1);
   await expect(page.getByTestId('usage-trend-point')).toHaveAttribute('data-value', '6');
@@ -358,7 +363,7 @@ test('unknown quota and stale estimates remain explicit without invented thresho
     reason: 'Fixture stale source diagnostics',
   };
   await installCloudflareHomeFixture(page, { overview });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   const card = page.getByTestId('usage-card');
   await expect(card.getByText('Unknown quota', { exact: true })).toBeVisible();
   await expect(card.getByText('Estimated', { exact: true })).toBeVisible();
@@ -382,7 +387,7 @@ test('a known quota with unknown consumption does not reuse an old percentage or
   };
   overview.history = [];
   await installCloudflareHomeFixture(page, { overview });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   const card = page.getByTestId('usage-card');
   await expect(card.getByText('Unknown requests', { exact: true })).toBeVisible();
   await expect(card).toContainText('Hard limit: 100');
@@ -406,7 +411,7 @@ test('a previous-period value stays labelled and cannot create current-quota pro
     collectedTimeUtc: usageFixtureNow - 86_400_000,
   };
   await installCloudflareHomeFixture(page, { overview });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   const card = page.getByTestId('usage-card');
   await expect(card.getByText('Previous period', { exact: true })).toBeVisible();
   await expect(card.getByText('120 requests', { exact: true })).toBeVisible();
@@ -434,7 +439,7 @@ test('a failed range read retains the last snapshot and allows one local reload'
       body: JSON.stringify({ ok: false, message: 'Fixture read unavailable' }),
     });
   });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await expect(page.getByTestId('usage-trend-point')).toHaveCount(5);
   rejectRead = true;
   await chooseUsageRange(page, 3);
@@ -457,7 +462,7 @@ test('a failed range read retains the last snapshot and allows one local reload'
 test('identity revision clears an open metric detail dialog', async ({ page }) => {
   await page.clock.setFixedTime(new Date(usageFixtureNow));
   await installCloudflareHomeFixture(page);
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await page.getByRole('button', { name: 'View details: Requests', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: /^Metric details/ });
   await expect(dialog).toBeVisible();
@@ -486,7 +491,7 @@ test('manual refresh requires update permission and missing configuration stays 
       'admin.maintenance.cloudflare_usage:update',
     ],
   });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await expect(page.getByText(/Cloudflare usage collection is not configured/)).toBeVisible();
   await expect(
     page.getByText(/Charges are unavailable; this does not mean zero charges/),
@@ -513,7 +518,7 @@ test('cost totals separate bases and never combine charges with unknown periods 
     { ...base, id: 'unknown-basis-two', amount: '0.06', status: 'provider_future_basis' },
   ];
   await installCloudflareHomeFixture(page, { overview });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   const groups = page.getByTestId('usage-cost-group');
   await expect(groups).toHaveCount(6);
   await expect(groups.filter({ hasText: 'USD 0.30' })).toContainText('Billed cost basis');
@@ -539,7 +544,7 @@ test('mobile viewport keeps the dashboard inside the page', async ({ page }, tes
     reason: longReason,
   });
   const fixture = await installCloudflareHomeFixture(page, { overview });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await expect(page.getByText(/Fixture account/)).toBeVisible();
   await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -580,7 +585,7 @@ test('Chinese dashboard translates short ranges and cumulative chart without exp
     overview: cumulativeUsageOverview(),
     langCode: 'zh-CN',
   });
-  await page.goto('/#/home');
+  await page.goto('/#/home?view=usage');
   await expect(
     page.getByRole('heading', { name: 'Cloudflare 用量总览', exact: true }),
   ).toBeVisible();

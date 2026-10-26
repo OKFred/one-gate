@@ -335,9 +335,14 @@ export async function installCloudflareHomeFixture(
   }, options.langCode ?? 'en-US');
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
-    if (/\/(enterprise|personal)\/remoteEntry\.js$/u.test(url.pathname)) {
+    if (
+      /\/(enterprise|personal)\/remoteEntry\.js$/u.test(url.pathname) ||
+      (url.pathname === '/remoteEntry.js' &&
+        ['gate-enterprise.this-time.com', 'gate-personal.this-time.com'].includes(url.hostname))
+    ) {
       await route.fulfill({
         contentType: 'application/javascript',
+        headers: { 'access-control-allow-origin': '*' },
         body: 'export const init = () => {}; export const get = async () => () => ({ default: () => null });',
       });
       return;

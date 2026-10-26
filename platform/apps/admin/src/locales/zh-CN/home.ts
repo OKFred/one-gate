@@ -2,6 +2,14 @@
  * admin app — 首页文案
  */
 export const home = {
+  'home.usage.summary.open': '查看详情',
+  'home.usage.summary.back': '返回首页',
+  'home.usage.summary.costGroups': '{{count}} 个费用分组',
+  'home.usage.summary.unavailable': '暂不可用',
+  'home.usage.summary.notConfigured': '尚未配置',
+  'home.usage.summary.partial': '部分数据不可用',
+  'home.usage.summary.incomplete': '部分数据待确认',
+  'home.usage.summary.noMetrics': '暂无用量数据',
   'home.title': '欢迎使用',
   'home.subtitle': '一站式信息管理解决方案',
   'quickStart.accounts': '邮件账户',

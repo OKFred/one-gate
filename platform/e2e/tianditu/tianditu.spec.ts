@@ -76,15 +76,19 @@ test('a 320px home header wraps all authorized actions without preloading the ma
     ],
   });
   await page.goto('/#/home');
-  await expect(page.getByText(/Fixture account/)).toBeVisible();
+  await expect(page.getByTestId('usage-summary')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Open map', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Open AI chat', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Request refresh', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Request refresh', exact: true })).toHaveCount(0);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
     ),
   ).toBe(true);
+  expect(fixture.configRequests).toHaveLength(0);
+  expect(fixture.tileRequests).toHaveLength(0);
+  await page.getByRole('link', { name: 'View usage details', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Request refresh', exact: true })).toBeVisible();
   expect(fixture.configRequests).toHaveLength(0);
   expect(fixture.tileRequests).toHaveLength(0);
 });

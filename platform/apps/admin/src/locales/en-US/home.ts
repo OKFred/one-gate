@@ -1,4 +1,12 @@
 export const home = {
+  'home.usage.summary.open': 'View usage details',
+  'home.usage.summary.back': 'Back to home',
+  'home.usage.summary.costGroups': '{{count}} charge groups',
+  'home.usage.summary.unavailable': 'Unavailable',
+  'home.usage.summary.notConfigured': 'Not configured',
+  'home.usage.summary.partial': 'Some data unavailable',
+  'home.usage.summary.incomplete': 'Some data needs verification',
+  'home.usage.summary.noMetrics': 'No usage data yet',
   'home.title': 'Welcome',
   'home.subtitle': 'All-in-one information management solution',
   'quickStart.accounts': 'Mail Accounts',
