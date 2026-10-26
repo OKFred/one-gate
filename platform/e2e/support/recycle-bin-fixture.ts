@@ -151,6 +151,11 @@ export async function installRecycleBinFixture(
       body: JSON.stringify({ ok: false, message: 'Unexpected fixture API request' }),
     });
   });
+  await page.route('**/api/v1/personal/calendar/due', (route) =>
+    route.fulfill(
+      fulfillOk({ list: [], hasMore: false, nextReminderTimeUtc: null, serverTimeUtc: Date.now() }),
+    ),
+  );
   await page.route('**/api/v1/admin/i18n/translation/listAll', (route) =>
     route.fulfill(
       fulfillOk([
