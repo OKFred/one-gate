@@ -31,6 +31,17 @@ const cloudflareMigrationSql = readFileSync(
 const cloudflareMigrationChecksum = createHash("sha256")
   .update(cloudflareMigrationSql)
   .digest("hex");
+const calendarMigrationId = "0003_personal_calendar";
+const calendarMigrationSql = readFileSync(
+  new URL(
+    "../../apps/server/postgresql-migrations/0003_personal_calendar.sql",
+    import.meta.url
+  ),
+  "utf8"
+);
+const calendarMigrationChecksum = createHash("sha256")
+  .update(calendarMigrationSql)
+  .digest("hex");
 
 function migrationTableNames(sql: string): string[] {
   return [...sql.matchAll(/^CREATE TABLE "([a-z0-9_]+)" \(/gm)]
@@ -53,6 +64,16 @@ export const postgresMigrations = [
     tableNames: [
       ...migrationTableNames(postgresMigrationSql),
       ...migrationTableNames(cloudflareMigrationSql),
+    ].sort(),
+  },
+  {
+    id: calendarMigrationId,
+    sql: calendarMigrationSql,
+    checksum: calendarMigrationChecksum,
+    tableNames: [
+      ...migrationTableNames(postgresMigrationSql),
+      ...migrationTableNames(cloudflareMigrationSql),
+      ...migrationTableNames(calendarMigrationSql),
     ].sort(),
   },
 ] as const;

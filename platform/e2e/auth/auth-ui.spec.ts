@@ -47,6 +47,15 @@ async function installSessionFixture(page: Page) {
           { id: 3, name: 'sidebar.menu.ai.chat', path: '/admin/ai/chat', children: [] },
         ]),
       );
+    } else if (pathname.endsWith('/personal/calendar/due')) {
+      await route.fulfill(
+        fulfillOk({
+          list: [],
+          hasMore: false,
+          nextReminderTimeUtc: null,
+          serverTimeUtc: Date.now(),
+        }),
+      );
     } else if (pathname.endsWith('/auth/check')) {
       await route.fulfill(fulfillOk(true));
     } else if (pathname.endsWith('/ai/chat/models')) {

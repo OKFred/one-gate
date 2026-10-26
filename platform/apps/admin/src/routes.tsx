@@ -3,6 +3,7 @@ import { lazy, Suspense, type ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import RootRedirect from '@/components/RootRedirect';
+import CalendarReminderHost from './components/CalendarReminderHost';
 
 const modules = import.meta.glob('./pages/**/index.tsx');
 export const loginPath = '/login';
@@ -34,7 +35,7 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
       </Suspense>
     );
 
-    const isRootException = routePath === 'home' || routePath === 'me';
+    const isRootException = routePath === 'home' || routePath === 'me' || routePath === 'calendar';
     const finalPath = isRootException
       ? routePath
       : routePath.startsWith('admin/')
@@ -102,6 +103,7 @@ export default function AppRoutes() {
       element: (
         <ProtectedRoute>
           <Layout />
+          <CalendarReminderHost />
         </ProtectedRoute>
       ),
       children: childrenRoutes,

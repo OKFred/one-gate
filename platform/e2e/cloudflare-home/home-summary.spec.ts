@@ -248,6 +248,7 @@ test('a late detail response cannot overwrite the newer summary snapshot', async
     { ...fixture.overview.metrics[0], used: 10, remaining: 90, percentage: 10 },
   ];
   await page.getByRole('link', { name: 'Back to home', exact: true }).click();
+  await expect(page.getByTestId('usage-summary-row')).toHaveCount(1);
   await expect(page.getByTestId('usage-summary-row')).toContainText('10%');
   release();
   await expect.poll(() => detailFinished).toBe(true);

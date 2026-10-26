@@ -21552,6 +21552,412 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personal/calendar/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** List private calendar events */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.calendar.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.calendar.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/calendar/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read a private calendar event */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.calendar.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.calendar.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/calendar/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a private calendar event */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.calendar.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.calendar.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/calendar/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update a private calendar event */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.calendar.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.calendar.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/calendar/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a private calendar event */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.calendar.cancel.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.calendar.cancel.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/calendar/due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read due private calendar reminders */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.calendar.due.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.calendar.due.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/calendar/ack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Acknowledge a private calendar reminder */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.calendar.ack.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.calendar.ack.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -35420,6 +35826,183 @@ export interface components {
                     creatorName?: ((string | null) | null) | null;
                     updaterName?: ((string | null) | null) | null;
                 }[];
+            };
+            message: string;
+        };
+        "personal.calendar.list.req": {
+            fromTimeUtc: number;
+            toTimeUtc: number;
+        };
+        "personal.calendar.list.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: string;
+                    title: string;
+                    description: string | null;
+                    url: string | null;
+                    startTimeUtc: number;
+                    endTimeUtc: number | null;
+                    timeZone: string;
+                    reminderTimeUtc: number | null;
+                    reminderAcknowledgedTimeUtc: number | null;
+                    /** @enum {string} */
+                    status: "active" | "cancelled";
+                    version: number;
+                    createTimeUtc: number;
+                    updateTimeUtc: number;
+                }[];
+                hasMore: boolean;
+                upcoming: {
+                    id: string;
+                    title: string;
+                    description: string | null;
+                    url: string | null;
+                    startTimeUtc: number;
+                    endTimeUtc: number | null;
+                    timeZone: string;
+                    reminderTimeUtc: number | null;
+                    reminderAcknowledgedTimeUtc: number | null;
+                    /** @enum {string} */
+                    status: "active" | "cancelled";
+                    version: number;
+                    createTimeUtc: number;
+                    updateTimeUtc: number;
+                }[];
+            };
+            message: string;
+        };
+        "personal.calendar.get.req": {
+            id: string;
+        };
+        "personal.calendar.get.res": {
+            ok: boolean;
+            data: {
+                id: string;
+                title: string;
+                description: string | null;
+                url: string | null;
+                startTimeUtc: number;
+                endTimeUtc: number | null;
+                timeZone: string;
+                reminderTimeUtc: number | null;
+                reminderAcknowledgedTimeUtc: number | null;
+                /** @enum {string} */
+                status: "active" | "cancelled";
+                version: number;
+                createTimeUtc: number;
+                updateTimeUtc: number;
+            };
+            message: string;
+        };
+        "personal.calendar.add.req": {
+            requestKey: string;
+            title: string;
+            description?: string | null;
+            url?: string | null;
+            startTimeUtc: number;
+            endTimeUtc?: number | null;
+            timeZone: string;
+            reminderTimeUtc?: number | null;
+        };
+        "personal.calendar.add.res": {
+            ok: boolean;
+            data: {
+                id: string;
+                title: string;
+                description: string | null;
+                url: string | null;
+                startTimeUtc: number;
+                endTimeUtc: number | null;
+                timeZone: string;
+                reminderTimeUtc: number | null;
+                reminderAcknowledgedTimeUtc: number | null;
+                /** @enum {string} */
+                status: "active" | "cancelled";
+                version: number;
+                createTimeUtc: number;
+                updateTimeUtc: number;
+            };
+            message: string;
+        };
+        "personal.calendar.update.req": {
+            id: string;
+            expectedVersion: number;
+            title: string;
+            description: string | null;
+            url: string | null;
+            startTimeUtc: number;
+            endTimeUtc: number | null;
+            timeZone: string;
+            reminderTimeUtc: number | null;
+        };
+        "personal.calendar.update.res": {
+            ok: boolean;
+            data: {
+                id: string;
+                title: string;
+                description: string | null;
+                url: string | null;
+                startTimeUtc: number;
+                endTimeUtc: number | null;
+                timeZone: string;
+                reminderTimeUtc: number | null;
+                reminderAcknowledgedTimeUtc: number | null;
+                /** @enum {string} */
+                status: "active" | "cancelled";
+                version: number;
+                createTimeUtc: number;
+                updateTimeUtc: number;
+            };
+            message: string;
+        };
+        "personal.calendar.cancel.req": {
+            id: string;
+            expectedVersion: number;
+        };
+        "personal.calendar.cancel.res": {
+            ok: boolean;
+            data: {
+                id: string;
+            };
+            message: string;
+        };
+        "personal.calendar.due.req": Record<string, never>;
+        "personal.calendar.due.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: string;
+                    title: string;
+                    description: string | null;
+                    url: string | null;
+                    startTimeUtc: number;
+                    endTimeUtc: number | null;
+                    timeZone: string;
+                    reminderTimeUtc: number | null;
+                    reminderAcknowledgedTimeUtc: number | null;
+                    /** @enum {string} */
+                    status: "active" | "cancelled";
+                    version: number;
+                    createTimeUtc: number;
+                    updateTimeUtc: number;
+                }[];
+                hasMore: boolean;
+                nextReminderTimeUtc: number | null;
+                serverTimeUtc: number;
+            };
+            message: string;
+        };
+        "personal.calendar.ack.req": {
+            id: string;
+            expectedVersion: number;
+            expectedReminderTimeUtc: number;
+        };
+        "personal.calendar.ack.res": {
+            ok: boolean;
+            data: {
+                id: string;
+                acknowledgedTimeUtc: number;
             };
             message: string;
         };

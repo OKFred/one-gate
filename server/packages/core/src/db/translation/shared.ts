@@ -7,6 +7,39 @@ export const sharedTranslations = {
   components: [],
   common: [],
   "business.exception": [
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.calendar.invalidInput",
+      langCodes: {
+        "zh-CN": "日程信息或时间无效，请检查输入",
+        "en-US": "The event details or times are invalid; check your input",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.calendar.notFound",
+      langCodes: {
+        "zh-CN": "日程不存在或无权访问",
+        "en-US": "The event does not exist or is not accessible",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.calendar.stateConflict",
+      langCodes: {
+        "zh-CN": "日程或提醒已变更，请刷新后重试",
+        "en-US": "The event or reminder has changed; refresh and try again",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.calendar.requestConflict",
+      langCodes: {
+        "zh-CN": "这次创建请求已被使用，请刷新查看原日程",
+        "en-US":
+          "This creation request has already been used; refresh to view the original event",
+      },
+    },
     ...Object.values(CLOUDFLARE_LIMIT_PRESENTATIONS).map((presentation) => ({
       application: "backend" as const,
       tKey: presentation.i18nKey,
