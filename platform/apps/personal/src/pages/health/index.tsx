@@ -12,18 +12,8 @@ export default function HealthPage() {
   const t = useTranslation();
 
   return (
-    <PageLayout title={t('personal.health.title')}>
+    <PageLayout title={t('sidebar.menu.personal.health')}>
       <Box sx={{ maxWidth: 1400, mx: 'auto', minWidth: 0 }} data-testid="health-page">
-        <Typography
-          component="h1"
-          variant="h4"
-          sx={{ fontWeight: 700, mb: 0.75, fontSize: { xs: 28, sm: 36 } }}
-        >
-          {t('personal.health.title')}
-        </Typography>
-        <Typography color="text.secondary" sx={{ mb: 3, fontSize: { xs: 16, sm: 20 } }}>
-          {t('personal.health.subtitle')}
-        </Typography>
         <Box
           sx={{
             display: 'grid',

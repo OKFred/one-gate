@@ -1,6 +1,4 @@
 export const health = {
-  'personal.health.title': '健康档案',
-  'personal.health.subtitle': '记录就诊、检查与用药',
   'personal.health.reference': '身体部位参考',
   'personal.health.referenceHelp': '仅作参考入口，不按部位筛选记录。',
   'personal.health.referenceEmpty': '记录尚未关联身体部位。可通过类别和搜索查找已有档案。',
