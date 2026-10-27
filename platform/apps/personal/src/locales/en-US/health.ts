@@ -1,6 +1,4 @@
 export const health = {
-  'personal.health.title': 'Health records',
-  'personal.health.subtitle': 'Keep visits, examinations and prescriptions together',
   'personal.health.reference': 'Body reference',
   'personal.health.referenceHelp': 'Reference only; these areas do not filter your records.',
   'personal.health.referenceEmpty':
