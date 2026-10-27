@@ -77,6 +77,7 @@ export const BUSINESS = {
   personal: "personal",
   /** 私人日历 */
   "personal.calendar": "personal.calendar",
+  "personal.calendar.subscription": "personal.calendar.subscription",
 
   /** 个人中心-账号配置 */
   "personal.base": "personal.base",

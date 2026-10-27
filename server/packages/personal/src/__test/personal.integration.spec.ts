@@ -31,7 +31,13 @@ describe("Personal 个人应用全模块集成测试与 Mock 数据验证", () =
     "system_user",
   ];
 
-  const userObj = { id: 1, userId: 1, userName: "Admin" } as unknown as UserObj;
+  const userObj = {
+    principal: { kind: "user", userId: 1 },
+    id: 1,
+    userId: 1,
+    userName: "Admin",
+    username: "Admin",
+  } as unknown as UserObj;
 
   beforeAll(async () => {
     await setupTestDb(db, [
@@ -130,7 +136,7 @@ describe("Personal 个人应用全模块集成测试与 Mock 数据验证", () =
       );
 
       // 5. 删除记录
-      await healthService.delete.service({ id: res1.id });
+      await healthService.delete.service({ id: res1.id }, userObj);
       const afterDelete = await healthService.list.service(
         { pageNo: 1, pageSize: 50 },
         userObj

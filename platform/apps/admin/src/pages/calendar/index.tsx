@@ -23,6 +23,7 @@ import { notifyCalendarChanged, subscribeCalendarChanges } from '@/api/personal/
 import { useTranslation } from '@/hooks/useTranslation';
 import { captureAuthSession, isCurrentAuthSession, subscribeAuthChanges } from '@/utils/auth';
 import EventForm from './EventForm';
+import SubscriptionDialog from './SubscriptionDialog';
 import { calendarFailureKey } from './calendar-errors';
 import {
   calendarDay,
@@ -41,6 +42,8 @@ export default function CalendarPage() {
   const selectedDay = validCalendarDay(searchParams.get('date')) ?? calendarDay();
   const month = calendarMonth(selectedDay);
   const [singleDay, setSingleDay] = useState(false);
+  const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+  const closeSubscription = useCallback(() => setSubscriptionOpen(false), []);
   const [data, setData] = useState<CalendarList | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -164,9 +167,9 @@ export default function CalendarPage() {
   return (
     <Stack spacing={2} sx={{ maxWidth: 1100, mx: 'auto', minWidth: 0 }} data-testid="calendar-page">
       <Stack
-        direction="row"
+        direction={{ xs: 'column', sm: 'row' }}
         spacing={1}
-        sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+        sx={{ alignItems: { xs: 'stretch', sm: 'center' }, justifyContent: 'space-between' }}
       >
         <Box>
           <Typography component="h1" variant="h5" sx={{ fontWeight: 600 }}>
@@ -176,15 +179,25 @@ export default function CalendarPage() {
             {t('calendar.private')}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          data-testid="calendar-new-event"
-          onClick={() => setForm({ key: crypto.randomUUID(), event: null })}
-        >
-          {t('calendar.new')}
-        </Button>
+        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+          <Button
+            variant="outlined"
+            data-testid="calendar-subscription-open"
+            onClick={() => setSubscriptionOpen(true)}
+          >
+            {t('calendar.subscription.open')}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            data-testid="calendar-new-event"
+            onClick={() => setForm({ key: crypto.randomUUID(), event: null })}
+          >
+            {t('calendar.new')}
+          </Button>
+        </Stack>
       </Stack>
+      {subscriptionOpen && <SubscriptionDialog onClose={closeSubscription} />}
       {notice && (
         <Alert severity="success" onClose={() => setNotice(null)}>
           {t(notice)}

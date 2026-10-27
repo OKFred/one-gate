@@ -16,5 +16,6 @@ export * from "../../packages/admin/src/maintenance/compliance/schema.pg";
 export * from "../../packages/admin/src/maintenance/cloudflare-usage/schema.pg";
 export * from "../../packages/personal/src/base/user_config/schema.pg";
 export * from "../../packages/personal/src/calendar/schema.pg";
+export * from "../../packages/personal/src/calendar/subscription/schema.pg";
 export * from "../../packages/enterprise/src/tenant/schema.pg";
 export * from "../../packages/enterprise/src/asset/schema.pg";

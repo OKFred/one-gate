@@ -10,7 +10,9 @@ import type { AppBindings, Context, ResJson } from "@hodor/core/types/app.js";
 import { getEnv } from "@hodor/core/utils/env.js";
 import createAdminApp from "@hodor/admin/index.js";
 import createEnterpriseApp from "@hodor/enterprise/index.js";
-import createPersonalApp from "@hodor/personal/index.js";
+import createPersonalApp, {
+  registerCalendarSubscriptionProtocol,
+} from "@hodor/personal/index.js";
 import type { TotpGateCenterResolver } from "@hodor/admin/system/auth/totp-gate/index.js";
 import { registerTotpGateMiddleware } from "./security/totp-gate.js";
 import { registerPostgresCapabilities } from "./postgresql-capabilities.js";
@@ -22,7 +24,6 @@ export interface ServerAppOptions {
 function createApp(options: ServerAppOptions) {
   const app = new OpenAPIHono<AppBindings>();
 
-  serveStaticFiles(app);
   errorHandler(app);
   logHandler(app);
   corsHandler(app);
@@ -34,6 +35,8 @@ function createApp(options: ServerAppOptions) {
     baseApiPath,
     resolveTotpGateCenter: options.resolveTotpGateCenter,
   });
+  registerCalendarSubscriptionProtocol(app);
+  serveStaticFiles(app);
 
   const apiApp = new OpenAPIHono<AppBindings>();
   apiApp.route(

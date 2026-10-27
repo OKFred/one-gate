@@ -21,3 +21,4 @@ function createPersonalApp(): App {
   return app;
 }
 export default createPersonalApp;
+export { registerCalendarSubscriptionProtocol } from "./calendar/subscription/protocol.js";

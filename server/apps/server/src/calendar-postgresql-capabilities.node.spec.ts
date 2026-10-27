@@ -53,4 +53,19 @@ describe("private calendar PostgreSQL capabilities", () => {
       ).status
     ).toBe(501);
   });
+  it("opens only the three subscription management actions without opening other personal modules", () => {
+    for (const action of ["status", "rotate", "revoke"])
+      expect(
+        supportsPostgresPath(`/personal/calendar/subscription/${action}`)
+      ).toBe(true);
+    for (const path of [
+      "/personal/calendar/subscription",
+      "/personal/calendar/subscription/",
+      "/personal/calendar/subscription/rotate/nested",
+      "/personal/calendar/subscription/token",
+      "/personal/calendar/subscription.ics",
+      "/personal/health/checkup/list",
+    ])
+      expect(supportsPostgresPath(path)).toBe(false);
+  });
 });
