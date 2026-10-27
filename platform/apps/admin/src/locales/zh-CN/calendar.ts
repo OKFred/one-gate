@@ -1,4 +1,43 @@
 export const calendar = {
+  'calendar.subscription.open': '订阅',
+  'calendar.subscription.title': '订阅到 Apple 日历',
+  'calendar.subscription.intro': '在 One Gate 管理日程，Apple 日历只读同步。',
+  'calendar.subscription.enabled': '已启用',
+  'calendar.subscription.disabled': '未启用',
+  'calendar.subscription.generate': '生成私有地址',
+  'calendar.subscription.rotate': '重新生成地址',
+  'calendar.subscription.revoke': '停用订阅',
+  'calendar.subscription.address': '私有订阅地址',
+  'calendar.subscription.copy': '复制 HTTPS 地址',
+  'calendar.subscription.show': '显示地址',
+  'calendar.subscription.hide': '隐藏地址',
+  'calendar.subscription.secretHelp': '地址仅本次显示。持有链接的人可读取你的日程，请不要公开。',
+  'calendar.subscription.existingHelp':
+    '已启用的地址不会再次显示。需要重新复制时，请重新生成并在客户端更新订阅。',
+  'calendar.subscription.rotateConfirm':
+    '生成的私有链接允许持有人只读查看你的活动日程；订阅后 Apple 或 iCloud 可下载这些日程。重新生成会使旧地址立即失效，需要更新客户端订阅。',
+  'calendar.subscription.revokeConfirm':
+    '停用后旧地址立即失效。客户端已下载的日程副本可能仍需在 Apple 日历中取消订阅。',
+  'calendar.subscription.generated': '私有地址已生成，请在关闭前复制。',
+  'calendar.subscription.revoked': '订阅已停用。',
+  'calendar.subscription.copied': '订阅地址已复制。',
+  'calendar.subscription.copyFailed': '复制未完成，可显示地址后手动复制。',
+  'calendar.subscription.loadFailed': '订阅状态加载失败，请刷新重试。',
+  'calendar.subscription.writeUnknown':
+    '暂时无法确认操作结果，请先刷新状态。若地址已生成但尚未复制，需要重新生成。',
+  'calendar.subscription.conflict': '订阅设置已变化，请刷新状态后再操作。',
+  'calendar.subscription.unavailable': '服务暂未启用日历订阅，请联系管理员。',
+  'calendar.subscription.appleHelp': '如何添加到 Apple 日历',
+  'calendar.subscription.iphone':
+    'iPhone / iPad：日历 → 日历列表 → 添加日历 → 添加订阅日历，粘贴 HTTPS 地址。',
+  'calendar.subscription.mac':
+    'Mac：日历 → 文件 → 新建日历订阅，粘贴 HTTPS 地址；位置选 iCloud 可用于其他设备。',
+  'calendar.subscription.alerts':
+    '需要提醒时，请保留订阅日历的提醒并允许系统通知。订阅会定期刷新，不保证修改立即同步；站内“知道了”不关闭 Apple 的提醒。',
+  'errorHandler.personal.calendar.subscription.unavailable': '日历订阅暂不可用',
+  'errorHandler.personal.calendar.subscription.stateConflict': '订阅设置已变化，请刷新后重试',
+  'errorHandler.personal.calendar.subscription.tooLarge': '日程超过完整订阅容量，未返回不完整内容',
+  'errorHandler.personal.calendar.subscription.invalidData': '日程时间暂时无法转换为订阅格式',
   'calendar.title': '日历',
   'calendar.private': '私人日程 · 北京时间',
   'calendar.open': '日历',

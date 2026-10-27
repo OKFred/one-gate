@@ -1,4 +1,51 @@
 export const calendar = {
+  'calendar.subscription.open': 'Subscribe',
+  'calendar.subscription.title': 'Subscribe in Apple Calendar',
+  'calendar.subscription.intro':
+    'Manage events in One Gate; Apple Calendar receives a read-only subscription.',
+  'calendar.subscription.enabled': 'Enabled',
+  'calendar.subscription.disabled': 'Not enabled',
+  'calendar.subscription.generate': 'Generate private address',
+  'calendar.subscription.rotate': 'Regenerate address',
+  'calendar.subscription.revoke': 'Disable subscription',
+  'calendar.subscription.address': 'Private subscription address',
+  'calendar.subscription.copy': 'Copy HTTPS address',
+  'calendar.subscription.show': 'Show address',
+  'calendar.subscription.hide': 'Hide address',
+  'calendar.subscription.secretHelp':
+    'Shown only this time. Anyone holding this link can read your events; keep it private.',
+  'calendar.subscription.existingHelp':
+    'An existing address cannot be shown again. To copy a new one, regenerate it and update your calendar client.',
+  'calendar.subscription.rotateConfirm':
+    'Anyone with the private link can read your active events. Subscribing lets Apple or iCloud download those events. Regenerating immediately invalidates the old address; update your calendar client afterwards.',
+  'calendar.subscription.revokeConfirm':
+    'The old address will stop working immediately. Already downloaded copies may remain until you unsubscribe in Apple Calendar.',
+  'calendar.subscription.generated': 'Private address generated. Copy it before closing.',
+  'calendar.subscription.revoked': 'Subscription disabled.',
+  'calendar.subscription.copied': 'Subscription address copied.',
+  'calendar.subscription.copyFailed':
+    'Copy did not complete. Show the address to copy it manually.',
+  'calendar.subscription.loadFailed': 'Could not load subscription status. Refresh to retry.',
+  'calendar.subscription.writeUnknown':
+    'The result could not be confirmed. Refresh status first. If an address was generated but not copied, regenerate it.',
+  'calendar.subscription.conflict':
+    'The subscription settings changed. Refresh status before trying again.',
+  'calendar.subscription.unavailable':
+    'Calendar subscriptions are not enabled on this service. Contact an administrator.',
+  'calendar.subscription.appleHelp': 'Add to Apple Calendar',
+  'calendar.subscription.iphone':
+    'iPhone / iPad: Calendar → Calendars → Add Calendar → Add Subscription Calendar, then paste the HTTPS address.',
+  'calendar.subscription.mac':
+    'Mac: Calendar → File → New Calendar Subscription, then paste the HTTPS address. Choose iCloud to use it on your other devices.',
+  'calendar.subscription.alerts':
+    'Keep subscription alerts and allow system notifications if you want reminders. Updates refresh periodically, not instantly. Acknowledging an in-app reminder does not dismiss Apple alerts.',
+  'errorHandler.personal.calendar.subscription.unavailable':
+    'Calendar subscriptions are unavailable',
+  'errorHandler.personal.calendar.subscription.stateConflict':
+    'Subscription settings changed; refresh to retry',
+  'errorHandler.personal.calendar.subscription.tooLarge':
+    'The calendar exceeds the complete-feed capacity; no partial feed was returned',
+  'errorHandler.personal.calendar.subscription.invalidData': 'The event dates cannot be exported',
   'calendar.title': 'Calendar',
   'calendar.private': 'Private events · Beijing time',
   'calendar.open': 'Calendar',

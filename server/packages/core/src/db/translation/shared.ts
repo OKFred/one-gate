@@ -9,6 +9,41 @@ export const sharedTranslations = {
   "business.exception": [
     {
       application: "backend",
+      tKey: "errorHandler.personal.calendar.subscription.unavailable",
+      langCodes: {
+        "zh-CN": "日历订阅暂不可用，请稍后重试或联系管理员",
+        "en-US":
+          "Calendar subscriptions are unavailable; retry later or contact an administrator",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.calendar.subscription.stateConflict",
+      langCodes: {
+        "zh-CN": "订阅设置已变化，请刷新后重试",
+        "en-US":
+          "The subscription settings have changed; refresh and try again",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.calendar.subscription.tooLarge",
+      langCodes: {
+        "zh-CN": "日程超过完整订阅容量，未返回不完整内容",
+        "en-US":
+          "The calendar exceeds the complete-feed capacity; no partial feed was returned",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.calendar.subscription.invalidData",
+      langCodes: {
+        "zh-CN": "日程暂时无法转换为订阅格式，请检查日程时间",
+        "en-US": "The events cannot be exported; check the event dates",
+      },
+    },
+    {
+      application: "backend",
       tKey: "errorHandler.personal.calendar.invalidInput",
       langCodes: {
         "zh-CN": "日程信息或时间无效，请检查输入",

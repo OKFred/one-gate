@@ -7,6 +7,10 @@ import {
 } from "@hodor/core/middleware/encapsulation/common.schema";
 import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@hodor/core/middleware/errorHandler/businessError";
 import { healthRepository } from "./repository.js";
 import {
   IndexVO,
@@ -21,6 +25,17 @@ import {
   type MedicalRecordAddVOLike,
   type MedicalRecordUpdateVOLike,
 } from "./model.js";
+
+function ownerId(actor: UserObj | undefined): number {
+  if (!actor) throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+  if (
+    actor.principal?.kind !== "user" ||
+    !Number.isSafeInteger(actor.principal.userId) ||
+    actor.principal.userId <= 0
+  )
+    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
+  return actor.principal.userId;
+}
 
 const listReq = {
   type: "object",
@@ -56,7 +71,7 @@ async function onList(
     category,
     keyword,
   } = params;
-  const userId = Number(userObj.id || userObj.userId || 0);
+  const userId = ownerId(userObj);
   const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
   const { total, list } = await healthRepository.findPage({
@@ -116,14 +131,13 @@ async function onAdd(
   params: FromSchema<typeof addReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes>> {
-  const userId = Number(userObj.id || userObj.userId || 0);
-  const userName =
-    (userObj as unknown as { username?: string; nickname?: string }).nickname ||
-    userObj.username ||
-    "User";
+  const userId = ownerId(userObj);
+  const userName = userObj.username;
 
   const result = await healthRepository.insert({
-    ...params,
+    category: params.category,
+    title: params.title,
+    visitDateUtc: params.visitDateUtc,
     cost: params.cost ?? 0,
     hospitalName: params.hospitalName ?? null,
     doctorName: params.doctorName ?? null,
@@ -177,18 +191,25 @@ async function onUpdate(
   params: FromSchema<typeof updateReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes>> {
-  const userId = Number(userObj.id || userObj.userId || 0);
-  const userName =
-    (userObj as unknown as { username?: string; nickname?: string }).nickname ||
-    userObj.username ||
-    "User";
+  const userId = ownerId(userObj);
+  const userName = userObj.username;
 
-  const { id, ...updateData } = params;
-  await healthRepository.update(id, {
-    ...updateData,
+  const updated = await healthRepository.update(userId, params.id, {
+    category: params.category,
+    title: params.title,
+    hospitalName: params.hospitalName,
+    doctorName: params.doctorName,
+    visitDateUtc: params.visitDateUtc,
+    diagnosis: params.diagnosis,
+    prescription: params.prescription,
+    reportUrl: params.reportUrl,
+    cost: params.cost,
+    remark: params.remark,
     updaterId: userId,
     updaterName: userName,
   });
+  if (updated === null)
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
 
   return { success: true };
 }
@@ -225,9 +246,12 @@ const deleteRes = {
 } as const satisfies JSONSchema;
 
 async function onDelete(
-  params: FromSchema<typeof deleteReq>
+  params: FromSchema<typeof deleteReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes>> {
-  await healthRepository.delete(params.id);
+  const deleted = await healthRepository.delete(ownerId(userObj), params.id);
+  if (deleted === null)
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   return { success: true };
 }
 

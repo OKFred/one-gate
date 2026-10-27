@@ -103,6 +103,28 @@ describe.skipIf(!configured)(
       }
       await enter();
     }
+    async function installCalendarSchema() {
+      await installUsageSchema();
+      await client.query("BEGIN");
+      try {
+        await client.query(`SET LOCAL search_path TO "${schema}", pg_catalog`);
+        const migration = postgresMigrations[2];
+        await client.query(migration.sql);
+        const fingerprint = await postgresCatalogFingerprint(client, schema);
+        await client.query(
+          "INSERT INTO _one_gate_pg_migrations VALUES($1,$2,$3,$4)",
+          [migration.id, migration.checksum, fingerprint, 3000]
+        );
+        await client.query("COMMIT");
+      } catch (error: unknown) {
+        await client.query("ROLLBACK");
+        throw error;
+      }
+      await enter();
+      await client.query(
+        "INSERT INTO personal_calendar_event(id,owner_user_id,request_key,title,description,url,start_time_utc,end_time_utc,time_zone,reminder_time_utc,reminder_acknowledged_time_utc,status,version,create_time_utc,update_time_utc) VALUES('00000000-0000-4000-8000-000000000001',7,'00000000-0000-4000-8000-000000000002','Synthetic retained event',NULL,NULL,1000,NULL,'UTC',900,NULL,'active',1,100,100)"
+      );
+    }
     async function counts() {
       await enter();
       const { rows } = await client.query<{
@@ -351,6 +373,135 @@ describe.skipIf(!configured)(
       );
       await client.query(
         "CREATE INDEX personal_calendar_event_owner_reminder_idx ON personal_calendar_event(owner_user_id,reminder_time_utc,id)"
+      );
+      await expect(
+        migratePostgres(client, { schema, apply: true })
+      ).rejects.toThrow("fingerprint mismatch");
+      await enter();
+      expect(
+        (
+          await client.query(
+            "SELECT * FROM _one_gate_pg_migrations ORDER BY id"
+          )
+        ).rows
+      ).toEqual(prior);
+    });
+    it("adds private subscriptions to a 0003 schema without changing old events or markers", async () => {
+      await installCalendarSchema();
+      const prior = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows;
+      const events = (
+        await client.query("SELECT * FROM personal_calendar_event")
+      ).rows;
+      expect(await migratePostgres(client, { schema })).toBe("pending");
+      expect(await migratePostgres(client, { schema, apply: true })).toBe(
+        "applied"
+      );
+      expect(await migratePostgres(client, { schema, apply: true })).toBe(
+        "already_applied"
+      );
+      await enter();
+      const markers = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows;
+      expect(markers.slice(0, 3)).toEqual(prior);
+      expect(markers[3]).toMatchObject({
+        id: "0004_personal_calendar_subscription",
+        checksum: postgresMigrations[3].checksum,
+      });
+      expect(
+        (await client.query("SELECT * FROM personal_calendar_event")).rows
+      ).toEqual(events);
+      expect(
+        (
+          await client.query(
+            "SELECT count(*)::text AS n FROM personal_calendar_subscription"
+          )
+        ).rows[0].n
+      ).toBe("0");
+      expect(
+        (
+          await client.query(
+            "SELECT column_default FROM information_schema.columns WHERE table_schema=$1 AND table_name='personal_calendar_subscription' AND column_default IS NOT NULL",
+            [schema]
+          )
+        ).rows
+      ).toEqual([]);
+      await client.query(
+        "INSERT INTO personal_calendar_subscription(owner_user_id,token_hash,version,create_time_utc,update_time_utc) VALUES(7,NULL,1,100,100),(8,NULL,1,100,100),(9,$1,1,100,100)",
+        ["a".repeat(64)]
+      );
+      await expect(
+        client.query(
+          "INSERT INTO personal_calendar_subscription(owner_user_id,token_hash,version,create_time_utc,update_time_utc) VALUES(10,$1,1,100,100)",
+          ["a".repeat(64)]
+        )
+      ).rejects.toThrow();
+      await expect(
+        client.query(
+          "INSERT INTO personal_calendar_subscription(owner_user_id,token_hash,version,create_time_utc,update_time_utc) VALUES(10,$1,1,100,100)",
+          ["A".repeat(64)]
+        )
+      ).rejects.toThrow();
+    });
+    it("rolls back a 0004 index collision after table creation, retaining calendar records and the 0003 ledger", async () => {
+      await installCalendarSchema();
+      const prior = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows;
+      const events = (
+        await client.query("SELECT * FROM personal_calendar_event")
+      ).rows;
+      await client.query(
+        "CREATE VIEW personal_calendar_subscription_token_unique AS SELECT 7 AS synthetic"
+      );
+      await expect(
+        migratePostgres(client, { schema, apply: true })
+      ).rejects.toThrow();
+      await enter();
+      expect(
+        (
+          await client.query(
+            "SELECT * FROM _one_gate_pg_migrations ORDER BY id"
+          )
+        ).rows
+      ).toEqual(prior);
+      expect(
+        (await client.query("SELECT * FROM personal_calendar_event")).rows
+      ).toEqual(events);
+      expect(
+        (
+          await client.query(
+            "SELECT synthetic FROM personal_calendar_subscription_token_unique"
+          )
+        ).rows[0].synthetic
+      ).toBe(7);
+      expect(
+        (
+          await client.query(
+            "SELECT to_regclass('personal_calendar_subscription') AS name"
+          )
+        ).rows[0].name
+      ).toBeNull();
+      await client.query(
+        "DROP VIEW personal_calendar_subscription_token_unique"
+      );
+      expect(await migratePostgres(client, { schema, apply: true })).toBe(
+        "applied"
+      );
+    });
+    it("fails closed on subscription digest uniqueness drift", async () => {
+      await migratePostgres(client, { schema, apply: true });
+      await enter();
+      const prior = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows;
+      await client.query(
+        "DROP INDEX personal_calendar_subscription_token_unique"
+      );
+      await client.query(
+        "CREATE INDEX personal_calendar_subscription_token_unique ON personal_calendar_subscription(token_hash)"
       );
       await expect(
         migratePostgres(client, { schema, apply: true })

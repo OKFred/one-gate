@@ -2,12 +2,36 @@ import db from "@hodor/core/db";
 import { medicalRecordsTable, type MedicalRecordPOLike } from "./model.js";
 import { eq, like, or, and, count, desc, asc, type SQL } from "drizzle-orm";
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@hodor/core/middleware/errorHandler/businessError";
+
+function owned(creatorId: number) {
+  if (!Number.isSafeInteger(creatorId) || creatorId <= 0)
+    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
+  return eq(medicalRecordsTable.creatorId, creatorId);
+}
+
+type EditableFields = Pick<
+  MedicalRecordPOLike,
+  | "category"
+  | "title"
+  | "hospitalName"
+  | "doctorName"
+  | "visitDateUtc"
+  | "diagnosis"
+  | "prescription"
+  | "reportUrl"
+  | "cost"
+  | "remark"
+>;
 
 export const healthRepository = {
   async findPage(params: {
     keyword?: string;
     category?: string;
-    creatorId?: number;
+    creatorId: number;
     orderBy?: keyof MedicalRecordPOLike;
     descend?: boolean;
     pageNo?: number;
@@ -23,11 +47,7 @@ export const healthRepository = {
       pageSize = 10,
     } = params;
 
-    const conditions: SQL[] = [];
-
-    if (creatorId) {
-      conditions.push(eq(medicalRecordsTable.creatorId, creatorId));
-    }
+    const conditions: SQL[] = [owned(creatorId)];
     if (category) {
       conditions.push(eq(medicalRecordsTable.category, category));
     }
@@ -43,7 +63,7 @@ export const healthRepository = {
       );
     }
 
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const whereClause = and(...conditions);
 
     const [totalRow] = await db
       .select({ total: count() })
@@ -85,17 +105,18 @@ export const healthRepository = {
     return { total, list };
   },
 
-  async findById(id: number) {
+  async findById(creatorId: number, id: number) {
     const [row] = await db
       .select()
       .from(medicalRecordsTable)
-      .where(eq(medicalRecordsTable.id, id));
+      .where(and(owned(creatorId), eq(medicalRecordsTable.id, id)));
     return row || null;
   },
 
   async insert(
     data: Omit<MedicalRecordPOLike, "id" | "createTimeUtc" | "updateTimeUtc">
   ) {
+    owned(data.creatorId);
     const [result] = await db
       .insert(medicalRecordsTable)
       .values({
@@ -107,23 +128,27 @@ export const healthRepository = {
   },
 
   async update(
+    creatorId: number,
     id: number,
-    data: Partial<
-      Omit<MedicalRecordPOLike, "id" | "createTimeUtc" | "updateTimeUtc">
-    >
+    data: Partial<EditableFields> &
+      Pick<MedicalRecordPOLike, "updaterId" | "updaterName">
   ) {
-    await db
+    const [row] = await db
       .update(medicalRecordsTable)
       .set({
         ...data,
         updateTimeUtc: getCurrentTimestampUtcSql(),
       })
-      .where(eq(medicalRecordsTable.id, id));
-    return true;
+      .where(and(owned(creatorId), eq(medicalRecordsTable.id, id)))
+      .returning({ id: medicalRecordsTable.id });
+    return row?.id ?? null;
   },
 
-  async delete(id: number) {
-    await db.delete(medicalRecordsTable).where(eq(medicalRecordsTable.id, id));
-    return true;
+  async delete(creatorId: number, id: number) {
+    const [row] = await db
+      .delete(medicalRecordsTable)
+      .where(and(owned(creatorId), eq(medicalRecordsTable.id, id)))
+      .returning({ id: medicalRecordsTable.id });
+    return row?.id ?? null;
   },
 };

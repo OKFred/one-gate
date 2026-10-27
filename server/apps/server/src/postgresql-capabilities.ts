@@ -47,6 +47,11 @@ const supportedCalendarActions = new Set([
   "due",
   "ack",
 ]);
+const supportedCalendarSubscriptionActions = new Set([
+  "status",
+  "rotate",
+  "revoke",
+]);
 
 /** An explicit capability boundary; unported modules cannot reach a SQLite database. */
 export function supportsPostgresPath(path: string): boolean {
@@ -56,6 +61,8 @@ export function supportsPostgresPath(path: string): boolean {
   if (domain === "/admin/base/map") return action === "config";
   if (domain === "/personal/calendar")
     return supportedCalendarActions.has(action);
+  if (domain === "/personal/calendar/subscription")
+    return supportedCalendarSubscriptionActions.has(action);
   if (domain === "/admin/system/auth") return supportedAuthActions.has(action);
   if (path.startsWith("/admin/system/auth/gate/"))
     return !action.includes("/") && domain === "/admin/system/auth/gate";

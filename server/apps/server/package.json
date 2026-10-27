@@ -22,6 +22,7 @@
     "db:migrate:assets:node": "tsx scripts/migrate-enterprise-assets.ts",
     "db:migrate:cloudflare-usage:node": "tsx scripts/migrate-cloudflare-usage.ts",
     "db:migrate:calendar:node": "tsx scripts/migrate-personal-calendar.ts",
+    "db:migrate:calendar-subscription:node": "tsx scripts/migrate-personal-calendar-subscription.ts",
     "db:preflight:role:worker:local": "wrangler d1 execute hodor_db --local --file=./d1-contract/role-soft-delete-preflight.sql --yes",
     "db:preflight:role:worker:remote": "wrangler d1 execute hodor_db --remote --file=./d1-contract/role-soft-delete-preflight.sql --yes",
     "db:check:worker:local": "wrangler d1 execute hodor_db --local --file=./d1-contract/worker-schema.sql --yes",
