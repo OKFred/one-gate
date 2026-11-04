@@ -9,6 +9,8 @@ function createApp() {
       dispatch: service.dispatch,
       get: service.get,
       callback: service.callback,
+      state: service.state,
+      cancel: service.cancel,
     },
     "admin.mobile.async_task" satisfies BusinessKey
   );

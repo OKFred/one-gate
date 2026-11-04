@@ -66,6 +66,15 @@ describe("authentication route policy", () => {
   });
 
   it("only bypasses Hodor authentication where the route owns another credential", () => {
+    expect(isHodorAuthBypassed("/admin/mobile/device/report/task-state")).toBe(
+      true
+    );
+    expect(
+      isHodorAuthBypassed("/admin/mobile/device/report/task-state-extra")
+    ).toBe(false);
+    expect(isHodorAuthBypassed("/admin/mobile/device/report")).toBe(false);
+    expect(isHodorAuthBypassed("/admin/mobile/async-task/state")).toBe(false);
+    expect(isHodorAuthBypassed("/admin/mobile/async-task/cancel")).toBe(false);
     expect(isHodorAuthBypassed("/admin/system/auth/login")).toBe(true);
     expect(isHodorAuthBypassed("/admin/system/auth/oauth/login/callback")).toBe(
       false

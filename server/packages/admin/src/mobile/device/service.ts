@@ -45,6 +45,10 @@ import { DeviceApplicationError } from "./application/error.js";
 import { adaptDeviceHttpError } from "./interfaces/http/error.js";
 import { reportTokenFromContext } from "./interfaces/http/report-token.js";
 import { scheduleDeviceDetailAuthorizationShadow } from "./interfaces/http/authorization-shadow.js";
+import { taskRuntimeCenter } from "../async-task/runtime/index.js";
+import { MobileTaskRuntimeReportSchema } from "../async-task/runtime/model.js";
+import { adaptDeviceTaskHttpError } from "../async-task/interfaces/http/error.js";
+import { hashDeviceToken } from "./infrastructure/crypto.js";
 import {
   CustomMetadataValueVO,
   DEVICE_EVENT_TYPES,
@@ -451,6 +455,29 @@ const reportNetworkRoutingApi = {
   permission: false,
 } satisfies API;
 
+const reportTaskStateApi = {
+  req: MobileTaskRuntimeReportSchema,
+  res: { type: "boolean" } as const,
+  pathInfo: {
+    path: "/report/task-state",
+    method: "post",
+    summary: "设备真实任务队列上报",
+  },
+  adapter: rawAdapter,
+  service: (context: Context) =>
+    adaptDeviceTaskHttpError(() =>
+      adaptDeviceHttpError(async () => {
+        const input = context.get("bodyObj") as FromSchema<
+          typeof MobileTaskRuntimeReportSchema
+        >;
+        const token = reportTokenFromContext(context);
+        await verifyDeviceReportToken(input.deviceId, token);
+        return taskRuntimeCenter.report(input, await hashDeviceToken(token));
+      })
+    ),
+  permission: false,
+} satisfies API;
+
 export default {
   list: listApi,
   add: addApi,
@@ -466,4 +493,5 @@ export default {
   reportEvent: reportEventApi,
   reportDeployment: reportDeploymentApi,
   reportNetworkRouting: reportNetworkRoutingApi,
+  reportTaskState: reportTaskStateApi,
 };

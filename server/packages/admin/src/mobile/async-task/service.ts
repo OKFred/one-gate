@@ -7,6 +7,7 @@ import {
 } from "@hodor/core/middleware/encapsulation/common.schema";
 import {
   bodyAdapter,
+  bodyUserAdapter,
   bodyUserContextAdapter,
   rawAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
@@ -35,6 +36,13 @@ import {
 import { buildTaskCallbackUrl } from "./interfaces/http/callback-url.js";
 import { adaptDeviceTaskHttpError } from "./interfaces/http/error.js";
 import { networkRoutingRepository } from "../network-routing/repository.js";
+import { taskRuntimeCenter } from "./runtime/index.js";
+import {
+  MobileTaskRuntimeStateReqSchema,
+  MobileTaskRuntimeStateResSchema,
+  MobileTaskRuntimeCancelReqSchema,
+  MobileTaskRuntimeCancelResSchema,
+} from "./runtime/model.js";
 
 const listReq = {
   type: "object",
@@ -218,9 +226,41 @@ const callbackApi = {
   permission: false,
 } satisfies API;
 
+const stateApi = {
+  req: MobileTaskRuntimeStateReqSchema,
+  res: MobileTaskRuntimeStateResSchema,
+  pathInfo: {
+    path: "/state",
+    method: "post",
+    summary: "读取手机真实任务队列快照",
+  },
+  adapter: bodyAdapter,
+  service: (params: FromSchema<typeof MobileTaskRuntimeStateReqSchema>) =>
+    adaptDeviceTaskHttpError(() => taskRuntimeCenter.state(params.clientId)),
+  permission: { action: "read" },
+} satisfies API;
+
+const cancelApi = {
+  req: MobileTaskRuntimeCancelReqSchema,
+  res: MobileTaskRuntimeCancelResSchema,
+  pathInfo: {
+    path: "/cancel",
+    method: "post",
+    summary: "请求手机终止指定活动任务",
+  },
+  adapter: bodyUserAdapter,
+  service: (
+    params: FromSchema<typeof MobileTaskRuntimeCancelReqSchema>,
+    user: UserObj
+  ) => adaptDeviceTaskHttpError(() => taskRuntimeCenter.cancel(params, user)),
+  permission: { action: "dispatch" },
+} satisfies API;
+
 export default {
   list: listApi,
   dispatch: dispatchApi,
   get: getApi,
   callback: callbackApi,
+  state: stateApi,
+  cancel: cancelApi,
 };

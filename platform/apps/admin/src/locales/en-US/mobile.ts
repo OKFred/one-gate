@@ -175,6 +175,36 @@ export const mobile = {
   'mobile.asyncTask.yes': 'Yes',
   'mobile.asyncTask.no': 'No',
 
+  'mobile.taskRuntime.title': 'Current task and queue',
+  'mobile.taskRuntime.running': 'Current task',
+  'mobile.taskRuntime.queued': 'Queued tasks',
+  'mobile.taskRuntime.phase.STARTING': 'Starting',
+  'mobile.taskRuntime.phase.RUNNING': 'Running',
+  'mobile.taskRuntime.phase.QUEUED': 'Queued',
+  'mobile.taskRuntime.position': 'Position {{position}}',
+  'mobile.taskRuntime.enqueuedAt': 'Enqueued at',
+  'mobile.taskRuntime.startedAt': 'Started at',
+  'mobile.taskRuntime.updatedAt': 'Last reported',
+  'mobile.taskRuntime.noPermission': 'You do not have permission to read device tasks.',
+  'mobile.taskRuntime.noSnapshot':
+    'The device has not reported a task snapshot. Check that its client is updated and online.',
+  'mobile.taskRuntime.noRunning': 'No task is currently running.',
+  'mobile.taskRuntime.noQueued': 'No queued tasks.',
+  'mobile.taskRuntime.stale':
+    'This is an expired device report. Wait for an update before terminating tasks.',
+  'mobile.taskRuntime.loadFailed': 'Could not read task state. Refresh before taking action.',
+  'mobile.taskRuntime.cancel': 'Terminate',
+  'mobile.taskRuntime.confirm':
+    'Terminate task {{taskId}}? External actions that already happened will not be undone.',
+  'mobile.taskRuntime.unavailable': 'This task cannot currently be terminated from this site.',
+  'mobile.taskRuntime.awaitingResult': 'Termination outcome is pending confirmation.',
+  'mobile.taskRuntime.sent': 'Termination request sent. Waiting for the device to confirm.',
+  'mobile.taskRuntime.unknown':
+    'The termination request could not be confirmed. Refresh to check device state.',
+  'mobile.taskRuntime.rejected':
+    'The termination request was rejected. Device state or permissions may have changed; refresh before trying again.',
+  'mobile.taskRuntime.changed': 'Task state or permissions changed. Refresh and confirm again.',
+
   // Missing keys for precommit
   'column.keyword': 'Keyword',
   'common.searchPlaceholder': 'Please enter search keyword',

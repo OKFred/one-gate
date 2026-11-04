@@ -65,7 +65,7 @@ export const tableConfig: SchemaCrudConfig<
     {
       key: 'status',
       label: t('mobile.device.statusDrawer'),
-      icon: <DevicesIcon fontSize="small" />,
+      icon: <DevicesIcon fontSize="small" titleAccess={t('mobile.device.statusDrawer')} />,
       color: 'success',
       permissionCodes: [THIS_PERMISSION.read],
       onClick: (row) => {

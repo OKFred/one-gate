@@ -53,6 +53,7 @@ export const machineCredentialBypass = freezeRoutePaths([
   "/admin/mobile/device/report/event",
   "/admin/mobile/device/report/deployment",
   "/admin/mobile/device/report/network-routing",
+  "/admin/mobile/device/report/task-state",
   "/admin/mobile/client-release/upload/prepare",
   "/admin/mobile/client-release/upload/finalize",
 ] as const);

@@ -44,6 +44,7 @@ import { THIS_PERMISSION } from '../constant';
 import { ClientDeploymentPanel } from './ClientDeploymentPanel';
 import { DeviceOpsPanel } from './DeviceOpsPanel';
 import { NetworkRoutingPanel } from './NetworkRoutingPanel';
+import { DeviceTaskPanel } from './DeviceTaskPanel';
 
 interface DeviceStatusDrawerProps {
   open: boolean;
@@ -217,7 +218,12 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
 
   return (
     <>
-      <Drawer anchor="right" open={open} onClose={onClose}>
+      <Drawer
+        anchor="right"
+        open={open}
+        onClose={onClose}
+        sx={{ zIndex: (theme) => theme.zIndex.modal }}
+      >
         <Box sx={{ width: { xs: '100vw', sm: 720 }, p: 3 }}>
           <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
             <Box>
@@ -231,13 +237,20 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
             </IconButton>
           </Stack>
 
-          <Tabs value={tab} onChange={(_, value: number) => setTab(value)} sx={{ mt: 2 }}>
+          <Tabs
+            value={tab}
+            onChange={(_, value: number) => setTab(value)}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{ mt: 2 }}
+          >
             <Tab label={t('mobile.device.tabs.overview')} />
             <Tab label={t('mobile.device.tabs.metadata')} />
             <Tab label={t('mobile.device.tabs.events')} />
             <Tab label={t('mobile.device.tabs.deployments')} />
             <Tab label={t('mobile.device.tabs.ops')} />
             <Tab label={t('mobile.device.tabs.networkRouting')} />
+            <Tab label={t('mobile.taskRuntime.title')} />
           </Tabs>
           <Divider />
 
@@ -470,6 +483,7 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
           )}
           {tab === 4 && clientId && <DeviceOpsPanel clientId={clientId} />}
           {tab === 5 && clientId && <NetworkRoutingPanel clientId={clientId} />}
+          {open && tab === 6 && clientId && <DeviceTaskPanel key={clientId} clientId={clientId} />}
         </Box>
       </Drawer>
 

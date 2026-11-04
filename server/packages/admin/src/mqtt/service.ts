@@ -56,10 +56,20 @@ export async function getActiveCredentials(): Promise<MqttConnectionCredentials>
  */
 async function connectMqttWithFallback(
   credentials: MqttConnectionCredentials,
-  opts: { connectTimeout?: number; timeoutMs?: number; clientIdPrefix?: string }
+  opts: {
+    connectTimeout?: number;
+    timeoutMs?: number;
+    clientIdPrefix?: string;
+    requireTls?: boolean;
+  }
 ): Promise<mqtt.MqttClient> {
-  const { connectTimeout = 4000, timeoutMs = 5000, clientIdPrefix = "" } = opts;
-  const clientId = `${credentials.clientId}_${clientIdPrefix}${Date.now().toString(36)}`;
+  const {
+    connectTimeout = 4000,
+    timeoutMs = 5000,
+    clientIdPrefix = "",
+    requireTls = false,
+  } = opts;
+  const clientId = `${credentials.clientId}_${clientIdPrefix}${Date.now().toString(36)}${requireTls ? `_${crypto.randomUUID()}` : ""}`;
 
   const urlsToTry: string[] = [];
   if (
@@ -86,8 +96,14 @@ async function connectMqttWithFallback(
   }
 
   let lastError: unknown;
-  for (const brokerUrl of urlsToTry) {
+  const candidates = requireTls
+    ? urlsToTry.filter(
+        (url) => url.startsWith("wss://") || url.startsWith("mqtts://")
+      )
+    : urlsToTry;
+  for (const brokerUrl of candidates) {
     let timer: ReturnType<typeof setTimeout> | null = null;
+    let connection: ReturnType<typeof mqtt.connectAsync> | null = null;
     try {
       const timeoutPromise = new Promise<never>((_, reject) => {
         timer = setTimeout(
@@ -96,19 +112,17 @@ async function connectMqttWithFallback(
         );
       });
 
-      const client = await Promise.race([
-        mqtt.connectAsync(brokerUrl, {
-          clientId,
-          username: credentials.username || undefined,
-          password: credentials.password || undefined,
-          keepalive: credentials.keepalive,
-          clean: credentials.cleanSession,
-          connectTimeout,
-          reconnectPeriod: 0,
-          rejectUnauthorized: false,
-        }),
-        timeoutPromise,
-      ]);
+      connection = mqtt.connectAsync(brokerUrl, {
+        clientId,
+        username: credentials.username || undefined,
+        password: credentials.password || undefined,
+        keepalive: credentials.keepalive,
+        clean: credentials.cleanSession,
+        connectTimeout,
+        reconnectPeriod: 0,
+        rejectUnauthorized: requireTls,
+      });
+      const client = await Promise.race([connection, timeoutPromise]);
 
       if (timer) clearTimeout(timer);
       if (client) {
@@ -116,6 +130,11 @@ async function connectMqttWithFallback(
       }
     } catch (err) {
       if (timer) clearTimeout(timer);
+      if (requireTls && connection) {
+        void connection
+          .then((client) => client.end(true))
+          .catch(() => undefined);
+      }
       lastError = err;
     }
   }
@@ -135,25 +154,48 @@ export async function publishDeviceManagementCommand(input: {
   sessionId: string;
   clientId: string;
   commandType: string;
+  requireTls?: true;
 }): Promise<{ traceId: string }> {
   const traceId = `mqtt_ops_${Date.now()}_${crypto.randomUUID().substring(0, 8)}`;
   const credentials = await getActiveCredentials();
   let client: mqtt.MqttClient | null = null;
+  let publishTimer: ReturnType<typeof setTimeout> | null = null;
   let errorMessage = "";
   try {
     client = await connectMqttWithFallback(credentials, {
       connectTimeout: 7000,
       timeoutMs: 8000,
       clientIdPrefix: "ops_",
+      requireTls: input.requireTls,
     });
-    await client.publishAsync(input.topic, JSON.stringify(input.payload), {
-      qos: 1,
-      retain: false,
-    });
+    const publishing = client.publishAsync(
+      input.topic,
+      JSON.stringify(input.payload),
+      {
+        qos: 1,
+        retain: false,
+      }
+    );
+    await (input.requireTls
+      ? Promise.race([
+          publishing,
+          new Promise<never>((_, reject) => {
+            publishTimer = setTimeout(
+              () => reject(new Error("MQTT PUBACK timeout")),
+              8000
+            );
+          }),
+        ])
+      : publishing);
   } catch (error) {
-    errorMessage = error instanceof Error ? error.message : String(error);
+    errorMessage = input.requireTls
+      ? "SECURE_DEVICE_COMMAND_TRANSPORT_FAILED"
+      : error instanceof Error
+        ? error.message
+        : String(error);
     throw new BusinessError(`设备管理命令发布失败: ${errorMessage}`);
   } finally {
+    if (publishTimer) clearTimeout(publishTimer);
     client?.end(true);
     await baseLogService.biz
       .add({

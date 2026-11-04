@@ -19,5 +19,8 @@ describe("mobile device report route whitelist", () => {
     expect(machineCredentialBypass).toContain(
       "/admin/mobile/device/report/network-routing"
     );
+    expect(machineCredentialBypass).toContain(
+      "/admin/mobile/device/report/task-state"
+    );
   });
 });

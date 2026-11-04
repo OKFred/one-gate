@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest";
 import service from "./service.js";
 
 describe("设备任务 HTTP API 契约", () => {
-  it("仅导出 list、dispatch、get、callback 四个纯 API 定义", () => {
+  it("导出任务历史、运行快照与终止纯 API 定义", () => {
     expect(Object.keys(service)).toEqual([
       "list",
       "dispatch",
       "get",
       "callback",
+      "state",
+      "cancel",
     ]);
   });
 
@@ -16,6 +18,8 @@ describe("设备任务 HTTP API 契约", () => {
     ["dispatch", "/dispatch"],
     ["get", "/get"],
     ["callback", "/callback"],
+    ["state", "/state"],
+    ["cancel", "/cancel"],
   ] as const)("%s 保持 POST %s", (name, path) => {
     expect(service[name].pathInfo).toMatchObject({
       path,
@@ -28,6 +32,8 @@ describe("设备任务 HTTP API 契约", () => {
     expect(service.dispatch.permission).toEqual({ action: "dispatch" });
     expect(service.get.permission).toEqual({ action: "read" });
     expect(service.callback.permission).toBe(false);
+    expect(service.state.permission).toEqual({ action: "read" });
+    expect(service.cancel.permission).toEqual({ action: "dispatch" });
   });
 
   it("请求与响应 Schema 保持封闭字段和必填约束", () => {
