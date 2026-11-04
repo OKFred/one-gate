@@ -14476,6 +14476,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mobile/device/report/task-state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 设备真实任务队列上报 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.report.task-state.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.report.task-state.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/mobile/app/list": {
         parameters: {
             query?: never;
@@ -15492,6 +15550,122 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.mobile.async_task.callback.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/async-task/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 读取手机真实任务队列快照 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.state.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.state.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/async-task/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 请求手机终止指定活动任务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.cancel.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.cancel.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -32027,6 +32201,44 @@ export interface components {
             };
             message: string;
         };
+        "admin.mobile.device.report.task-state.req": {
+            /** @constant */
+            protocolVersion: 2;
+            deviceId: string;
+            timestamp: number;
+            sessionId: string;
+            sessionStartedAt: number;
+            revision: number;
+            running: {
+                taskId: string;
+                scriptId: string;
+                /** @enum {string} */
+                priority: "LOW" | "NORMAL" | "HIGH";
+                createdAt: number;
+                startedAt: ((number | null) | null) | null;
+                position: ((number | null) | null) | null;
+                /** @enum {string} */
+                phase: "STARTING" | "RUNNING" | "QUEUED";
+                cancellable: boolean;
+            } | null;
+            queued: {
+                taskId: string;
+                scriptId: string;
+                /** @enum {string} */
+                priority: "LOW" | "NORMAL" | "HIGH";
+                createdAt: number;
+                startedAt: ((number | null) | null) | null;
+                position: ((number | null) | null) | null;
+                /** @enum {string} */
+                phase: "STARTING" | "RUNNING" | "QUEUED";
+                cancellable: boolean;
+            }[];
+        };
+        "admin.mobile.device.report.task-state.res": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
         "admin.mobile.app.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
@@ -32768,6 +32980,67 @@ export interface components {
         "admin.mobile.async_task.callback.res": {
             ok: boolean;
             data: boolean;
+            message: string;
+        };
+        "admin.mobile.async_task.state.req": {
+            clientId: string;
+        };
+        "admin.mobile.async_task.state.res": {
+            ok: boolean;
+            data: {
+                clientId: string;
+                serverTimeUtc: number;
+                receivedTimeUtc: ((number | null) | null) | null;
+                stale: boolean;
+                snapshot: {
+                    /** @constant */
+                    protocolVersion: 2;
+                    deviceId: string;
+                    timestamp: number;
+                    sessionId: string;
+                    sessionStartedAt: number;
+                    revision: number;
+                    running: {
+                        taskId: string;
+                        scriptId: string;
+                        /** @enum {string} */
+                        priority: "LOW" | "NORMAL" | "HIGH";
+                        createdAt: number;
+                        startedAt: ((number | null) | null) | null;
+                        position: ((number | null) | null) | null;
+                        /** @enum {string} */
+                        phase: "STARTING" | "RUNNING" | "QUEUED";
+                        cancellable: boolean;
+                    } | null;
+                    queued: {
+                        taskId: string;
+                        scriptId: string;
+                        /** @enum {string} */
+                        priority: "LOW" | "NORMAL" | "HIGH";
+                        createdAt: number;
+                        startedAt: ((number | null) | null) | null;
+                        position: ((number | null) | null) | null;
+                        /** @enum {string} */
+                        phase: "STARTING" | "RUNNING" | "QUEUED";
+                        cancellable: boolean;
+                    }[];
+                } | null;
+                cancellableTaskIds: string[];
+            };
+            message: string;
+        };
+        "admin.mobile.async_task.cancel.req": {
+            clientId: string;
+            taskId: string;
+        };
+        "admin.mobile.async_task.cancel.res": {
+            ok: boolean;
+            data: {
+                taskId: string;
+                commandId: string;
+                /** @constant */
+                status: "CANCEL_REQUESTED";
+            };
             message: string;
         };
         "admin.mobile.device.session.open.req": {

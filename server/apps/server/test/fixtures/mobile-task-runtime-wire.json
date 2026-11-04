@@ -1,0 +1,81 @@
+{
+  "STARTING": {
+    "protocolVersion": 2,
+    "deviceId": "fixture-device",
+    "sessionId": "fixture_session_20261105",
+    "sessionStartedAt": 1700000000000,
+    "timestamp": 1700000100000,
+    "revision": 1,
+    "running": {
+      "taskId": "task_start_01",
+      "scriptId": "device.apps.list",
+      "priority": "NORMAL",
+      "createdAt": 1700000001000,
+      "startedAt": 1700000002000,
+      "position": null,
+      "phase": "STARTING",
+      "cancellable": false
+    },
+    "queued": []
+  },
+  "RUNNING": {
+    "protocolVersion": 2,
+    "deviceId": "fixture-device",
+    "sessionId": "fixture_session_20261105",
+    "sessionStartedAt": 1700000000000,
+    "timestamp": 1700000100000,
+    "revision": 2,
+    "running": {
+      "taskId": "task_run_0001",
+      "scriptId": "device.apps.list",
+      "priority": "NORMAL",
+      "createdAt": 1700000010000,
+      "startedAt": 1700000011000,
+      "position": null,
+      "phase": "RUNNING",
+      "cancellable": true
+    },
+    "queued": []
+  },
+  "QUEUED": {
+    "protocolVersion": 2,
+    "deviceId": "fixture-device",
+    "sessionId": "fixture_session_20261105",
+    "sessionStartedAt": 1700000000000,
+    "timestamp": 1700000100000,
+    "revision": 3,
+    "running": null,
+    "queued": [
+      {
+        "taskId": "task_queue_01",
+        "scriptId": "device.apps.list",
+        "priority": "NORMAL",
+        "createdAt": 1700000020000,
+        "startedAt": null,
+        "position": 1,
+        "phase": "QUEUED",
+        "cancellable": true
+      },
+      {
+        "taskId": "task_queue_02",
+        "scriptId": "device.apps.list",
+        "priority": "LOW",
+        "createdAt": 1700000021000,
+        "startedAt": null,
+        "position": 2,
+        "phase": "QUEUED",
+        "cancellable": true
+      }
+    ]
+  },
+  "EMPTY": {
+    "protocolVersion": 2,
+    "deviceId": "fixture-device",
+    "sessionId": "fixture_session_20261105",
+    "sessionStartedAt": 1700000000000,
+    "timestamp": 1700000100000,
+    "revision": 4,
+    "running": null,
+    "queued": []
+  }
+}

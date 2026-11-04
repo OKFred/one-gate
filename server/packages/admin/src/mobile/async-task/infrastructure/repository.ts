@@ -27,7 +27,7 @@ export class DrizzleDeviceTaskRepository implements DeviceTaskRepository {
     clientId: string,
     data: DeviceTaskCompletion
   ): Promise<boolean> {
-    const result = await db
+    const rows = await db
       .update(mobileAsyncTaskTable)
       .set({
         ...data,
@@ -39,8 +39,9 @@ export class DrizzleDeviceTaskRepository implements DeviceTaskRepository {
           eq(mobileAsyncTaskTable.clientId, clientId),
           inArray(mobileAsyncTaskTable.status, ["PENDING", "RUNNING"])
         )
-      );
-    return result.rowsAffected > 0;
+      )
+      .returning({ taskId: mobileAsyncTaskTable.taskId });
+    return rows.length > 0;
   }
 
   /** 按业务任务标识查询任务。 */
