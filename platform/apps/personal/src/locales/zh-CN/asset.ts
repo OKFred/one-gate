@@ -4,6 +4,9 @@ export const asset = {
   'personal.asset.touchControls':
     '触屏：单指旋转，双指缩放或平移；键盘：聚焦场景后方向键平移，Home 重置',
   'personal.asset.resetView': '重置视角',
+  'personal.asset.linkAnimation': '连接线动画',
+  'personal.asset.playLinkAnimation': '播放连线',
+  'personal.asset.pauseLinkAnimation': '暂停连线',
   'personal.asset.loading3d': '正在加载 3D 场景',
   'personal.asset.webglUnavailable':
     '此浏览器无法启用 3D 图形。仍可使用楼层设备按钮和资产清单查看详情。',

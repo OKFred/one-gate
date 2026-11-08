@@ -30,6 +30,7 @@ export interface HoveredAsset {
 export interface SpacesRenderer {
   update(state: SceneState): void;
   setColors(colors: SceneColors): void;
+  setMotion(enabled: boolean | null): void;
   reset(): void;
   dispose(): void;
 }
@@ -147,6 +148,7 @@ export function createSpacesRenderer(
   let lost = false;
   let animation: number | undefined;
   let lastFrame = -Infinity;
+  let motionOverride: boolean | null = null;
   let currentState: SceneState | null = null;
   let ready = false;
   const homeSphere = new THREE.Sphere();
@@ -199,9 +201,13 @@ export function createSpacesRenderer(
     }
   }
 
+  function canAnimate() {
+    return !disposed && !lost && !document.hidden && (motionOverride ?? !motion.matches);
+  }
+
   function animate(time: number) {
     animation = undefined;
-    if (disposed || lost || document.hidden || motion.matches) {
+    if (!canAnimate()) {
       canvas.dataset.linkAnimation = 'paused';
       return;
     }
@@ -219,7 +225,7 @@ export function createSpacesRenderer(
   function animationState() {
     if (animation !== undefined) cancelAnimationFrame(animation);
     animation = undefined;
-    const running = !disposed && !lost && !document.hidden && !motion.matches;
+    const running = canAnimate();
     canvas.dataset.linkAnimation = running ? 'running' : 'paused';
     if (running) animation = requestAnimationFrame(animate);
     render();
@@ -575,6 +581,11 @@ export function createSpacesRenderer(
 
   return {
     update,
+    setMotion(enabled) {
+      if (disposed) return;
+      motionOverride = enabled;
+      animationState();
+    },
     setColors(nextColors) {
       if (disposed || lost) return;
       colors = nextColors;

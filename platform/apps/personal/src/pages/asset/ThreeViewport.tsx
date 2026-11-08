@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Box, Button, Chip, Stack, Typography, useTheme } from '@mui/material';
-import { RestartAlt } from '@mui/icons-material';
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
+import { Pause, PlayArrow, RestartAlt } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   createSpacesRenderer,
@@ -23,6 +32,9 @@ export function ThreeViewport({
   const select = useRef(onSelect);
   const [mode, setMode] = useState<'loading' | 'ready' | 'unavailable' | 'lost'>('loading');
   const [hovered, setHovered] = useState<HoveredAsset | null>(null);
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)', { noSsr: true });
+  const [motion, setMotion] = useState<boolean | null>(null);
+  const playing = motion ?? !reducedMotion;
   const colors = useMemo(
     () => ({
       background: theme.palette.background.default,
@@ -64,6 +76,9 @@ export function ThreeViewport({
     runtime.current?.setColors(colors);
   }, [colors]);
   useEffect(() => {
+    runtime.current?.setMotion(motion);
+  }, [motion]);
+  useEffect(() => {
     if (!runtime.current) return;
     try {
       runtime.current.update(state);
@@ -87,14 +102,28 @@ export function ThreeViewport({
             {t('personal.asset.touchControls')}
           </Typography>
         </Box>
-        <Button
-          size="small"
-          startIcon={<RestartAlt />}
-          disabled={mode !== 'ready'}
-          onClick={() => runtime.current?.reset()}
-        >
-          {t('personal.asset.resetView')}
-        </Button>
+        <Stack direction="row" spacing={0.5} sx={{ flexShrink: 0 }}>
+          <Button
+            size="small"
+            startIcon={playing ? <Pause /> : <PlayArrow />}
+            aria-label={t('personal.asset.linkAnimation')}
+            aria-pressed={playing}
+            disabled={mode !== 'ready'}
+            onClick={() => setMotion((value) => !(value ?? !reducedMotion))}
+            sx={{ minHeight: 44 }}
+          >
+            {t(playing ? 'personal.asset.pauseLinkAnimation' : 'personal.asset.playLinkAnimation')}
+          </Button>
+          <Button
+            size="small"
+            startIcon={<RestartAlt />}
+            disabled={mode !== 'ready'}
+            onClick={() => runtime.current?.reset()}
+            sx={{ minHeight: 44 }}
+          >
+            {t('personal.asset.resetView')}
+          </Button>
+        </Stack>
       </Stack>
       {mode === 'loading' && (
         <Typography variant="body2">{t('personal.asset.loading3d')}</Typography>
