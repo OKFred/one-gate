@@ -15,9 +15,18 @@ import {
   Stack,
   TablePagination,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { ArrowForward, Close, LocationOnOutlined, Search } from '@mui/icons-material';
+import {
+  ArrowForward,
+  Close,
+  LocationOnOutlined,
+  Search,
+  ViewInArOutlined,
+  ViewListOutlined,
+} from '@mui/icons-material';
 import { classifyApiFailure } from '@/api/config';
 import type { AssetPlacement } from '@/api/personal/asset';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -56,6 +65,8 @@ export function AssetWorkspace({
   onPlace: SavePlacement;
 }) {
   const t = useTranslation();
+  const [view, setView] = useState<'list' | 'space'>('list');
+  const focusList = useRef(false);
   const [floors, setFloors] = useState({ OpenLife: 1, OpenMind: 1 });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [keyword, setKeyword] = useState('');
@@ -70,6 +81,13 @@ export function AssetWorkspace({
     [snapshot.asOfUtc],
   );
   const now = clock.server + Math.max(0, performance.now() - clock.received);
+  useEffect(() => {
+    if (view !== 'list' || !focusList.current) return;
+    focusList.current = false;
+    const list = document.getElementById('personal-asset-list');
+    list?.focus({ preventScroll: true });
+    list?.scrollIntoView({ behavior: 'instant', block: 'start' });
+  }, [view]);
   useEffect(() => {
     const update = () => tick((value) => value + 1);
     const currentTime = clock.server + Math.max(0, performance.now() - clock.received);
@@ -128,9 +146,8 @@ export function AssetWorkspace({
     setSiteFilter(site);
     setFloorFilter(floors[site]);
     setPage(0);
-    const list = document.getElementById('personal-asset-list');
-    list?.focus({ preventScroll: true });
-    list?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    focusList.current = true;
+    setView('list');
   };
   return (
     <Stack spacing={2.5}>
@@ -144,20 +161,47 @@ export function AssetWorkspace({
           {t(demo ? 'personal.asset.demoSaved' : 'personal.asset.saved')}
         </Alert>
       )}
-      <AssetSpacesScene
-        floors={floors}
-        assets={physical}
-        selectedId={selected?.demoKind ? selected.hostAssetId : selectedId}
-        now={now}
-        onFloorChange={(site, floor) => setFloors((value) => ({ ...value, [site]: floor }))}
-        onSelect={select}
-        onShowFloor={showFloor}
-      />
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <ToggleButtonGroup
+          value={view}
+          exclusive
+          size="small"
+          aria-label={t('personal.asset.viewMode')}
+          onChange={(_, next: unknown) => {
+            if (next === 'list' || next === 'space') setView(next);
+          }}
+        >
+          <ToggleButton value="list" sx={{ gap: 0.75, minHeight: 44 }}>
+            <ViewListOutlined fontSize="small" />
+            {t('personal.asset.listView')}
+          </ToggleButton>
+          <ToggleButton value="space" sx={{ gap: 0.75, minHeight: 44 }}>
+            <ViewInArOutlined fontSize="small" />
+            {t('personal.asset.spaceView')}
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+      {view === 'space' && (
+        <AssetSpacesScene
+          floors={floors}
+          assets={physical}
+          selectedId={selected?.demoKind ? selected.hostAssetId : selectedId}
+          now={now}
+          onFloorChange={(site, floor) => setFloors((value) => ({ ...value, [site]: floor }))}
+          onSelect={select}
+          onShowFloor={showFloor}
+        />
+      )}
       <Paper
         id="personal-asset-list"
         tabIndex={-1}
         variant="outlined"
-        sx={{ p: { xs: 1.5, sm: 2.5 }, borderRadius: 3, scrollMarginTop: 96 }}
+        sx={{
+          display: view === 'list' ? 'block' : 'none',
+          p: { xs: 1.5, sm: 2.5 },
+          borderRadius: 3,
+          scrollMarginTop: 96,
+        }}
       >
         <Stack
           direction="row"

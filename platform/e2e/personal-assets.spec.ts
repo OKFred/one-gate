@@ -38,6 +38,21 @@ async function demo(page: Page) {
   await page.getByRole('switch', { name: '演示' }).check();
   await expect(page.getByText(/演示数据 · 合成设备与状态/)).toBeVisible();
 }
+async function showSpace(page: Page) {
+  await page
+    .getByRole('group', { name: '资产视图', exact: true })
+    .getByRole('button', { name: '空间', exact: true })
+    .click();
+  await expect(page.locator('#personal-asset-list')).toBeHidden();
+}
+async function showList(page: Page) {
+  await page
+    .getByRole('group', { name: '资产视图', exact: true })
+    .getByRole('button', { name: '列表', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: /资产清单/ })).toBeVisible();
+  await expect(page.getByTestId('asset-three-canvas')).toHaveCount(0);
+}
 
 type CameraPose = { position: number[]; target: number[]; zoom: number };
 function isVector(value: unknown): value is number[] {
@@ -114,12 +129,78 @@ async function clickProjectedAsset(page: Page, canvas: Locator, assetId: string)
 test('real-shaped unconfigured data stays unknown and unlocated', async ({ page }) => {
   await install(page);
   await open(page);
+  await expect(page.locator('canvas')).toHaveCount(0);
+  await expect(
+    page
+      .getByRole('group', { name: '资产视图', exact: true })
+      .getByRole('button', { name: '列表', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: '待定位 3', exact: true })).toBeVisible();
+  await page.getByRole('textbox', { name: '搜索资产名称' }).fill('合成资产 1');
+  await expect(page.getByRole('button', { name: '查看资产 合成资产 2', exact: true })).toHaveCount(
+    0,
+  );
   await page.getByRole('button', { name: '查看资产 合成资产 1', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '资产详情' });
   await expect(dialog.getByText('未接通在线状态来源')).toBeVisible();
   await expect(dialog.getByText('未知', { exact: true })).toBeVisible();
   await expect(dialog.getByText('在线', { exact: true })).toHaveCount(0);
+});
+
+test('switching between list and space retains list filters and the selected floor', async ({
+  page,
+}) => {
+  await demo(page);
+  await page.getByRole('textbox', { name: '搜索资产名称' }).fill('Compute');
+  await page.getByRole('combobox', { name: '在线状态', exact: true }).click();
+  await page.getByRole('option', { name: '离线', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: '查看资产 Demo · Compute', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true }),
+  ).toHaveCount(0);
+  await showSpace(page);
+  await threeCanvas(page);
+  const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
+  await remote.getByRole('button', { name: '3F', exact: true }).click();
+  await showList(page);
+  await expect(page.getByRole('textbox', { name: '搜索资产名称' })).toHaveValue('Compute');
+  await expect(page.getByRole('combobox', { name: '在线状态', exact: true })).toHaveText('离线');
+  await expect(
+    page.getByRole('button', { name: '查看资产 Demo · Compute', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true }),
+  ).toHaveCount(0);
+  await showSpace(page);
+  await threeCanvas(page);
+  await expect(remote.getByRole('button', { name: '3F', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+});
+
+test('showing a floor switches to the filtered list and transfers keyboard focus', async ({
+  page,
+}) => {
+  await demo(page);
+  await showSpace(page);
+  const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
+  await remote.getByRole('button', { name: '2F', exact: true }).click();
+  const showFloor = remote.getByRole('button', { name: '2F · 查看 1 台', exact: true });
+  await showFloor.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: /资产清单/ })).toBeVisible();
+  await expect(page.getByTestId('asset-three-canvas')).toHaveCount(0);
+  await expect(page.locator('#personal-asset-list')).toBeFocused();
+  await expect(page.getByRole('button', { name: 'OpenMind · 2F', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: '查看资产 Demo · Compute', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: '查看资产 Demo · Relay', exact: true }),
+  ).toHaveCount(0);
 });
 
 test('save confirms only a successful response and keeps UUID and version', async ({ page }) => {
@@ -195,9 +276,11 @@ test('explicit demo has four floors, stale evidence unknown, and virtual childre
   page,
 }) => {
   await demo(page);
+  await showSpace(page);
   const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
   await remote.getByRole('button', { name: '4F', exact: true }).click();
   await expect(remote.getByRole('button', { name: /Expired observation, 4F, 未知/ })).toBeVisible();
+  await showList(page);
   await page.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '资产详情' });
   await expect(dialog.getByRole('button', { name: /Virtual machine/ })).toBeVisible();
@@ -213,6 +296,7 @@ test('mobile layout, keyboard and reduced motion preserve accessible controls', 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await demo(page);
+  await showSpace(page);
   const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
   await remote.getByRole('button', { name: '3F', exact: true }).click();
   const marker = remote.getByRole('button', { name: /Workstation.*3F, 失联/ });
@@ -235,6 +319,7 @@ test('all current-floor devices remain reachable in a large asset list', async (
   });
   await install(page, data);
   await open(page);
+  await showSpace(page);
   const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
   await remote.getByRole('button', { name: '2F', exact: true }).click();
   const canvas = await threeCanvas(page);
@@ -258,6 +343,7 @@ test('the shared viewport renders real WebGL2 and responds to mouse rotate, zoom
   page,
 }) => {
   await demo(page);
+  await showSpace(page);
   const canvas = await threeCanvas(page);
   await expect(page.locator('canvas')).toHaveCount(1);
   expect(
@@ -317,6 +403,7 @@ test('a short mouse click raycasts a device, and list selection updates the visi
   page,
 }) => {
   await demo(page);
+  await showSpace(page);
   const canvas = await threeCanvas(page);
   await clickProjectedAsset(page, canvas, '00000000-0000-4000-8000-000000000001');
   const dialog = page.getByRole('dialog', { name: '资产详情' });
@@ -325,9 +412,12 @@ test('a short mouse click raycasts a device, and list selection updates the visi
     dialog.getByText('00000000-0000-4000-8000-000000000001', { exact: true }),
   ).toBeVisible();
   await page.keyboard.press('Escape');
+  await showList(page);
   await page.getByRole('button', { name: '查看资产 Demo · Compute', exact: true }).click();
   await expect(dialog.getByRole('heading', { name: 'Demo · Compute', exact: true })).toBeVisible();
   await page.keyboard.press('Escape');
+  await showSpace(page);
+  await threeCanvas(page);
   await expect(
     page
       .getByRole('region', { name: 'OpenMind 房屋空间示意' })
@@ -341,6 +431,7 @@ test('transparent building shells keep every floor pickable while selection foll
   page,
 }) => {
   await demo(page);
+  await showSpace(page);
   const canvas = await threeCanvas(page);
   const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
   await expect(remote.getByRole('button', { name: '1F', exact: true })).toHaveAttribute(
@@ -380,6 +471,7 @@ test('changing theme preserves the real WebGL context, camera and mouse interact
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await demo(page);
+  await showSpace(page);
   const canvas = await threeCanvas(page);
   await canvas.scrollIntoViewIfNeeded();
   const box = await canvas.boundingBox();
@@ -456,6 +548,7 @@ test('explicit connection playback animates real pixels and pause survives a sys
   await page.clock.pauseAt(start);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await demo(page);
+  await showSpace(page);
   const canvas = await threeCanvas(page);
   const playback = page.getByRole('button', { name: '连接线动画', exact: true });
   await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
@@ -507,6 +600,7 @@ test('WebGL unavailable is a visible fallback, while floor and asset controls st
     return route.abort('failed');
   });
   await demo(page);
+  await showSpace(page);
   const viewport = page.locator('[data-render-state]');
   await expect(viewport).toHaveAttribute('data-render-state', 'unavailable');
   await expect(viewport.getByRole('alert')).toBeVisible();
@@ -522,6 +616,7 @@ test('a lost WebGL context stops animation and preserves accessible device selec
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await demo(page);
+  await showSpace(page);
   const canvas = await threeCanvas(page);
   const playback = page.getByRole('button', { name: '连接线动画', exact: true });
   await playback.click();
@@ -539,6 +634,7 @@ test('a lost WebGL context stops animation and preserves accessible device selec
   await expect(viewport.getByRole('alert')).toBeVisible();
   await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
   await expect(playback).toBeDisabled();
+  await showList(page);
   await page.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true }).click();
   await expect(page.getByRole('dialog', { name: '资产详情' })).toBeVisible();
 });
@@ -623,23 +719,22 @@ test('demo online evidence becomes unknown at the exact displayed lease boundary
   await page.clock.install({ time: start });
   await page.clock.pauseAt(start);
   await demo(page);
-  const life = page.getByRole('region', { name: 'OpenLife 房屋空间示意' });
-  await expect(
-    life.getByRole('button', { name: 'Demo · Atlas, 1F, 在线', exact: true }),
-  ).toBeVisible();
+  const row = page.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true });
+  await expect(row).toContainText('在线');
   await page.clock.fastForward(599_999);
-  await expect(
-    life.getByRole('button', { name: 'Demo · Atlas, 1F, 在线', exact: true }),
-  ).toBeVisible();
+  await expect(row).toContainText('在线');
   await page.clock.runFor(1);
-  await expect(
-    life.getByRole('button', { name: 'Demo · Atlas, 1F, 未知', exact: true }),
-  ).toBeVisible();
+  await expect(row).toContainText('未知');
+  await expect(row).not.toContainText('在线');
+  await expect(page.getByTestId('asset-three-canvas')).toHaveCount(0);
 });
 
-test('capture a shareable synthetic desktop preview', async ({ page }) => {
+test('capture shareable synthetic desktop list and space previews', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await demo(page);
+  await expect(page.getByTestId('asset-three-canvas')).toHaveCount(0);
+  await page.screenshot({ path: 'test-results/personal-assets-list-preview.png', fullPage: true });
+  await showSpace(page);
   await page
     .getByRole('region', { name: 'OpenMind 房屋空间示意' })
     .getByRole('button', { name: '4F', exact: true })

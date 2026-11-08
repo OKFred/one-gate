@@ -1,4 +1,7 @@
 export const asset = {
+  'personal.asset.viewMode': 'Asset view',
+  'personal.asset.listView': 'List',
+  'personal.asset.spaceView': 'Space',
   'personal.asset.sceneLabel': '3D asset spaces',
   'personal.asset.sceneControls': 'Drag to orbit · Scroll to zoom · Right-drag to pan',
   'personal.asset.touchControls':

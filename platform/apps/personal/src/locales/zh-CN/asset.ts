@@ -1,4 +1,7 @@
 export const asset = {
+  'personal.asset.viewMode': '资产视图',
+  'personal.asset.listView': '列表',
+  'personal.asset.spaceView': '空间',
   'personal.asset.sceneLabel': '资产 3D 空间',
   'personal.asset.sceneControls': '拖动旋转 · 滚轮缩放 · 右键拖动平移',
   'personal.asset.touchControls':
