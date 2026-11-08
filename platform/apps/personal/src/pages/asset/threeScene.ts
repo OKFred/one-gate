@@ -339,7 +339,14 @@ export function createSpacesRenderer(
           );
           roof.rotation.x = side * Math.atan(1.1 / 3.2);
         }
-      } else box([8.4, 0.12, 6.4], [x, top, 0], colors.border, 0.04, 0.8);
+      } else {
+        box([8.4, 0.24, 6.4], [x, top + 0.12, 0], colors.border, 0.12, 0.95);
+        const rimY = top + 0.36;
+        box([8.4, 0.24, 0.1], [x, rimY, -3.15], colors.border, 0.06, 0.85);
+        box([8.4, 0.24, 0.1], [x, rimY, 3.15], colors.border, 0.06, 0.85);
+        box([0.1, 0.24, 6.2], [x - 4.15, rimY, 0], colors.border, 0.06, 0.85);
+        box([0.1, 0.24, 6.2], [x + 4.15, rimY, 0], colors.border, 0.06, 0.85);
+      }
       label(site, x, site === 'OpenLife' ? 3.3 : 8.5, -2.9);
     }
     const bounds = new THREE.Box3().setFromObject(structure);
