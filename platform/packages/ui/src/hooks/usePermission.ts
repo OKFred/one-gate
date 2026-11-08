@@ -463,6 +463,11 @@ export const permissions = {
   },
   personal: {
     read: 'personal:read',
+    /** 个人资产空间 */
+    asset: {
+      read: 'personal.asset:read',
+      update: 'personal.asset:update',
+    },
     /** 账号配置 */
     base: {
       read: 'personal.base:read',

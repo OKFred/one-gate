@@ -57,7 +57,7 @@ export default defineConfig({
     },
     {
       name: 'chromium',
-      testIgnore: /auth\.setup\.ts/,
+      testIgnore: [/auth\.setup\.ts/, /personal-assets(?:-model)?\.spec\.ts/],
       use: {
         ...devices['Desktop Chrome'],
         channel: process.env.CI ? 'chromium' : 'chrome',

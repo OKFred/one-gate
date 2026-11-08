@@ -2,6 +2,8 @@
  * 导航侧边栏菜单与业务类型标签
  */
 export const sidebar = {
+  'sidebar.menu.personal.asset': '个人资产',
+  'businessType.personal.asset': '个人资产空间',
   // 侧边栏菜单
   'sidebar.menu.admin': '管理后台',
   'sidebar.menu.admin.base': '底座',
