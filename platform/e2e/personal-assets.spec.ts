@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import type { AssetOverview } from '../packages/ui/src/api/personal/asset';
 
 const prefix = '**/api/v1/personal/asset/';
@@ -34,6 +34,78 @@ async function demo(page: Page) {
   await open(page);
   await page.getByRole('switch', { name: '演示' }).check();
   await expect(page.getByText(/演示数据 · 合成设备与状态/)).toBeVisible();
+}
+
+type CameraPose = { position: number[]; target: number[]; zoom: number };
+function isVector(value: unknown): value is number[] {
+  return (
+    Array.isArray(value) &&
+    value.length === 3 &&
+    value.every((item: unknown) => typeof item === 'number' && Number.isFinite(item))
+  );
+}
+async function cameraPose(canvas: Locator): Promise<CameraPose> {
+  const value: unknown = JSON.parse((await canvas.getAttribute('data-camera')) ?? 'null');
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    !('position' in value) ||
+    !isVector(value.position) ||
+    !('target' in value) ||
+    !isVector(value.target) ||
+    !('zoom' in value) ||
+    typeof value.zoom !== 'number' ||
+    !Number.isFinite(value.zoom)
+  )
+    throw new Error('The rendered scene did not expose a finite camera pose');
+  return { position: value.position, target: value.target, zoom: value.zoom };
+}
+async function threeCanvas(page: Page): Promise<Locator> {
+  const canvas = page.getByTestId('asset-three-canvas');
+  await expect(canvas).toBeVisible();
+  await expect(page.locator('[data-render-state]')).toHaveAttribute('data-render-state', 'ready');
+  return canvas;
+}
+async function projectedAssetIds(canvas: Locator): Promise<string[]> {
+  const value: unknown = JSON.parse((await canvas.getAttribute('data-pick-targets')) ?? 'null');
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter(
+      (item: unknown): item is { assetId: string } =>
+        typeof item === 'object' &&
+        item !== null &&
+        'assetId' in item &&
+        typeof item.assetId === 'string',
+    )
+    .map((item) => item.assetId)
+    .sort();
+}
+async function clickProjectedAsset(page: Page, canvas: Locator, assetId: string) {
+  await canvas.scrollIntoViewIfNeeded();
+  const value: unknown = JSON.parse((await canvas.getAttribute('data-pick-targets')) ?? 'null');
+  if (!Array.isArray(value))
+    throw new Error('The rendered scene did not expose device projections');
+  const target = value.find(
+    (item: unknown): item is { assetId: string; x: number; y: number } =>
+      typeof item === 'object' &&
+      item !== null &&
+      'assetId' in item &&
+      item.assetId === assetId &&
+      'x' in item &&
+      typeof item.x === 'number' &&
+      Number.isFinite(item.x) &&
+      'y' in item &&
+      typeof item.y === 'number' &&
+      Number.isFinite(item.y),
+  );
+  const box = await canvas.boundingBox();
+  if (!target || !box) throw new Error('The requested asset has no visible scene projection');
+  expect(target.x).toBeGreaterThan(0);
+  expect(target.x).toBeLessThan(box.width);
+  expect(target.y).toBeGreaterThan(0);
+  expect(target.y).toBeLessThan(box.height);
+  // Click the real canvas: this must pass through the production Raycaster handler.
+  await page.mouse.click(box.x + target.x, box.y + target.y);
 }
 
 test('real-shaped unconfigured data stays unknown and unlocated', async ({ page }) => {
@@ -132,7 +204,9 @@ test('explicit demo has four floors, stale evidence unknown, and virtual childre
   await expect(dialog.getByRole('button', { name: '更新演示位置' })).toHaveCount(0);
 });
 
-test('mobile touch, keyboard and reduced motion preserve accessible controls', async ({ page }) => {
+test('mobile layout, keyboard and reduced motion preserve accessible controls', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await demo(page);
@@ -147,18 +221,11 @@ test('mobile touch, keyboard and reduced motion preserve accessible controls', a
   expect(
     await page.locator('html').evaluate((element) => element.scrollWidth <= window.innerWidth),
   ).toBe(true);
-  const lines = page.locator('svg path[d="M0 7H180"]');
-  await expect(lines).toHaveCount(2);
-  expect(
-    await lines.evaluateAll((nodes) =>
-      nodes.every((node) => getComputedStyle(node).animationName === 'none'),
-    ),
-  ).toBe(true);
+  const canvas = await threeCanvas(page);
+  await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
 });
 
-test('all devices remain reachable when the scene only shows representative markers', async ({
-  page,
-}) => {
+test('all current-floor devices remain reachable in a large asset list', async ({ page }) => {
   const data = overview(32);
   data.assets.forEach((asset) => {
     asset.placement = { site: 'OpenMind', floor: 2, version: 1, updateTimeUtc: Date.now() };
@@ -167,11 +234,220 @@ test('all devices remain reachable when the scene only shows representative mark
   await open(page);
   const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
   await remote.getByRole('button', { name: '2F', exact: true }).click();
+  const canvas = await threeCanvas(page);
+  await expect
+    .poll(() => projectedAssetIds(canvas))
+    .toEqual(data.assets.map((asset) => asset.assetId).sort());
+  const lastId = data.assets[31].assetId;
+  await clickProjectedAsset(page, canvas, lastId);
+  await expect(
+    page.getByRole('dialog', { name: '资产详情' }).getByText(lastId, { exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press('Escape');
   await remote.getByRole('button', { name: '2F · 查看 32 台', exact: true }).click();
   await page.getByRole('textbox', { name: '搜索资产名称' }).fill('合成资产 32');
   await expect(
     page.getByRole('button', { name: '查看资产 合成资产 32', exact: true }),
   ).toBeVisible();
+});
+
+test('the shared viewport renders real WebGL2 and responds to mouse rotate, zoom and pan', async ({
+  page,
+}) => {
+  await demo(page);
+  const canvas = await threeCanvas(page);
+  await expect(page.locator('canvas')).toHaveCount(1);
+  expect(
+    await canvas.evaluate((element: HTMLCanvasElement) => {
+      const context = element.getContext('webgl2');
+      return (
+        !!context &&
+        !context.isContextLost() &&
+        context.drawingBufferWidth > 0 &&
+        context.drawingBufferHeight > 0
+      );
+    }),
+  ).toBe(true);
+  await canvas.scrollIntoViewIfNeeded();
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('The WebGL viewport has no bounds');
+  const x = box.x + box.width * 0.5;
+  const y = box.y + box.height * 0.5;
+  const initial = await cameraPose(canvas);
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 110, y + 35, { steps: 10 });
+  await page.mouse.up();
+  await expect.poll(async () => (await cameraPose(canvas)).position).not.toEqual(initial.position);
+  await expect(page.getByRole('dialog', { name: '资产详情' })).toHaveCount(0);
+
+  const rotated = await cameraPose(canvas);
+  await page.mouse.move(x, y);
+  await page.mouse.wheel(0, -250);
+  await expect
+    .poll(async () => {
+      const pose = await cameraPose(canvas);
+      return { position: pose.position, zoom: pose.zoom };
+    })
+    .not.toEqual({ position: rotated.position, zoom: rotated.zoom });
+
+  const zoomed = await cameraPose(canvas);
+  await page.mouse.move(x, y);
+  await page.mouse.down({ button: 'right' });
+  await page.mouse.move(x + 85, y + 30, { steps: 8 });
+  await page.mouse.up({ button: 'right' });
+  await expect.poll(async () => (await cameraPose(canvas)).target).not.toEqual(zoomed.target);
+  await expect(page.getByRole('dialog', { name: '资产详情' })).toHaveCount(0);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect
+    .poll(() => page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches))
+    .toBe(true);
+  await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect
+    .poll(() => page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches))
+    .toBe(false);
+  await expect(canvas).toHaveAttribute('data-link-animation', 'running');
+});
+
+test('a short mouse click raycasts a device, and list selection updates the visible floor', async ({
+  page,
+}) => {
+  await demo(page);
+  const canvas = await threeCanvas(page);
+  await clickProjectedAsset(page, canvas, '00000000-0000-4000-8000-000000000001');
+  const dialog = page.getByRole('dialog', { name: '资产详情' });
+  await expect(dialog.getByRole('heading', { name: 'Demo · Atlas', exact: true })).toBeVisible();
+  await expect(
+    dialog.getByText('00000000-0000-4000-8000-000000000001', { exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: '查看资产 Demo · Compute', exact: true }).click();
+  await expect(dialog.getByRole('heading', { name: 'Demo · Compute', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(
+    page
+      .getByRole('region', { name: 'OpenMind 房屋空间示意' })
+      .getByRole('button', { name: '2F', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await clickProjectedAsset(page, canvas, '00000000-0000-4000-8000-000000000005');
+  await expect(dialog.getByRole('heading', { name: 'Demo · Compute', exact: true })).toBeVisible();
+});
+
+test('changing theme preserves the real WebGL context, camera and mouse interaction', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await demo(page);
+  const canvas = await threeCanvas(page);
+  await canvas.scrollIntoViewIfNeeded();
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('The WebGL viewport has no bounds');
+  const x = box.x + box.width * 0.5;
+  const y = box.y + box.height * 0.5;
+  const initial = await cameraPose(canvas);
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 70, y + 15, { steps: 8 });
+  await page.mouse.up();
+  await expect.poll(async () => (await cameraPose(canvas)).position).not.toEqual(initial.position);
+  const rotated = await cameraPose(canvas);
+  const context = await canvas.evaluateHandle((element: HTMLCanvasElement) =>
+    element.getContext('webgl2'),
+  );
+  const background = () =>
+    page.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor);
+  const lightBackground = await background();
+  const lightImage = await canvas.screenshot();
+  try {
+    await page.getByTestId('preview-theme-toggle').click();
+    await expect.poll(background).not.toBe(lightBackground);
+    await expect(page.locator('[data-render-state]')).toHaveAttribute('data-render-state', 'ready');
+    expect(await cameraPose(canvas)).toEqual(rotated);
+    expect(
+      await canvas.evaluate((element: HTMLCanvasElement, original) => {
+        const current = element.getContext('webgl2');
+        return current === original && current !== null && !current.isContextLost();
+      }, context),
+    ).toBe(true);
+    const darkImage = await canvas.screenshot();
+    expect(darkImage).not.toEqual(lightImage);
+
+    await page.getByTestId('preview-theme-toggle').click();
+    await expect.poll(background).toBe(lightBackground);
+    await expect(page.locator('[data-render-state]')).toHaveAttribute('data-render-state', 'ready');
+    expect(await cameraPose(canvas)).toEqual(rotated);
+    expect(
+      await canvas.evaluate((element: HTMLCanvasElement, original) => {
+        const current = element.getContext('webgl2');
+        return current === original && current !== null && !current.isContextLost();
+      }, context),
+    ).toBe(true);
+    expect(await canvas.screenshot()).not.toEqual(darkImage);
+
+    const latestBounds = await canvas.boundingBox();
+    if (!latestBounds) throw new Error('The themed WebGL viewport has no bounds');
+    await page.mouse.move(
+      latestBounds.x + latestBounds.width * 0.5,
+      latestBounds.y + latestBounds.height * 0.5,
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      latestBounds.x + latestBounds.width * 0.5 + 40,
+      latestBounds.y + latestBounds.height * 0.5,
+      { steps: 6 },
+    );
+    await page.mouse.up();
+    await expect
+      .poll(async () => (await cameraPose(canvas)).position)
+      .not.toEqual(rotated.position);
+    await expect(page.getByRole('dialog', { name: '资产详情' })).toHaveCount(0);
+  } finally {
+    await context.dispose();
+  }
+});
+
+test('WebGL unavailable is a visible fallback, while floor and asset controls still work', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    HTMLCanvasElement.prototype.getContext = () => null;
+  });
+  let writes = 0;
+  await page.route(`${prefix}place`, (route) => {
+    writes++;
+    return route.abort('failed');
+  });
+  await demo(page);
+  const viewport = page.locator('[data-render-state]');
+  await expect(viewport).toHaveAttribute('data-render-state', 'unavailable');
+  await expect(viewport.getByRole('alert')).toBeVisible();
+  const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
+  await remote.getByRole('button', { name: '3F', exact: true }).click();
+  await remote.getByRole('button', { name: /Workstation.*3F, 失联/ }).click();
+  await expect(page.getByRole('dialog', { name: '资产详情' })).toBeVisible();
+  expect(writes).toBe(0);
+});
+
+test('a lost WebGL context stops animation and preserves accessible device selection', async ({
+  page,
+}) => {
+  await demo(page);
+  const canvas = await threeCanvas(page);
+  expect(
+    await canvas.evaluate((element: HTMLCanvasElement) => {
+      const extension = element.getContext('webgl2')?.getExtension('WEBGL_lose_context');
+      if (!extension) return false;
+      extension.loseContext();
+      return true;
+    }),
+  ).toBe(true);
+  const viewport = page.locator('[data-render-state]');
+  await expect(viewport).toHaveAttribute('data-render-state', 'lost');
+  await expect(viewport.getByRole('alert')).toBeVisible();
+  await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
+  await page.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: '资产详情' })).toBeVisible();
 });
 
 test('read failure stays a failure, never silently switches to demo', async ({ page }) => {
@@ -275,5 +551,11 @@ test('capture a shareable synthetic desktop preview', async ({ page }) => {
     .getByRole('region', { name: 'OpenMind 房屋空间示意' })
     .getByRole('button', { name: '4F', exact: true })
     .click();
+  const canvas = await threeCanvas(page);
+  await expect
+    .poll(() => projectedAssetIds(canvas))
+    .toEqual(
+      [1, 2, 3, 7, 9].map((id) => `00000000-0000-4000-8000-${String(id).padStart(12, '0')}`),
+    );
   await page.screenshot({ path: 'test-results/personal-assets-preview.png', fullPage: true });
 });

@@ -1,4 +1,15 @@
 export const asset = {
+  'personal.asset.sceneLabel': '资产 3D 空间',
+  'personal.asset.sceneControls': '拖动旋转 · 滚轮缩放 · 右键拖动平移',
+  'personal.asset.touchControls':
+    '触屏：单指旋转，双指缩放或平移；键盘：聚焦场景后方向键平移，Home 重置',
+  'personal.asset.resetView': '重置视角',
+  'personal.asset.loading3d': '正在加载 3D 场景',
+  'personal.asset.webglUnavailable':
+    '此浏览器无法启用 3D 图形。仍可使用楼层设备按钮和资产清单查看详情。',
+  'personal.asset.webglLost': '3D 图形上下文已中断。仍可使用设备清单；刷新页面后可重新尝试 3D。',
+  'personal.asset.currentFloorDevices': '当前楼层设备',
+  'personal.asset.noFloorAssets': '该楼层暂无已定位设备',
   'personal.asset.title': '我的资产',
   'personal.asset.demo': '演示',
   'personal.asset.demoHelp':

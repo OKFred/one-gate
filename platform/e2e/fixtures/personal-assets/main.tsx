@@ -1,6 +1,7 @@
+import { useMemo, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter } from 'react-router-dom';
-import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { Box, Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { MenuContext } from '@/contexts/MenuContext';
 import { PermissionContext } from '@/contexts/PermissionContext';
 import { setTranslations } from '@/hooks/useTranslation';
@@ -29,9 +30,26 @@ const codes = new Set([
 ]);
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing preview container');
+
+function PreviewTheme({ children }: { children: ReactNode }) {
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
+  const theme = useMemo(() => createTheme({ palette: { mode } }), [mode]);
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Button
+        data-testid="preview-theme-toggle"
+        onClick={() => setMode((value) => (value === 'light' ? 'dark' : 'light'))}
+      >
+        切换预览主题
+      </Button>
+      {children}
+    </ThemeProvider>
+  );
+}
+
 createRoot(root).render(
-  <ThemeProvider theme={createTheme()}>
-    <CssBaseline />
+  <PreviewTheme>
     <HashRouter>
       <MenuContext.Provider
         value={{ navItems: [], setNavItems: () => {}, loading: false, loadMenus: async () => [] }}
@@ -55,5 +73,5 @@ createRoot(root).render(
         </PermissionContext.Provider>
       </MenuContext.Provider>
     </HashRouter>
-  </ThemeProvider>,
+  </PreviewTheme>,
 );

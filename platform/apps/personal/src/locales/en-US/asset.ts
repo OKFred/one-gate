@@ -1,4 +1,16 @@
 export const asset = {
+  'personal.asset.sceneLabel': '3D asset spaces',
+  'personal.asset.sceneControls': 'Drag to orbit · Scroll to zoom · Right-drag to pan',
+  'personal.asset.touchControls':
+    'Touch: one finger to orbit, two to zoom or pan. Keyboard: focus the scene, arrows to pan, Home to reset.',
+  'personal.asset.resetView': 'Reset view',
+  'personal.asset.loading3d': 'Loading the 3D scene',
+  'personal.asset.webglUnavailable':
+    'This browser cannot start 3D graphics. Use the floor device buttons and inventory to view details.',
+  'personal.asset.webglLost':
+    'The 3D graphics context was interrupted. The device list remains available; reload to try 3D again.',
+  'personal.asset.currentFloorDevices': 'Current-floor devices',
+  'personal.asset.noFloorAssets': 'No located devices on this floor',
   'personal.asset.title': 'My assets',
   'personal.asset.demo': 'Demo',
   'personal.asset.demoHelp':

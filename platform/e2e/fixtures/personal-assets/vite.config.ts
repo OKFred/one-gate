@@ -114,7 +114,7 @@ export default defineConfig({
               res.end(
                 JSON.stringify({
                   ok: false,
-                  code: 'PERSONAL_ASSET_STATE_CONFLICT',
+                  data: { code: 'PERSONAL_ASSET_STATE_CONFLICT' },
                   message: '合成位置冲突',
                 }),
               );

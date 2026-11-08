@@ -21,7 +21,7 @@ import { ArrowForward, Close, LocationOnOutlined, Search } from '@mui/icons-mate
 import { classifyApiFailure } from '@/api/config';
 import type { AssetPlacement } from '@/api/personal/asset';
 import { useTranslation } from '@/hooks/useTranslation';
-import { AssetIcon, ConnectionStrip, HouseScene, StatusChip } from './HouseScene';
+import { AssetIcon, AssetSpacesScene, StatusChip } from './HouseScene';
 import {
   effectivePresence,
   presenceStatuses,
@@ -91,7 +91,10 @@ export function AssetWorkspace({
       document.removeEventListener('visibilitychange', update);
     };
   }, [snapshot.assets, clock, now]);
-  const physical = snapshot.assets.filter((asset) => !asset.demoKind);
+  const physical = useMemo(
+    () => snapshot.assets.filter((asset) => !asset.demoKind),
+    [snapshot.assets],
+  );
   const selected = snapshot.assets.find((asset) => asset.assetId === selectedId) ?? null;
   const pending = physical.filter(
     (asset) => asset.placement.site === null || asset.placement.floor === null,
@@ -141,28 +144,15 @@ export function AssetWorkspace({
           {t(demo ? 'personal.asset.demoSaved' : 'personal.asset.saved')}
         </Alert>
       )}
-      <ConnectionStrip />
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: 'minmax(0,1fr)', md: 'repeat(2,minmax(0,1fr))' },
-          gap: 2,
-        }}
-      >
-        {sites.map((site) => (
-          <HouseScene
-            key={site}
-            site={site}
-            floor={floors[site]}
-            assets={physical}
-            selectedId={selected?.demoKind ? selected.hostAssetId : selectedId}
-            now={now}
-            onFloorChange={(floor) => setFloors((value) => ({ ...value, [site]: floor }))}
-            onSelect={select}
-            onShowFloor={() => showFloor(site)}
-          />
-        ))}
-      </Box>
+      <AssetSpacesScene
+        floors={floors}
+        assets={physical}
+        selectedId={selected?.demoKind ? selected.hostAssetId : selectedId}
+        now={now}
+        onFloorChange={(site, floor) => setFloors((value) => ({ ...value, [site]: floor }))}
+        onSelect={select}
+        onShowFloor={showFloor}
+      />
       <Paper
         id="personal-asset-list"
         tabIndex={-1}
