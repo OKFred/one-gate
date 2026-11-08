@@ -24,6 +24,7 @@ const supportedBusinesses = [
   "admin.maintenance.compliance",
   "personal.base.user_config",
   "personal.base.preference",
+  "personal.asset",
   "enterprise.tenant",
   "enterprise.asset",
 ] as const;
@@ -43,6 +44,7 @@ const supportedPaths = new Set([
   "/admin/maintenance/recycle-bin",
   "/enterprise/tenant",
   "/enterprise/asset",
+  "/personal/asset",
 ]);
 
 function supported(business: string) {

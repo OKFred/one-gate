@@ -3,10 +3,41 @@ import type { BusinessKey } from "@hodor/core/types/business";
 import { CLOUDFLARE_LIMIT_PRESENTATIONS } from "../../middleware/errorHandler/cloudflare-limit";
 
 export const sharedTranslations = {
-  "business.type": [],
+  "business.type": [
+    {
+      application: "backend",
+      tKey: "businessType.personal.asset",
+      langCodes: { "zh-CN": "个人资产空间", "en-US": "Personal asset spaces" },
+    },
+  ],
   components: [],
   common: [],
   "business.exception": [
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.asset.invalidPlacement",
+      langCodes: {
+        "zh-CN": "请选择有效的区域和楼层",
+        "en-US": "Select a valid site and floor",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.asset.stateConflict",
+      langCodes: {
+        "zh-CN": "展示位置已变更，请刷新后重试",
+        "en-US": "The placement changed. Refresh before trying again.",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.personal.asset.tooManyAssets",
+      langCodes: {
+        "zh-CN": "当前企业超过 1000 项资产，无法完整展示；未返回部分清单",
+        "en-US":
+          "This enterprise has more than 1,000 assets. No partial list was returned.",
+      },
+    },
     {
       application: "backend",
       tKey: "errorHandler.personal.calendar.subscription.unavailable",

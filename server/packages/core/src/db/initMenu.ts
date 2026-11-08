@@ -504,6 +504,15 @@ export const initialMenuData = [
     business: "personal",
   },
   {
+    id: 81,
+    name: "sidebar.menu.personal.asset",
+    icon: "material-symbols:home-work-outline",
+    path: "/personal/asset",
+    parentId: 47,
+    sort: 0,
+    business: "personal.asset",
+  },
+  {
     id: 62,
     name: "sidebar.menu.personal.base",
     icon: "material-symbols:settings-account-box",

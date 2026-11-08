@@ -193,8 +193,8 @@ describe.skipIf(!configured)(
       expect(await counts()).toEqual({
         roles: "0",
         users: "0",
-        menus: "0",
-        permissions: "0",
+        menus: "1",
+        permissions: "2",
         bindings: "0",
       });
     });
@@ -696,8 +696,8 @@ describe.skipIf(!configured)(
       expect(await counts()).toEqual({
         roles: "0",
         users: "0",
-        menus: "0",
-        permissions: "0",
+        menus: "1",
+        permissions: "2",
         bindings: "0",
       });
       expect((await seedPostgres(client, { schema, apply: true })).status).toBe(
@@ -754,8 +754,8 @@ describe.skipIf(!configured)(
       expect(await counts()).toEqual({
         roles: "0",
         users: "0",
-        menus: "0",
-        permissions: "0",
+        menus: "1",
+        permissions: "2",
         bindings: "0",
       });
       const password = `synthetic-${randomUUID()}`;

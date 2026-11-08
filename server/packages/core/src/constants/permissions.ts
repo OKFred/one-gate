@@ -156,6 +156,9 @@ export const permissionSeeds = {
   personal: {
     "": ["read"],
 
+    /** 个人资产空间 */
+    asset: ["read", "update"],
+
     /** 账号配置 */
     base: {
       "": ["read"],

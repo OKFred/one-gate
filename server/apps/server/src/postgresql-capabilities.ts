@@ -61,6 +61,8 @@ export function supportsPostgresPath(path: string): boolean {
   if (domain === "/admin/base/map") return action === "config";
   if (domain === "/personal/calendar")
     return supportedCalendarActions.has(action);
+  if (domain === "/personal/asset")
+    return action === "overview" || action === "place";
   if (domain === "/personal/calendar/subscription")
     return supportedCalendarSubscriptionActions.has(action);
   if (domain === "/admin/system/auth") return supportedAuthActions.has(action);

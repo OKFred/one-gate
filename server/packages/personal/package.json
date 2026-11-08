@@ -9,6 +9,7 @@
   "dependencies": {
     "@hodor/core": "workspace:*",
     "@hodor/admin": "workspace:*",
+    "@hodor/enterprise": "workspace:*",
     "@hono/zod-openapi": "^1.3.0",
     "hono": "^4.12.12"
   }
