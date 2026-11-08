@@ -1,6 +1,12 @@
 export const asset = {
   'personal.asset.viewMode': '资产视图',
   'personal.asset.listView': '列表',
+  'personal.asset.topologyView': '拓扑',
+  'personal.asset.topologyTitle': '资产 2D 拓扑',
+  'personal.asset.topologyHelp': '个人位置与主机关联示意，连线不代表实际网络。',
+  'personal.asset.topologyZoomIn': '拓扑放大',
+  'personal.asset.topologyZoomOut': '拓扑缩小',
+  'personal.asset.topologyFit': '适配拓扑',
   'personal.asset.spaceView': '空间',
   'personal.asset.sceneLabel': '资产 3D 空间',
   'personal.asset.sceneControls': '拖动旋转 · 滚轮缩放 · 右键拖动平移',

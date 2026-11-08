@@ -1,6 +1,13 @@
 export const asset = {
   'personal.asset.viewMode': 'Asset view',
   'personal.asset.listView': 'List',
+  'personal.asset.topologyView': 'Topology',
+  'personal.asset.topologyTitle': 'Asset 2D topology',
+  'personal.asset.topologyHelp':
+    'Personal locations and host associations; lines do not represent actual network links.',
+  'personal.asset.topologyZoomIn': 'Zoom in topology',
+  'personal.asset.topologyZoomOut': 'Zoom out topology',
+  'personal.asset.topologyFit': 'Fit topology',
   'personal.asset.spaceView': 'Space',
   'personal.asset.sceneLabel': '3D asset spaces',
   'personal.asset.sceneControls': 'Drag to orbit · Scroll to zoom · Right-drag to pan',

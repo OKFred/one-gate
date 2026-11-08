@@ -53,6 +53,26 @@ async function showList(page: Page) {
   await expect(page.getByRole('heading', { name: /资产清单/ })).toBeVisible();
   await expect(page.getByTestId('asset-three-canvas')).toHaveCount(0);
 }
+async function showTopology(page: Page): Promise<Locator> {
+  await page
+    .getByRole('group', { name: '资产视图', exact: true })
+    .getByRole('button', { name: '拓扑', exact: true })
+    .click();
+  await expect(page.locator('#personal-asset-list')).toBeHidden();
+  const topology = page.getByTestId('asset-topology');
+  await expect(topology).toBeVisible();
+  await expect(page.locator('canvas')).toHaveCount(0);
+  await topology.scrollIntoViewIfNeeded();
+  return topology;
+}
+async function topologyViewport(
+  topology: Locator,
+): Promise<{ x: number; y: number; zoom: number }> {
+  return topology.locator('.react-flow__viewport').evaluate((element) => {
+    const transform = new DOMMatrixReadOnly(getComputedStyle(element).transform);
+    return { x: transform.e, y: transform.f, zoom: transform.a };
+  });
+}
 
 type CameraPose = { position: number[]; target: number[]; zoom: number };
 function isVector(value: unknown): value is number[] {
@@ -201,6 +221,131 @@ test('showing a floor switches to the filtered list and transfers keyboard focus
   await expect(
     page.getByRole('button', { name: '查看资产 Demo · Relay', exact: true }),
   ).toHaveCount(0);
+});
+
+test('the 2D topology works without WebGL and shows only physical devices including unlocated assets', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    HTMLCanvasElement.prototype.getContext = () => null;
+  });
+  await demo(page);
+  const topology = await showTopology(page);
+  await expect(topology.getByRole('button', { name: /^查看资产 / })).toHaveCount(9);
+  await expect(
+    topology.getByRole('button', { name: '查看资产 Demo · Unlocated', exact: true }),
+  ).toBeVisible();
+  await expect(topology.getByRole('button', { name: /Virtual machine|Container/ })).toHaveCount(0);
+  await expect(page.getByTestId('asset-three-canvas')).toHaveCount(0);
+});
+
+test('topology device pointer and keyboard activation open the correct UUID while dragging does not', async ({
+  page,
+}) => {
+  await demo(page);
+  const topology = await showTopology(page);
+  const atlas = topology.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true });
+  await atlas.click();
+  const dialog = page.getByRole('dialog', { name: '资产详情' });
+  await expect(
+    dialog.getByText('00000000-0000-4000-8000-000000000001', { exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press('Escape');
+  const unlocated = topology.getByRole('button', {
+    name: '查看资产 Demo · Unlocated',
+    exact: true,
+  });
+  await unlocated.focus();
+  await page.keyboard.press('Enter');
+  await expect(
+    dialog.getByText('00000000-0000-4000-8000-000000000008', { exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press('Escape');
+  await topology.getByRole('button', { name: '适配拓扑', exact: true }).click();
+  await expect(atlas).toBeInViewport();
+  const box = await atlas.boundingBox();
+  if (!box) throw new Error('The actual topology device button has no bounds');
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 80, box.y + box.height / 2 + 45, { steps: 10 });
+  await page.mouse.up();
+  await expect(dialog).toHaveCount(0);
+});
+
+test('topology pan, wheel zoom and fit controls change the actual viewport while list filters persist', async ({
+  page,
+}) => {
+  await demo(page);
+  await page.getByRole('textbox', { name: '搜索资产名称' }).fill('Compute');
+  const topology = await showTopology(page);
+  await topology.getByRole('button', { name: '适配拓扑', exact: true }).click();
+  const pane = topology.locator('.react-flow__pane');
+  const box = await pane.boundingBox();
+  if (!box) throw new Error('The actual topology pane has no bounds');
+  const initial = await topologyViewport(topology);
+  await page.mouse.move(box.x + box.width - 18, box.y + 18);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width - 128, box.y + 83, { steps: 10 });
+  await page.mouse.up();
+  await expect
+    .poll(async () => {
+      const view = await topologyViewport(topology);
+      return { x: view.x, y: view.y };
+    })
+    .not.toEqual({ x: initial.x, y: initial.y });
+  const panned = await topologyViewport(topology);
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.wheel(0, -250);
+  await expect
+    .poll(async () => (await topologyViewport(topology)).zoom)
+    .toBeGreaterThan(panned.zoom);
+  const zoomed = await topologyViewport(topology);
+  await topology.getByRole('button', { name: '拓扑放大', exact: true }).click();
+  await expect
+    .poll(async () => (await topologyViewport(topology)).zoom)
+    .toBeGreaterThan(zoomed.zoom);
+  const enlarged = await topologyViewport(topology);
+  await topology.getByRole('button', { name: '拓扑缩小', exact: true }).click();
+  await expect
+    .poll(async () => (await topologyViewport(topology)).zoom)
+    .toBeLessThan(enlarged.zoom);
+  await topology.getByRole('button', { name: '适配拓扑', exact: true }).click();
+  await expect(
+    topology.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true }),
+  ).toBeInViewport();
+  await expect(
+    topology.getByRole('button', { name: '查看资产 Demo · Unlocated', exact: true }),
+  ).toBeInViewport();
+  await showList(page);
+  await expect(page.getByRole('textbox', { name: '搜索资产名称' })).toHaveValue('Compute');
+  await expect(
+    page.getByRole('button', { name: '查看资产 Demo · Compute', exact: true }),
+  ).toBeVisible();
+});
+
+test('the topology remains 2D on mobile, follows the theme and expires stale device evidence', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.clock.install({ time: new Date('2030-01-01T00:00:00.000Z') });
+  await demo(page);
+  const topology = await showTopology(page);
+  await expect(topology.getByRole('button', { name: /^查看资产 / })).toHaveCount(9);
+  const atlas = topology.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true });
+  await expect(atlas).toContainText('在线');
+  const background = () =>
+    page.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor);
+  const lightBackground = await background();
+  await page.getByTestId('preview-theme-toggle').click();
+  await expect.poll(background).not.toBe(lightBackground);
+  await expect(topology).toBeVisible();
+  await expect(page.locator('canvas')).toHaveCount(0);
+  expect(
+    await page.locator('html').evaluate((element) => element.scrollWidth <= window.innerWidth),
+  ).toBe(true);
+  await page.clock.fastForward(600_001);
+  await expect(atlas).toContainText('未知');
+  await expect(atlas).not.toContainText('在线');
 });
 
 test('save confirms only a successful response and keeps UUID and version', async ({ page }) => {
@@ -729,11 +874,24 @@ test('demo online evidence becomes unknown at the exact displayed lease boundary
   await expect(page.getByTestId('asset-three-canvas')).toHaveCount(0);
 });
 
-test('capture shareable synthetic desktop list and space previews', async ({ page }) => {
+test('capture shareable synthetic desktop list, topology and space previews', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await demo(page);
   await expect(page.getByTestId('asset-three-canvas')).toHaveCount(0);
   await page.screenshot({ path: 'test-results/personal-assets-list-preview.png', fullPage: true });
+  const topology = await showTopology(page);
+  await expect(topology.getByRole('button', { name: /^查看资产 / })).toHaveCount(9);
+  await topology.getByRole('button', { name: '适配拓扑', exact: true }).click();
+  await expect(
+    topology.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true }),
+  ).toBeInViewport();
+  await expect(
+    topology.getByRole('button', { name: '查看资产 Demo · Unlocated', exact: true }),
+  ).toBeInViewport();
+  await page.screenshot({
+    path: 'test-results/personal-assets-topology-preview.png',
+    fullPage: true,
+  });
   await showSpace(page);
   await page
     .getByRole('region', { name: 'OpenMind 房屋空间示意' })

@@ -20,6 +20,7 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  AccountTreeOutlined,
   ArrowForward,
   Close,
   LocationOnOutlined,
@@ -30,6 +31,7 @@ import {
 import { classifyApiFailure } from '@/api/config';
 import type { AssetPlacement } from '@/api/personal/asset';
 import { useTranslation } from '@/hooks/useTranslation';
+import { AssetTopology } from './AssetTopology';
 import { AssetIcon, AssetSpacesScene, StatusChip } from './HouseScene';
 import {
   effectivePresence,
@@ -65,7 +67,7 @@ export function AssetWorkspace({
   onPlace: SavePlacement;
 }) {
   const t = useTranslation();
-  const [view, setView] = useState<'list' | 'space'>('list');
+  const [view, setView] = useState<'list' | 'topology' | 'space'>('list');
   const focusList = useRef(false);
   const [floors, setFloors] = useState({ OpenLife: 1, OpenMind: 1 });
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -168,12 +170,16 @@ export function AssetWorkspace({
           size="small"
           aria-label={t('personal.asset.viewMode')}
           onChange={(_, next: unknown) => {
-            if (next === 'list' || next === 'space') setView(next);
+            if (next === 'list' || next === 'topology' || next === 'space') setView(next);
           }}
         >
           <ToggleButton value="list" sx={{ gap: 0.75, minHeight: 44 }}>
             <ViewListOutlined fontSize="small" />
             {t('personal.asset.listView')}
+          </ToggleButton>
+          <ToggleButton value="topology" sx={{ gap: 0.75, minHeight: 44 }}>
+            <AccountTreeOutlined fontSize="small" />
+            {t('personal.asset.topologyView')}
           </ToggleButton>
           <ToggleButton value="space" sx={{ gap: 0.75, minHeight: 44 }}>
             <ViewInArOutlined fontSize="small" />
@@ -181,6 +187,14 @@ export function AssetWorkspace({
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
+      {view === 'topology' && (
+        <AssetTopology
+          assets={physical}
+          selectedId={selected?.demoKind ? selected.hostAssetId : selectedId}
+          now={now}
+          onSelect={select}
+        />
+      )}
       {view === 'space' && (
         <AssetSpacesScene
           floors={floors}

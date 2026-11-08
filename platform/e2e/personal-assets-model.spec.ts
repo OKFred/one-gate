@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { createDemoAssets, effectivePresence } from '../apps/personal/src/pages/asset/model';
 import { cameraFitDistance, deviceSlots } from '../apps/personal/src/pages/asset/threeScene';
+import { buildAssetTopologyLayout } from '../apps/personal/src/pages/asset/topologyLayout';
 
 test('evidence expiration is half open and never invents loss or a new lease', () => {
   const now = 1_800_000_000_000;
@@ -67,4 +68,60 @@ test('floor slots retain every device and its outline within the usable ground a
       expect(Math.abs(slot.z) + slot.scale * 0.5).toBeLessThan(4.6 / 2);
     }
   }
+});
+
+test('topology preserves canonical physical identities and only links valid visible hosts', () => {
+  const assets = createDemoAssets(1_800_000_000_000);
+  assets[1].hostAssetId = assets[0].assetId;
+  assets[2].hostAssetId = assets[2].assetId;
+  assets[3].hostAssetId = '00000000-0000-4000-8000-000000000099';
+  assets[4].hostAssetId = assets[7].assetId;
+  const input = [...assets, { ...assets[0] }];
+  const layout = buildAssetTopologyLayout(input);
+  const physical = layout.nodes.filter((node) => node.kind === 'asset');
+  expect(physical.map((node) => node.asset.assetId).sort()).toEqual(
+    assets
+      .filter((asset) => !asset.demoKind)
+      .map((asset) => asset.assetId)
+      .sort(),
+  );
+  expect(physical).toHaveLength(9);
+  const nodes = new Map(layout.nodes.map((node) => [node.id, node]));
+  expect(nodes.size).toBe(layout.nodes.length);
+  for (const edge of layout.edges) {
+    expect(nodes.has(edge.source) && nodes.has(edge.target)).toBe(true);
+    expect(edge.source).not.toBe(edge.target);
+  }
+  const hostPairs = layout.edges
+    .filter((edge) => edge.kind === 'host')
+    .map((edge) => [edge.source, edge.target].sort().join('|'))
+    .sort();
+  expect(hostPairs).toEqual(
+    [
+      [assets[0].assetId, assets[1].assetId]
+        .map((id) => `asset:${id}`)
+        .sort()
+        .join('|'),
+      [assets[4].assetId, assets[7].assetId]
+        .map((id) => `asset:${id}`)
+        .sort()
+        .join('|'),
+    ].sort(),
+  );
+  for (const node of physical) {
+    const placements = layout.edges.filter(
+      (edge) => edge.kind === 'placement' && edge.target === node.id,
+    );
+    expect(placements).toHaveLength(1);
+    const parent = nodes.get(placements[0].source);
+    if (node.asset.placement.site === null) expect(parent?.kind).toBe('pending');
+    else {
+      expect(parent).toMatchObject({
+        kind: 'floor',
+        site: node.asset.placement.site,
+        floor: node.asset.placement.floor,
+      });
+    }
+  }
+  expect(buildAssetTopologyLayout([...input].reverse())).toEqual(layout);
 });
