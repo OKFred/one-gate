@@ -30,7 +30,6 @@ export interface HoveredAsset {
 export interface SpacesRenderer {
   update(state: SceneState): void;
   setColors(colors: SceneColors): void;
-  setMotion(enabled: boolean | null): void;
   reset(): void;
   dispose(): void;
 }
@@ -138,7 +137,6 @@ export function createSpacesRenderer(
   scene.add(link);
   const distances = link.geometry.getAttribute('lineDistance');
   const baseDistances = Float32Array.from(distances.array);
-  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const transform = new THREE.Object3D();
@@ -148,7 +146,6 @@ export function createSpacesRenderer(
   let lost = false;
   let animation: number | undefined;
   let lastFrame = -Infinity;
-  let motionOverride: boolean | null = null;
   let currentState: SceneState | null = null;
   let ready = false;
   const homeSphere = new THREE.Sphere();
@@ -202,7 +199,7 @@ export function createSpacesRenderer(
   }
 
   function canAnimate() {
-    return !disposed && !lost && !document.hidden && (motionOverride ?? !motion.matches);
+    return !disposed && !lost && !document.hidden;
   }
 
   function animate(time: number) {
@@ -572,7 +569,6 @@ export function createSpacesRenderer(
   canvas.addEventListener('wheel', wheel, { passive: true });
   canvas.addEventListener('keydown', keyDown);
   canvas.addEventListener('webglcontextlost', contextLost);
-  motion.addEventListener('change', animationState);
   document.addEventListener('visibilitychange', animationState);
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
@@ -581,11 +577,6 @@ export function createSpacesRenderer(
 
   return {
     update,
-    setMotion(enabled) {
-      if (disposed) return;
-      motionOverride = enabled;
-      animationState();
-    },
     setColors(nextColors) {
       if (disposed || lost) return;
       colors = nextColors;
@@ -616,7 +607,6 @@ export function createSpacesRenderer(
       canvas.removeEventListener('wheel', wheel);
       canvas.removeEventListener('keydown', keyDown);
       canvas.removeEventListener('webglcontextlost', contextLost);
-      motion.removeEventListener('change', animationState);
       document.removeEventListener('visibilitychange', animationState);
       disposeObjects(scene);
       renderer.dispose();
