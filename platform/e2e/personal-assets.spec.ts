@@ -572,6 +572,120 @@ test('a short mouse click raycasts a device, and list selection updates the visi
   await expect(dialog.getByRole('heading', { name: 'Demo · Compute', exact: true })).toBeVisible();
 });
 
+test('the internet is a non-asset intermediary and clicking it preserves floor and device identities', async ({
+  page,
+}) => {
+  await demo(page);
+  await expect(page.getByRole('button', { name: /^查看资产 / })).toHaveCount(9);
+  await showSpace(page);
+  await expect(
+    page.getByText('OpenLife ↔ 互联网 ↔ OpenMind · 互联示意', { exact: true }),
+  ).toBeVisible();
+  const canvas = await threeCanvas(page);
+  await expect.poll(() => projectedAssetIds(canvas)).toEqual(demoPlacedIds);
+  const local = page.getByRole('region', { name: 'OpenLife 房屋空间示意' });
+  const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
+  await expect(local.getByText('3 台设备', { exact: true })).toBeVisible();
+  await expect(remote.getByText('5 台设备', { exact: true })).toBeVisible();
+  await expect(local.getByRole('button', { name: '1F', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(remote.getByRole('button', { name: '1F', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+
+  await canvas.scrollIntoViewIfNeeded();
+  const internetTarget = async () => {
+    const target: unknown = JSON.parse(
+      (await canvas.getAttribute('data-internet-target')) ?? 'null',
+    );
+    if (
+      !target ||
+      typeof target !== 'object' ||
+      !('x' in target) ||
+      typeof target.x !== 'number' ||
+      !Number.isFinite(target.x) ||
+      !('y' in target) ||
+      typeof target.y !== 'number' ||
+      !Number.isFinite(target.y)
+    )
+      throw new Error('The internet has no finite rendered projection');
+    return { x: target.x, y: target.y };
+  };
+  const target = await internetTarget();
+  const bounds = await canvas.boundingBox();
+  if (!bounds) throw new Error('The WebGL viewport has no bounds');
+  expect(target.x).toBeGreaterThan(0);
+  expect(target.x).toBeLessThan(bounds.width);
+  expect(target.y).toBeGreaterThan(0);
+  expect(target.y).toBeLessThan(bounds.height);
+  await page.mouse.click(bounds.x + target.x, bounds.y + target.y);
+  await expect(page.getByRole('dialog', { name: '资产详情' })).toHaveCount(0);
+  await expect.poll(() => projectedAssetIds(canvas)).toEqual(demoPlacedIds);
+  await expect(local.getByRole('button', { name: '1F', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(remote.getByRole('button', { name: '1F', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(local.getByText('3 台设备', { exact: true })).toBeVisible();
+  await expect(remote.getByText('5 台设备', { exact: true })).toBeVisible();
+
+  const initialPose = await cameraPose(canvas);
+  const x = bounds.x + bounds.width / 2;
+  const y = bounds.y + bounds.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x - bounds.height * 0.155, y - bounds.height * 0.055, { steps: 10 });
+  await page.mouse.up();
+  await expect
+    .poll(async () => (await cameraPose(canvas)).position)
+    .not.toEqual(initialPose.position);
+  const rotatedPose = await cameraPose(canvas);
+  const assetId = '00000000-0000-4000-8000-000000000001';
+  const projections: unknown = JSON.parse(
+    (await canvas.getAttribute('data-pick-targets')) ?? 'null',
+  );
+  if (!Array.isArray(projections)) throw new Error('The scene has no rendered asset projections');
+  const atlas = projections.find(
+    (item: unknown): item is { assetId: string; x: number; y: number } =>
+      typeof item === 'object' &&
+      item !== null &&
+      'assetId' in item &&
+      item.assetId === assetId &&
+      'x' in item &&
+      typeof item.x === 'number' &&
+      Number.isFinite(item.x) &&
+      'y' in item &&
+      typeof item.y === 'number' &&
+      Number.isFinite(item.y),
+  );
+  if (!atlas) throw new Error('Atlas has no finite rendered projection');
+  const occludingCloud = await internetTarget();
+  // Prove the real device projection is behind the cloud rather than clicking empty space.
+  expect(Math.hypot(atlas.x - occludingCloud.x, atlas.y - occludingCloud.y)).toBeLessThan(2);
+  await clickProjectedAsset(page, canvas, assetId);
+  await expect(page.getByRole('dialog', { name: '资产详情' })).toHaveCount(0);
+
+  await page.getByRole('button', { name: '重置视角', exact: true }).click();
+  await expect
+    .poll(async () => (await cameraPose(canvas)).position)
+    .not.toEqual(rotatedPose.position);
+  await expect.poll(() => projectedAssetIds(canvas)).toEqual(demoPlacedIds);
+  await clickProjectedAsset(page, canvas, assetId);
+  const dialog = page.getByRole('dialog', { name: '资产详情' });
+  await expect(dialog.getByRole('heading', { name: 'Demo · Atlas', exact: true })).toBeVisible();
+  await expect(dialog.getByText(assetId, { exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await showList(page);
+  await expect(page.getByRole('button', { name: /^查看资产 / })).toHaveCount(9);
+  await expect(page.getByRole('button', { name: '查看资产 互联网', exact: true })).toHaveCount(0);
+});
+
 test('transparent building shells keep every floor pickable while selection follows the clicked device', async ({
   page,
 }) => {

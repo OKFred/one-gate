@@ -28,6 +28,7 @@ export const asset = {
   'personal.asset.unconfigured':
     'Device presence is not connected. All live states are unknown; inventory is not real-time monitoring.',
   'personal.asset.connection': 'Connection diagram',
+  'personal.asset.internet': 'Internet',
   'personal.asset.houseLabel': '{{site}} house diagram',
   'personal.asset.site.OpenLife': 'Local · Single-floor home',
   'personal.asset.site.OpenMind': 'Remote · Four floors',

@@ -48,10 +48,13 @@ export function AssetSpacesScene({
           {t('personal.asset.sceneLabel')}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          OpenLife ↔ OpenMind · {t('personal.asset.connection')}
+          OpenLife ↔ {t('personal.asset.internet')} ↔ OpenMind · {t('personal.asset.connection')}
         </Typography>
       </Stack>
-      <ThreeViewport state={{ floors, assets, selectedId, now }} onSelect={onSelect} />
+      <ThreeViewport
+        state={{ floors, assets, selectedId, now, internetLabel: t('personal.asset.internet') }}
+        onSelect={onSelect}
+      />
       <Box
         sx={{
           display: 'grid',
