@@ -23,7 +23,7 @@ export const asset = {
   'personal.asset.site.OpenMind': 'Remote · Four floors',
   'personal.asset.deviceCount': '{{count}} devices',
   'personal.asset.floorPicker': '{{site}} floor selector',
-  'personal.asset.diagram': 'Schematic · Not a measured position',
+  'personal.asset.diagram': 'Transparent schematic · Highlighted floor · Not measured',
   'personal.asset.floorAssets': '{{floor}}F · View {{count}}',
   'personal.asset.list': 'Asset inventory',
   'personal.asset.pendingCount': 'Unlocated {{count}}',

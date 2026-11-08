@@ -2,6 +2,9 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
 import type { AssetOverview } from '../packages/ui/src/api/personal/asset';
 
 const prefix = '**/api/v1/personal/asset/';
+const demoPlacedIds = [1, 2, 3, 4, 5, 6, 7, 9].map(
+  (id) => `00000000-0000-4000-8000-${String(id).padStart(12, '0')}`,
+);
 function overview(count = 3): AssetOverview {
   return {
     asOfUtc: Date.now(),
@@ -334,6 +337,44 @@ test('a short mouse click raycasts a device, and list selection updates the visi
   await expect(dialog.getByRole('heading', { name: 'Demo · Compute', exact: true })).toBeVisible();
 });
 
+test('transparent building shells keep every floor pickable while selection follows the clicked device', async ({
+  page,
+}) => {
+  await demo(page);
+  const canvas = await threeCanvas(page);
+  const remote = page.getByRole('region', { name: 'OpenMind 房屋空间示意' });
+  await expect(remote.getByRole('button', { name: '1F', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect.poll(() => projectedAssetIds(canvas)).toEqual(demoPlacedIds);
+  for (const target of [
+    { assetId: '00000000-0000-4000-8000-000000000005', name: 'Demo · Compute', floor: 2 },
+    { assetId: '00000000-0000-4000-8000-000000000007', name: 'Demo · Vault', floor: 4 },
+  ]) {
+    await remote.getByRole('button', { name: '1F', exact: true }).click();
+    await expect(remote.getByRole('button', { name: '1F', exact: true })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await clickProjectedAsset(page, canvas, target.assetId);
+    const dialog = page.getByRole('dialog', { name: '资产详情' });
+    await expect(dialog.getByRole('heading', { name: target.name, exact: true })).toBeVisible();
+    await expect(dialog.getByText(target.assetId, { exact: true })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(
+      remote.getByRole('button', { name: `${target.floor}F`, exact: true }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => projectedAssetIds(canvas)).toEqual(demoPlacedIds);
+  }
+  await clickProjectedAsset(page, canvas, '00000000-0000-4000-8000-000000000004');
+  await expect(
+    page
+      .getByRole('dialog', { name: '资产详情' })
+      .getByRole('heading', { name: 'Demo · Relay', exact: true }),
+  ).toBeVisible();
+});
+
 test('changing theme preserves the real WebGL context, camera and mouse interaction', async ({
   page,
 }) => {
@@ -552,10 +593,6 @@ test('capture a shareable synthetic desktop preview', async ({ page }) => {
     .getByRole('button', { name: '4F', exact: true })
     .click();
   const canvas = await threeCanvas(page);
-  await expect
-    .poll(() => projectedAssetIds(canvas))
-    .toEqual(
-      [1, 2, 3, 7, 9].map((id) => `00000000-0000-4000-8000-${String(id).padStart(12, '0')}`),
-    );
+  await expect.poll(() => projectedAssetIds(canvas)).toEqual(demoPlacedIds);
   await page.screenshot({ path: 'test-results/personal-assets-preview.png', fullPage: true });
 });

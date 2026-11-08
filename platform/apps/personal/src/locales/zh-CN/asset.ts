@@ -21,7 +21,7 @@ export const asset = {
   'personal.asset.site.OpenMind': '异地 · 四层空间',
   'personal.asset.deviceCount': '{{count}} 台设备',
   'personal.asset.floorPicker': '{{site}} 楼层选择',
-  'personal.asset.diagram': '空间示意 · 位置非测绘',
+  'personal.asset.diagram': '透视示意 · 当前层突出 · 位置非测绘',
   'personal.asset.floorAssets': '{{floor}}F · 查看 {{count}} 台',
   'personal.asset.list': '资产清单',
   'personal.asset.pendingCount': '待定位 {{count}}',

@@ -142,7 +142,6 @@ export function createSpacesRenderer(
   const pointer = new THREE.Vector2();
   const transform = new THREE.Object3D();
   const pickMeshes = new Map<THREE.Object3D, AssetView[]>();
-  const occluders: THREE.Object3D[] = [];
   const targets: { assetId: string; site: Site; floor: number; position: THREE.Vector3 }[] = [];
   let disposed = false;
   let lost = false;
@@ -230,21 +229,33 @@ export function createSpacesRenderer(
     size: [number, number, number],
     at: [number, number, number],
     color: string,
-    opacity = 1,
+    opacity = 0.04,
+    outlineOpacity = 0.5,
+    outlineColor = colors.text,
   ) {
     const mesh = new THREE.Mesh(
       new THREE.BoxGeometry(...size),
       new THREE.MeshStandardMaterial({
         color,
         roughness: 0.85,
-        transparent: opacity < 1,
+        transparent: true,
         opacity,
-        depthWrite: opacity === 1,
+        depthWrite: false,
       }),
     );
     mesh.position.set(...at);
+    const outline = new THREE.LineSegments(
+      new THREE.EdgesGeometry(mesh.geometry),
+      new THREE.LineBasicMaterial({
+        color: outlineColor,
+        transparent: true,
+        opacity: outlineOpacity,
+        depthWrite: false,
+      }),
+    );
+    outline.renderOrder = 1;
+    mesh.add(outline);
     structure.add(mesh);
-    if (opacity === 1) occluders.push(mesh);
     return mesh;
   }
 
@@ -275,7 +286,6 @@ export function createSpacesRenderer(
     disposeObjects(structure);
     disposeObjects(devices);
     pickMeshes.clear();
-    occluders.length = 0;
     targets.length = 0;
     for (const site of sites) {
       const x = centers[site];
@@ -283,99 +293,129 @@ export function createSpacesRenderer(
       const levels = site === 'OpenLife' ? [1] : [1, 2, 3, 4];
       for (const level of levels) {
         const y = floorHeight(level);
-        const ghost = level > selectedFloor;
+        const active = level === selectedFloor;
         box(
           [8, 0.22, 6],
           [x, y, 0],
-          level === selectedFloor ? colors.primary : colors.border,
-          ghost ? 0.12 : 1,
+          active ? colors.primary : colors.border,
+          active ? 0.12 : 0.035,
+          active ? 0.9 : 0.6,
+          active ? colors.primary : colors.text,
         );
-        box([7.75, 0.04, 5.75], [x, y + 0.13, 0], colors.paper, ghost ? 0.1 : 1);
-        if (level === selectedFloor) {
-          box([8, 0.8, 0.14], [x, y + 0.5, -2.9], colors.border);
-          box([0.14, 0.8, 6], [x - 3.9, y + 0.5, 0], colors.border);
-          box([2.8, 0.18, 0.08], [x + 2.5, y + 0.24, -0.2], colors.border);
-          box([0.08, 0.18, 2.2], [x - 0.4, y + 0.24, 1.75], colors.border);
-        }
+        box([7.75, 0.04, 5.75], [x, y + 0.13, 0], colors.paper, 0.02, 0.15);
+        box([8, 1.65, 0.1], [x, y + 0.98, -2.95], colors.border);
+        box([8, 1.65, 0.1], [x, y + 0.98, 2.95], colors.border);
+        box([0.1, 1.65, 6], [x - 3.95, y + 0.98, 0], colors.border);
+        box([0.1, 1.65, 6], [x + 3.95, y + 0.98, 0], colors.border);
+        box([2.8, 0.45, 0.08], [x + 2.5, y + 0.4, -0.2], colors.border, 0.025);
+        box([0.08, 0.45, 2.2], [x - 0.4, y + 0.4, 1.75], colors.border, 0.025);
         label(`${level}F`, x + 4.55, y + 0.15, 0);
+        addResidents(site, level, state);
       }
-      label(site, x, site === 'OpenLife' ? 1.9 : 8, -2.9);
-      const residents = state.assets.filter(
-        (asset) =>
-          !asset.demoKind &&
-          asset.placement.site === site &&
-          asset.placement.floor === selectedFloor,
+      const top = floorHeight(levels[levels.length - 1]) + 1.85;
+      const silhouette = new THREE.LineSegments(
+        new THREE.EdgesGeometry(new THREE.BoxGeometry(8.1, top + 0.12, 6.1)),
+        new THREE.LineBasicMaterial({
+          color: colors.text,
+          transparent: true,
+          opacity: 0.9,
+          depthWrite: false,
+        }),
       );
-      if (!residents.length) continue;
-      const body = new THREE.InstancedMesh(
-        new THREE.BoxGeometry(1, 1, 1),
-        new THREE.MeshStandardMaterial({ color: colors.paper, roughness: 0.7, metalness: 0.15 }),
-        residents.length,
-      );
-      const lights = new THREE.InstancedMesh(
-        new THREE.SphereGeometry(1, 8, 6),
-        new THREE.MeshBasicMaterial(),
-        residents.length,
-      );
-      const slots = deviceSlots(residents.length);
-      residents.forEach((asset, index) => {
-        const slot = slots[index];
-        const y = floorHeight(selectedFloor) + 0.18;
-        const deviceHeight =
-          slot.scale * (asset.category === 'disk' || asset.category === 'board' ? 0.4 : 1.15);
-        transform.position.set(x + slot.x, y + deviceHeight / 2, slot.z);
-        transform.scale.set(slot.scale, deviceHeight, slot.scale * 0.8);
-        transform.updateMatrix();
-        body.setMatrixAt(index, transform.matrix);
-        body.setColorAt(
-          index,
-          new THREE.Color(asset.assetId === state.selectedId ? colors.primary : colors.border),
-        );
-        const status = effectivePresence(asset, state.now).status;
-        const lightPosition = new THREE.Vector3(
-          x + slot.x,
-          y + deviceHeight + slot.scale * 0.13,
-          slot.z,
-        );
-        transform.position.copy(lightPosition);
-        transform.scale.setScalar(slot.scale * 0.13);
-        transform.updateMatrix();
-        lights.setMatrixAt(index, transform.matrix);
-        lights.setColorAt(index, new THREE.Color(colors[status]));
-        targets.push({
-          assetId: asset.assetId,
-          site,
-          floor: selectedFloor,
-          position: new THREE.Vector3(x + slot.x, y + deviceHeight / 2, slot.z),
-        });
-        if (asset.assetId === state.selectedId) {
-          const outline = new THREE.Box3Helper(
-            new THREE.Box3(
-              new THREE.Vector3(x + slot.x - slot.scale * 0.6, y - 0.02, slot.z - slot.scale * 0.5),
-              new THREE.Vector3(
-                x + slot.x + slot.scale * 0.6,
-                y + deviceHeight + slot.scale * 0.3,
-                slot.z + slot.scale * 0.5,
-              ),
-            ),
-            new THREE.Color(colors.primary),
+      silhouette.position.set(x, (top - 0.12) / 2, 0);
+      silhouette.renderOrder = 1;
+      structure.add(silhouette);
+      if (site === 'OpenLife') {
+        for (const side of [-1, 1]) {
+          const roof = box(
+            [8.4, 0.06, Math.hypot(3.2, 1.1)],
+            [x, top + 0.55, side * 1.6],
+            colors.border,
+            0.035,
+            0.8,
           );
-          devices.add(outline);
+          roof.rotation.x = side * Math.atan(1.1 / 3.2);
         }
-      });
-      body.instanceMatrix.needsUpdate = true;
-      lights.instanceMatrix.needsUpdate = true;
-      body.computeBoundingSphere();
-      lights.computeBoundingSphere();
-      devices.add(body, lights);
-      pickMeshes.set(body, residents);
-      pickMeshes.set(lights, residents);
+      } else box([8.4, 0.12, 6.4], [x, top, 0], colors.border, 0.04, 0.8);
+      label(site, x, site === 'OpenLife' ? 3.3 : 8.5, -2.9);
     }
     const bounds = new THREE.Box3().setFromObject(structure);
     bounds.union(new THREE.Box3().setFromObject(devices));
     bounds.getBoundingSphere(homeSphere);
     if (firstState) reset();
     else render();
+  }
+
+  function addResidents(site: Site, level: number, state: SceneState) {
+    const x = centers[site];
+    const residents = state.assets.filter(
+      (asset) =>
+        !asset.demoKind && asset.placement.site === site && asset.placement.floor === level,
+    );
+    if (!residents.length) return;
+    const body = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshStandardMaterial({ color: colors.paper, roughness: 0.7, metalness: 0.15 }),
+      residents.length,
+    );
+    const lights = new THREE.InstancedMesh(
+      new THREE.SphereGeometry(1, 8, 6),
+      new THREE.MeshBasicMaterial(),
+      residents.length,
+    );
+    const slots = deviceSlots(residents.length);
+    residents.forEach((asset, index) => {
+      const slot = slots[index];
+      const y = floorHeight(level) + 0.18;
+      const deviceHeight =
+        slot.scale * (asset.category === 'disk' || asset.category === 'board' ? 0.4 : 1.15);
+      transform.position.set(x + slot.x, y + deviceHeight / 2, slot.z);
+      transform.scale.set(slot.scale, deviceHeight, slot.scale * 0.8);
+      transform.updateMatrix();
+      body.setMatrixAt(index, transform.matrix);
+      body.setColorAt(
+        index,
+        new THREE.Color(asset.assetId === state.selectedId ? colors.primary : colors.border),
+      );
+      const status = effectivePresence(asset, state.now).status;
+      const lightPosition = new THREE.Vector3(
+        x + slot.x,
+        y + deviceHeight + slot.scale * 0.13,
+        slot.z,
+      );
+      transform.position.copy(lightPosition);
+      transform.scale.setScalar(slot.scale * 0.13);
+      transform.updateMatrix();
+      lights.setMatrixAt(index, transform.matrix);
+      lights.setColorAt(index, new THREE.Color(colors[status]));
+      targets.push({
+        assetId: asset.assetId,
+        site,
+        floor: level,
+        position: new THREE.Vector3(x + slot.x, y + deviceHeight / 2, slot.z),
+      });
+      if (asset.assetId === state.selectedId) {
+        const outline = new THREE.Box3Helper(
+          new THREE.Box3(
+            new THREE.Vector3(x + slot.x - slot.scale * 0.6, y - 0.02, slot.z - slot.scale * 0.5),
+            new THREE.Vector3(
+              x + slot.x + slot.scale * 0.6,
+              y + deviceHeight + slot.scale * 0.3,
+              slot.z + slot.scale * 0.5,
+            ),
+          ),
+          new THREE.Color(colors.primary),
+        );
+        devices.add(outline);
+      }
+    });
+    body.instanceMatrix.needsUpdate = true;
+    lights.instanceMatrix.needsUpdate = true;
+    body.computeBoundingSphere();
+    lights.computeBoundingSphere();
+    devices.add(body, lights);
+    pickMeshes.set(body, residents);
+    pickMeshes.set(lights, residents);
   }
 
   function reset() {
@@ -428,7 +468,7 @@ export function createSpacesRenderer(
       1 - ((event.clientY - bounds.top) / height) * 2,
     );
     raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects([...occluders, ...pickMeshes.keys()], false)[0];
+    const hit = raycaster.intersectObjects([...pickMeshes.keys()], false)[0];
     if (!hit || hit.instanceId === undefined) return;
     return pickMeshes.get(hit.object)?.[hit.instanceId]?.assetId;
   }
