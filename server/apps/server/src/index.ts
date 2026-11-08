@@ -10,6 +10,7 @@ import type { AppBindings, Context, ResJson } from "@hodor/core/types/app.js";
 import { getEnv } from "@hodor/core/utils/env.js";
 import createAdminApp from "@hodor/admin/index.js";
 import createEnterpriseApp from "@hodor/enterprise/index.js";
+import { initEnterpriseRegistry } from "@hodor/enterprise/register.js";
 import createPersonalApp, {
   registerCalendarSubscriptionProtocol,
 } from "@hodor/personal/index.js";
@@ -22,6 +23,7 @@ export interface ServerAppOptions {
 }
 
 function createApp(options: ServerAppOptions) {
+  initEnterpriseRegistry();
   const app = new OpenAPIHono<AppBindings>();
 
   errorHandler(app);

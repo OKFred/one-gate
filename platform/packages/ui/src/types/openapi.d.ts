@@ -22306,6 +22306,122 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personal/asset/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read private asset spaces */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.asset.overview.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.asset.overview.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/asset/place": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Place an asset in a private space */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.asset.place.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.asset.place.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -36485,6 +36601,65 @@ export interface components {
             data: {
                 id: string;
                 acknowledgedTimeUtc: number;
+            };
+            message: string;
+        };
+        "personal.asset.overview.req": {
+            tenantId: number;
+        };
+        "personal.asset.overview.res": {
+            ok: boolean;
+            data: {
+                asOfUtc: number;
+                /** @constant */
+                presenceSource: "unconfigured";
+                assets: {
+                    assetId: string;
+                    name: string;
+                    /** @enum {string} */
+                    category: "host" | "disk" | "gpu" | "board" | "sensor" | "meter" | "other";
+                    /** @enum {string} */
+                    inventoryStatus: "active" | "retired";
+                    placement: {
+                        /** @enum {string|null} */
+                        site: "OpenLife" | "OpenMind" | null;
+                        /** @enum {integer|null} */
+                        floor: 1 | 2 | 3 | 4 | null;
+                        version: number | null;
+                        updateTimeUtc: number | null;
+                    };
+                    presence: {
+                        /** @constant */
+                        status: "unknown";
+                        /** @constant */
+                        basis: "not_connected";
+                        lastHeartbeatTimeUtc: null;
+                        observedTimeUtc: null;
+                        expiresTimeUtc: null;
+                    };
+                    hostAssetId: string | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.asset.place.req": {
+            tenantId: number;
+            assetId: string;
+            /** @enum {string|null} */
+            site: "OpenLife" | "OpenMind" | null;
+            /** @enum {integer|null} */
+            floor: 1 | 2 | 3 | 4 | null;
+            expectedVersion: number | null;
+        };
+        "personal.asset.place.res": {
+            ok: boolean;
+            data: {
+                /** @enum {string|null} */
+                site: "OpenLife" | "OpenMind" | null;
+                /** @enum {integer|null} */
+                floor: 1 | 2 | 3 | 4 | null;
+                version: number | null;
+                updateTimeUtc: number | null;
             };
             message: string;
         };

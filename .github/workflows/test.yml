@@ -90,6 +90,7 @@ jobs:
           pnpm run db:generate:cloudflare-usage
           pnpm run db:generate:calendar
           pnpm run db:generate:mobile-task-runtime
+          pnpm run db:generate:personal-assets
         working-directory: server
       - name: Create isolated Worker test configuration
         working-directory: server/apps/server
@@ -155,6 +156,9 @@ jobs:
       - name: Mocked auth, recycle bin, undo and enterprise isolation tests
         run: pnpm exec playwright test auth/auth-ui.spec.ts recycle-bin/recycle-bin.spec.ts delete-undo/ enterprise-assets/ api-token/ cloudflare-home/ calendar/ mobile-task-runtime/ --project=chromium
         working-directory: platform
+      - name: Personal asset spaces and evidence boundary tests
+        run: pnpm run test:e2e:personal-assets
+        working-directory: platform
 
   secrets:
     runs-on: ubuntu-latest
@@ -172,8 +176,10 @@ jobs:
           archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
           checksums="gitleaks_${GITLEAKS_VERSION}_checksums.txt"
           release="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
-          curl --fail --location --retry 3 "$release/$archive" -o "$tool_dir/$archive"
-          curl --fail --location --retry 3 "$release/$checksums" -o "$tool_dir/$checksums"
+          curl --http1.1 --fail --location --retry 3 --retry-all-errors \
+            --connect-timeout 15 --max-time 30 --retry-max-time 60 "$release/$archive" -o "$tool_dir/$archive"
+          curl --http1.1 --fail --location --retry 3 --retry-all-errors \
+            --connect-timeout 15 --max-time 30 --retry-max-time 60 "$release/$checksums" -o "$tool_dir/$checksums"
           (cd "$tool_dir" && grep "  $archive$" "$checksums" | sha256sum --check --strict)
           tar -xzf "$tool_dir/$archive" -C "$tool_dir"
           "$tool_dir/gitleaks" git . --log-opts="--all --full-history -m" --redact --no-banner

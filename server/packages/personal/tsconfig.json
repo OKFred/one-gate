@@ -13,7 +13,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@hodor/core/*": ["../core/src/*"],
-      "@hodor/admin/*": ["../admin/src/*"]
+      "@hodor/admin/*": ["../admin/src/*"],
+      "@hodor/enterprise/*": ["../enterprise/src/*"]
     }
   },
   "include": ["src/**/*"]

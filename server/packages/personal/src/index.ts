@@ -4,6 +4,7 @@ import financial from "./financial/index.js";
 import family from "./family/index.js";
 import social from "./social/index.js";
 import calendar from "./calendar/index.js";
+import asset from "./asset/index.js";
 
 import type { App, AppBindings } from "@hodor/core/types/app";
 import { OpenAPIHono } from "@hono/zod-openapi";
@@ -17,6 +18,7 @@ function createPersonalApp(): App {
   app.route("/family", family());
   app.route("/social", social());
   app.route("/calendar", calendar());
+  app.route("/asset", asset());
 
   return app;
 }

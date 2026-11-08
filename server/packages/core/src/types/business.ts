@@ -1,4 +1,6 @@
 export const BUSINESS = {
+  /** 个人资产空间 */
+  "personal.asset": "personal.asset",
   /** 国际化 */
   "admin.i18n": "admin.i18n",
   /** 国际化语言 */

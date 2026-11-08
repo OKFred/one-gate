@@ -1,0 +1,9 @@
+{
+  "extends": "../crud-switch/tsconfig.json",
+  "include": [
+    "main.tsx",
+    "vite.config.ts",
+    "../../personal-assets.spec.ts",
+    "../../personal-assets-model.spec.ts"
+  ]
+}

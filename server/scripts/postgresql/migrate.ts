@@ -53,12 +53,42 @@ const subscriptionMigrationSql = readFileSync(
 const subscriptionMigrationChecksum = createHash("sha256")
   .update(subscriptionMigrationSql)
   .digest("hex");
+const assetPlacementMigrationId = "0005_personal_asset_placement";
+const assetPlacementMigrationSql = readFileSync(
+  new URL(
+    "../../apps/server/postgresql-migrations/0005_personal_asset_placement.sql",
+    import.meta.url
+  ),
+  "utf8"
+);
+const assetPlacementMigrationChecksum = createHash("sha256")
+  .update(assetPlacementMigrationSql)
+  .digest("hex");
+const assetMetadataMigrationId = "0006_personal_asset_metadata";
+const assetMetadataMigrationSql = readFileSync(
+  new URL(
+    "../../apps/server/postgresql-migrations/0006_personal_asset_metadata.sql",
+    import.meta.url
+  ),
+  "utf8"
+);
+const assetMetadataMigrationChecksum = createHash("sha256")
+  .update(assetMetadataMigrationSql)
+  .digest("hex");
 
 function migrationTableNames(sql: string): string[] {
   return [...sql.matchAll(/^CREATE TABLE "([a-z0-9_]+)" \(/gm)]
     .map((match) => match[1])
     .sort();
 }
+
+const assetPlacementTableNames = [
+  ...migrationTableNames(postgresMigrationSql),
+  ...migrationTableNames(cloudflareMigrationSql),
+  ...migrationTableNames(calendarMigrationSql),
+  ...migrationTableNames(subscriptionMigrationSql),
+  ...migrationTableNames(assetPlacementMigrationSql),
+].sort();
 
 /** Earlier SQL, checksums and contract fingerprints remain immutable. */
 export const postgresMigrations = [
@@ -97,6 +127,18 @@ export const postgresMigrations = [
       ...migrationTableNames(calendarMigrationSql),
       ...migrationTableNames(subscriptionMigrationSql),
     ].sort(),
+  },
+  {
+    id: assetPlacementMigrationId,
+    sql: assetPlacementMigrationSql,
+    checksum: assetPlacementMigrationChecksum,
+    tableNames: assetPlacementTableNames,
+  },
+  {
+    id: assetMetadataMigrationId,
+    sql: assetMetadataMigrationSql,
+    checksum: assetMetadataMigrationChecksum,
+    tableNames: assetPlacementTableNames,
   },
 ] as const;
 

@@ -1,4 +1,6 @@
 export const sidebar = {
+  'sidebar.menu.personal.asset': 'Personal assets',
+  'businessType.personal.asset': 'Personal asset spaces',
   'sidebar.menu.admin': 'Admin Backend',
   'sidebar.menu.admin.base': 'Base',
   'sidebar.menu.executive.workflow': 'Workflow',
