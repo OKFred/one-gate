@@ -7,6 +7,7 @@ export interface SceneState {
   floors: Record<Site, number>;
   selectedId: string | null;
   now: number;
+  internetLabel: string;
 }
 
 export interface SceneColors {
@@ -34,7 +35,7 @@ export interface SpacesRenderer {
   dispose(): void;
 }
 
-const centers: Record<Site, number> = { OpenLife: -6.5, OpenMind: 6.5 };
+const centers: Record<Site, number> = { OpenLife: -9, OpenMind: 9 };
 const floorHeight = (floor: number) => (floor - 1) * 2;
 
 export function cameraFitDistance(radius: number, aspect: number, verticalFovDegrees: number) {
@@ -124,13 +125,21 @@ export function createSpacesRenderer(
   }
   scene.add(grid);
 
-  const curve = new THREE.QuadraticBezierCurve3(
-    new THREE.Vector3(-2.5, 0.55, 1),
-    new THREE.Vector3(0, 3.5, 1),
-    new THREE.Vector3(2.5, 0.55, 1),
-  );
-  const link = new THREE.Line(
-    new THREE.BufferGeometry().setFromPoints(curve.getPoints(60)),
+  const linkPoints: THREE.Vector3[] = [];
+  for (const side of [-1, 1]) {
+    const houseX = side === -1 ? centers.OpenLife : centers.OpenMind;
+    const curve = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(houseX - side * 4, 0.55, 3.1),
+      new THREE.Vector3(side * 3.6, 3.2, 1.7),
+      new THREE.Vector3(side * 1.7, 3.45, 0.7),
+    );
+    const points = curve.getPoints(60);
+    if (side === 1) points.reverse();
+    for (let index = 1; index < points.length; index++)
+      linkPoints.push(points[index - 1], points[index]);
+  }
+  const link = new THREE.LineSegments(
+    new THREE.BufferGeometry().setFromPoints(linkPoints),
     new THREE.LineDashedMaterial({ color: colors.unknown, dashSize: 0.22, gapSize: 0.16 }),
   );
   link.computeLineDistances();
@@ -147,6 +156,7 @@ export function createSpacesRenderer(
   let animation: number | undefined;
   let lastFrame = -Infinity;
   let currentState: SceneState | null = null;
+  let internet: THREE.Mesh | null = null;
   let ready = false;
   const homeSphere = new THREE.Sphere();
   let previousFit: number | undefined;
@@ -177,6 +187,15 @@ export function createSpacesRenderer(
         ];
       }),
     );
+    if (internet) {
+      const projected = internet.getWorldPosition(new THREE.Vector3()).project(camera);
+      if (Math.abs(projected.x) <= 1 && Math.abs(projected.y) <= 1 && Math.abs(projected.z) <= 1)
+        canvas.dataset.internetTarget = JSON.stringify({
+          x: ((projected.x + 1) / 2) * width,
+          y: ((1 - projected.y) / 2) * height,
+        });
+      else delete canvas.dataset.internetTarget;
+    }
   }
 
   function render(project = true) {
@@ -288,6 +307,7 @@ export function createSpacesRenderer(
     callbacks.onHover(null);
     disposeObjects(structure);
     disposeObjects(devices);
+    internet = null;
     pickMeshes.clear();
     targets.length = 0;
     for (const site of sites) {
@@ -340,6 +360,36 @@ export function createSpacesRenderer(
       }
       label(site, x, site === 'OpenLife' ? 3.3 : top + 1.75, -2.9);
     }
+    const cloud = new THREE.Shape();
+    cloud.moveTo(-1.15, -0.65);
+    cloud.bezierCurveTo(-1.9, -0.65, -2.05, 0.45, -1.25, 0.6);
+    cloud.bezierCurveTo(-1.3, 1.35, -0.2, 1.6, 0.3, 0.85);
+    cloud.bezierCurveTo(0.95, 1.15, 1.55, 0.75, 1.5, 0.2);
+    cloud.bezierCurveTo(2.1, 0.1, 1.95, -0.65, 1.2, -0.65);
+    cloud.closePath();
+    internet = new THREE.Mesh(
+      new THREE.ExtrudeGeometry(cloud, { depth: 0.4, bevelEnabled: false, curveSegments: 24 }),
+      new THREE.MeshStandardMaterial({
+        color: colors.paper,
+        roughness: 0.7,
+        transparent: true,
+        opacity: 0.9,
+        depthWrite: false,
+      }),
+    );
+    internet.position.set(0, 3.5, 0.5);
+    const cloudOutline = new THREE.LineSegments(
+      new THREE.EdgesGeometry(internet.geometry, 30),
+      new THREE.LineBasicMaterial({
+        color: colors.text,
+        transparent: true,
+        opacity: 0.9,
+        depthWrite: false,
+      }),
+    );
+    internet.add(cloudOutline);
+    structure.add(internet);
+    label(state.internetLabel, 0, 5.6, 0.9);
     const bounds = new THREE.Box3().setFromObject(structure);
     bounds.union(new THREE.Box3().setFromObject(devices));
     bounds.getBoundingSphere(homeSphere);
@@ -471,6 +521,10 @@ export function createSpacesRenderer(
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObjects([...pickMeshes.keys()], false)[0];
     if (!hit || hit.instanceId === undefined) return;
+    if (internet) {
+      const cloudHit = raycaster.intersectObject(internet, false)[0];
+      if (cloudHit && cloudHit.distance < hit.distance) return;
+    }
     return pickMeshes.get(hit.object)?.[hit.instanceId]?.assetId;
   }
 
@@ -544,6 +598,7 @@ export function createSpacesRenderer(
     pointers.clear();
     gesture = null;
     canvas.dataset.pickTargets = '[]';
+    delete canvas.dataset.internetTarget;
     animationState();
     callbacks.onHover(null);
     callbacks.onLost();
@@ -591,6 +646,7 @@ export function createSpacesRenderer(
       disposed = true;
       canvas.dataset.linkAnimation = 'paused';
       canvas.dataset.pickTargets = '[]';
+      delete canvas.dataset.internetTarget;
       pointers.clear();
       gesture = null;
       if (animation !== undefined) cancelAnimationFrame(animation);

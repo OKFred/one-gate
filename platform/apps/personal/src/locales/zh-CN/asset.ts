@@ -25,6 +25,7 @@ export const asset = {
     '演示数据 · 合成设备与状态，与真实资产隔离；位置修改仅在本次演示中有效。',
   'personal.asset.unconfigured': '设备在线状态尚未接通；当前均显示未知，资产台账不代表实时监测。',
   'personal.asset.connection': '互联示意',
+  'personal.asset.internet': '互联网',
   'personal.asset.houseLabel': '{{site}} 房屋空间示意',
   'personal.asset.site.OpenLife': '本地 · 单层住宅',
   'personal.asset.site.OpenMind': '异地 · 四层空间',
