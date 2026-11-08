@@ -176,8 +176,10 @@ jobs:
           archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
           checksums="gitleaks_${GITLEAKS_VERSION}_checksums.txt"
           release="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
-          curl --fail --location --retry 3 "$release/$archive" -o "$tool_dir/$archive"
-          curl --fail --location --retry 3 "$release/$checksums" -o "$tool_dir/$checksums"
+          curl --http1.1 --fail --location --retry 3 --retry-all-errors \
+            --connect-timeout 15 --max-time 30 --retry-max-time 60 "$release/$archive" -o "$tool_dir/$archive"
+          curl --http1.1 --fail --location --retry 3 --retry-all-errors \
+            --connect-timeout 15 --max-time 30 --retry-max-time 60 "$release/$checksums" -o "$tool_dir/$checksums"
           (cd "$tool_dir" && grep "  $archive$" "$checksums" | sha256sum --check --strict)
           tar -xzf "$tool_dir/$archive" -C "$tool_dir"
           "$tool_dir/gitleaks" git . --log-opts="--all --full-history -m" --redact --no-banner
