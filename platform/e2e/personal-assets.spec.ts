@@ -454,7 +454,7 @@ test('mobile layout, keyboard and reduced motion preserve accessible controls', 
     await page.locator('html').evaluate((element) => element.scrollWidth <= window.innerWidth),
   ).toBe(true);
   const canvas = await threeCanvas(page);
-  await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
+  await expect(canvas).toHaveAttribute('data-link-animation', 'running');
 });
 
 test('all current-floor devices remain reachable in a large asset list', async ({ page }) => {
@@ -536,7 +536,7 @@ test('the shared viewport renders real WebGL2 and responds to mouse rotate, zoom
   await expect
     .poll(() => page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches))
     .toBe(true);
-  await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
+  await expect(canvas).toHaveAttribute('data-link-animation', 'running');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expect
     .poll(() => page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches))
@@ -614,7 +614,9 @@ test('transparent building shells keep every floor pickable while selection foll
 test('changing theme preserves the real WebGL context, camera and mouse interaction', async ({
   page,
 }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const start = new Date('2030-01-01T00:00:00.000Z');
+  await page.clock.install({ time: start });
+  await page.clock.pauseAt(start);
   await demo(page);
   await showSpace(page);
   const canvas = await threeCanvas(page);
@@ -685,7 +687,7 @@ test('changing theme preserves the real WebGL context, camera and mouse interact
   }
 });
 
-test('explicit connection playback animates real pixels and pause survives a system preference change', async ({
+test('connections autoplay real pixels without controls even with reduced motion', async ({
   page,
 }) => {
   const start = new Date('2030-01-01T00:00:00.000Z');
@@ -695,14 +697,10 @@ test('explicit connection playback animates real pixels and pause survives a sys
   await demo(page);
   await showSpace(page);
   const canvas = await threeCanvas(page);
-  const playback = page.getByRole('button', { name: '连接线动画', exact: true });
-  await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
-  await expect(playback).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByRole('button', { name: /连接线动画|播放连线|暂停连线/ })).toHaveCount(0);
+  await expect(canvas).toHaveAttribute('data-link-animation', 'running');
   const pose = await cameraPose(canvas);
 
-  await playback.click();
-  await expect(playback).toHaveAttribute('aria-pressed', 'true');
-  await expect(canvas).toHaveAttribute('data-link-animation', 'running');
   // Advance real renderer frames deterministically; the WebGL canvas remains unstubbed.
   await page.clock.runFor(200);
   const firstFrame = await canvas.screenshot();
@@ -711,26 +709,90 @@ test('explicit connection playback animates real pixels and pause survives a sys
   expect(secondFrame).not.toEqual(firstFrame);
   expect(await cameraPose(canvas)).toEqual(pose);
 
-  await playback.click();
-  await expect(playback).toHaveAttribute('aria-pressed', 'false');
-  await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
-  const pausedFrame = await canvas.screenshot();
-  await page.clock.runFor(300);
-  expect(await canvas.screenshot()).toEqual(pausedFrame);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expect
     .poll(() => page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches))
     .toBe(false);
-  await expect(playback).toHaveAttribute('aria-pressed', 'false');
-  await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
-  await page.clock.runFor(300);
-  expect(await canvas.screenshot()).toEqual(pausedFrame);
-
-  await playback.click();
   await expect(canvas).toHaveAttribute('data-link-animation', 'running');
   await page.clock.runFor(200);
-  expect(await canvas.screenshot()).not.toEqual(pausedFrame);
+  expect(await canvas.screenshot()).not.toEqual(secondFrame);
   expect(await cameraPose(canvas)).toEqual(pose);
+});
+
+test('connection frames pause for hidden input and dispose when leaving the scene, then autoplay on return', async ({
+  page,
+}) => {
+  const start = new Date('2030-01-01T00:00:00.000Z');
+  await page.clock.install({ time: start });
+  await page.clock.pauseAt(start);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await demo(page);
+  await showSpace(page);
+  const canvas = await threeCanvas(page);
+  await expect(canvas).toHaveAttribute('data-link-animation', 'running');
+  await page.clock.runFor(200);
+  const pose = await cameraPose(canvas);
+  const original = await canvas.evaluateHandle((element: HTMLCanvasElement) => element);
+  try {
+    // Exercise the visibility input deterministically; this is not a real background-tab check.
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
+    const hiddenFrame = await canvas.screenshot();
+    await page.clock.runFor(300);
+    expect(await canvas.screenshot()).toEqual(hiddenFrame);
+    await page.evaluate(() => {
+      Reflect.deleteProperty(document, 'hidden');
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await expect(canvas).toHaveAttribute('data-link-animation', 'running');
+    await page.clock.runFor(200);
+    expect(await canvas.screenshot()).not.toEqual(hiddenFrame);
+    expect(await cameraPose(canvas)).toEqual(pose);
+
+    await showList(page);
+    await expect
+      .poll(() =>
+        original.evaluate((element) => ({
+          connected: element.isConnected,
+          animation: element.dataset.linkAnimation,
+          contextLost: element.getContext('webgl2')?.isContextLost(),
+        })),
+      )
+      .toEqual({ connected: false, animation: 'paused', contextLost: true });
+  } finally {
+    await page.evaluate(() => {
+      Reflect.deleteProperty(document, 'hidden');
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await original.dispose();
+  }
+
+  await showSpace(page);
+  const returnedCanvas = await threeCanvas(page);
+  await expect(returnedCanvas).toHaveAttribute('data-link-animation', 'running');
+  await page.clock.runFor(200);
+  const firstFrame = await returnedCanvas.screenshot();
+  await page.clock.runFor(200);
+  expect(await returnedCanvas.screenshot()).not.toEqual(firstFrame);
+  const returned = await returnedCanvas.evaluateHandle((element: HTMLCanvasElement) => element);
+  try {
+    await page.getByRole('switch', { name: '演示' }).uncheck();
+    await expect(page.getByTestId('asset-three-canvas')).toHaveCount(0);
+    await expect
+      .poll(() =>
+        returned.evaluate((element) => ({
+          connected: element.isConnected,
+          animation: element.dataset.linkAnimation,
+          contextLost: element.getContext('webgl2')?.isContextLost(),
+        })),
+      )
+      .toEqual({ connected: false, animation: 'paused', contextLost: true });
+  } finally {
+    await returned.dispose();
+  }
 });
 
 test('WebGL unavailable is a visible fallback, while floor and asset controls still work', async ({
@@ -763,8 +825,6 @@ test('a lost WebGL context stops animation and preserves accessible device selec
   await demo(page);
   await showSpace(page);
   const canvas = await threeCanvas(page);
-  const playback = page.getByRole('button', { name: '连接线动画', exact: true });
-  await playback.click();
   await expect(canvas).toHaveAttribute('data-link-animation', 'running');
   expect(
     await canvas.evaluate((element: HTMLCanvasElement) => {
@@ -778,7 +838,7 @@ test('a lost WebGL context stops animation and preserves accessible device selec
   await expect(viewport).toHaveAttribute('data-render-state', 'lost');
   await expect(viewport.getByRole('alert')).toBeVisible();
   await expect(canvas).toHaveAttribute('data-link-animation', 'paused');
-  await expect(playback).toBeDisabled();
+  await expect(page.getByRole('button', { name: /连接线动画|播放连线|暂停连线/ })).toHaveCount(0);
   await showList(page);
   await page.getByRole('button', { name: '查看资产 Demo · Atlas', exact: true }).click();
   await expect(page.getByRole('dialog', { name: '资产详情' })).toBeVisible();

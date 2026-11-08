@@ -14,9 +14,6 @@ export const asset = {
   'personal.asset.touchControls':
     'Touch: one finger to orbit, two to zoom or pan. Keyboard: focus the scene, arrows to pan, Home to reset.',
   'personal.asset.resetView': 'Reset view',
-  'personal.asset.linkAnimation': 'Connection animation',
-  'personal.asset.playLinkAnimation': 'Play line',
-  'personal.asset.pauseLinkAnimation': 'Pause line',
   'personal.asset.loading3d': 'Loading the 3D scene',
   'personal.asset.webglUnavailable':
     'This browser cannot start 3D graphics. Use the floor device buttons and inventory to view details.',

@@ -9,6 +9,11 @@ import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError
 import { ErrorCodes as ChatErrorCodes } from "../chat/prevention";
 import type { UserObj } from "@hodor/core/types/app";
 
+// Fetch is mocked below; DNS must also be deterministic so lookups cannot outlive a test.
+vi.mock("node:dns/promises", () => ({
+  lookup: vi.fn(async () => [{ address: "93.184.216.34", family: 4 }]),
+}));
+
 describe("AI 模块全链路集成测试", () => {
   const testTables = ["base_sys_config"];
   const userObj = { userId: 1 } as unknown as UserObj;
