@@ -328,26 +328,17 @@ export function createSpacesRenderer(
       silhouette.position.set(x, (top - 0.12) / 2, 0);
       silhouette.renderOrder = 1;
       structure.add(silhouette);
-      if (site === 'OpenLife') {
-        for (const side of [-1, 1]) {
-          const roof = box(
-            [8.4, 0.06, Math.hypot(3.2, 1.1)],
-            [x, top + 0.55, side * 1.6],
-            colors.border,
-            0.035,
-            0.8,
-          );
-          roof.rotation.x = side * Math.atan(1.1 / 3.2);
-        }
-      } else {
-        box([8.4, 0.24, 6.4], [x, top + 0.12, 0], colors.border, 0.12, 0.95);
-        const rimY = top + 0.36;
-        box([8.4, 0.24, 0.1], [x, rimY, -3.15], colors.border, 0.06, 0.85);
-        box([8.4, 0.24, 0.1], [x, rimY, 3.15], colors.border, 0.06, 0.85);
-        box([0.1, 0.24, 6.2], [x - 4.15, rimY, 0], colors.border, 0.06, 0.85);
-        box([0.1, 0.24, 6.2], [x + 4.15, rimY, 0], colors.border, 0.06, 0.85);
+      for (const side of [-1, 1]) {
+        const roof = box(
+          [8.4, 0.06, Math.hypot(3.2, 1.1)],
+          [x, top + 0.55, side * 1.6],
+          colors.border,
+          0.035,
+          0.8,
+        );
+        roof.rotation.x = side * Math.atan(1.1 / 3.2);
       }
-      label(site, x, site === 'OpenLife' ? 3.3 : 8.5, -2.9);
+      label(site, x, site === 'OpenLife' ? 3.3 : top + 1.75, -2.9);
     }
     const bounds = new THREE.Box3().setFromObject(structure);
     bounds.union(new THREE.Box3().setFromObject(devices));
