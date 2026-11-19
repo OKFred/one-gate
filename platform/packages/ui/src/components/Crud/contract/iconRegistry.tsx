@@ -20,6 +20,7 @@ import {
   OpenInNew,
   CheckCircle,
   Error as ErrorIcon,
+  Sensors,
 } from '@mui/icons-material';
 
 const ICON_MAP: Record<string, () => ReactNode> = {
@@ -43,6 +44,7 @@ const ICON_MAP: Record<string, () => ReactNode> = {
   OpenInNew: () => <OpenInNew />,
   CheckCircle: () => <CheckCircle />,
   Error: () => <ErrorIcon />,
+  Sensors: () => <Sensors />,
 };
 
 export function renderContractIcon(name?: string): ReactNode {

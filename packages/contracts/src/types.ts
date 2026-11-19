@@ -210,6 +210,7 @@ export interface FormFieldUiSpec {
   readonly widget?: FormWidgetType;
   readonly labelKey?: string;
   readonly placeholderKey?: string;
+  readonly placeholder?: string;
   readonly helperTextKey?: string;
   readonly span?: number | FormGridSpan;
   readonly dividerBefore?: boolean;
@@ -255,6 +256,7 @@ export interface FieldScopeMembership {
   readonly update?: boolean;
   readonly get?: boolean;
   readonly listAll?: boolean;
+  readonly listFilter?: boolean;
 }
 
 export type FieldPreset = 'id' | 'isEnabled' | 'remark' | 'createTimeUtc' | 'updateTimeUtc';

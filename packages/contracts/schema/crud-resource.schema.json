@@ -196,7 +196,8 @@
               "add": { "type": "boolean" },
               "update": { "type": "boolean" },
               "get": { "type": "boolean" },
-              "listAll": { "type": "boolean" }
+              "listAll": { "type": "boolean" },
+              "listFilter": { "type": "boolean" }
             }
           },
           "ui": {
@@ -504,6 +505,7 @@
         },
         "labelKey": { "type": "string" },
         "placeholderKey": { "type": "string" },
+        "placeholder": { "type": "string" },
         "helperTextKey": { "type": "string" },
         "span": {
           "oneOf": [

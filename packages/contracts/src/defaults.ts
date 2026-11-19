@@ -278,7 +278,9 @@ export interface ResolvedFieldSpec {
   readonly name: string;
   readonly schema: JsonSchemaProperty;
   readonly requiredOn: readonly ('add' | 'update' | 'list' | 'detail' | 'get')[];
-  readonly in: Required<NonNullable<CrudFieldSpec['in']>>;
+  readonly in: Required<Omit<NonNullable<CrudFieldSpec['in']>, 'listFilter'>> & {
+    readonly listFilter?: boolean;
+  };
   readonly ui: NonNullable<CrudFieldSpec['ui']>;
 }
 
@@ -295,13 +297,14 @@ export function resolveContractFields(contract: CrudResourceContract): ResolvedF
       ...(preset?.schema ?? {}),
       ...(field.schema ?? {}),
     };
-    const membership: Required<NonNullable<CrudFieldSpec['in']>> = {
+    const membership: ResolvedFieldSpec['in'] = {
       list: field.in?.list ?? preset?.in.list ?? true,
       detail: field.in?.detail ?? preset?.in.detail ?? true,
       add: field.in?.add ?? preset?.in.add ?? true,
       update: field.in?.update ?? preset?.in.update ?? true,
       get: field.in?.get ?? preset?.in.get ?? false,
       listAll: field.in?.listAll ?? preset?.in.listAll ?? false,
+      ...(field.in?.listFilter !== undefined ? { listFilter: field.in.listFilter } : {}),
     };
     const requiredOn = field.requiredOn ?? preset?.requiredOn ?? [];
     const ui = mergeFieldUi(preset?.ui, field.ui);

@@ -1,0 +1,180 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/mail/account",
+  "operations": {
+    "listAll": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keywordLabel",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "mailAddress", "isEnabled", "createTimeUtc"],
+    "showSortControls": true,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": false
+    },
+    "sortFieldLabelKeys": {
+      "id": "columns.id",
+      "createTimeUtc": "columns.createTime"
+    }
+  },
+  "actions": [
+    {
+      "key": "verify",
+      "type": "api",
+      "icon": "QuestionMark",
+      "color": "success",
+      "permissionCodes": ["admin.mail.account:edit"],
+      "url": "/api/v1/admin/mail/action/verify",
+      "payloadMap": { "accountId": "$row.id" },
+      "successCheck": "httpOk",
+      "successMessageKey": "account.verifySuccess"
+    }
+  ],
+  "fields": [
+    {
+      "name": "nickname",
+      "schema": { "type": "string", "description": "昵称", "examples": ["Maddison Foo KochZh"] },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "account.table.nickname",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "title" },
+        "form": { "show": true, "widget": "text", "span": 6, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "mailAddress",
+      "schema": {
+        "type": "string",
+        "format": "email",
+        "description": "邮箱地址",
+        "examples": ["maddison53@ethereal.email"]
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "account.table.email",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "content", "labelKey": "account.table.email" },
+        "form": { "show": true, "widget": "email", "span": 6, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "host",
+      "schema": { "type": "string", "description": "邮箱服务器地址", "examples": ["smtp.ethereal.email"] },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "account.table.host",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "content", "labelKey": "account.table.host", "template": "${host}:${port}" },
+        "form": { "show": true, "widget": "text", "span": 6, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "port",
+      "schema": { "type": "number", "description": "邮箱服务器端口", "examples": [587, 465] },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "account.table.port",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "hidden" },
+        "form": { "show": true, "widget": "number", "span": 6, "defaultValue": 465 }
+      }
+    },
+    {
+      "name": "password",
+      "schema": { "type": "string", "description": "邮箱密码", "examples": ["jn7jnAPss4f63QBp6D"] },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "account.table.password",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "password", "toggleVisibility": true, "valueTransform": "base64", "span": 6, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "scope",
+      "schema": {
+        "type": "string",
+        "enum": ["sys", "biz"],
+        "description": "作用域：sys(系统级)/biz(企业级)",
+        "default": "sys"
+      },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "mail.scope",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "filled",
+          "options": [
+            { "value": "sys", "labelKey": "mail.scope.sys", "color": "primary", "variant": "filled" },
+            { "value": "biz", "labelKey": "mail.scope.biz", "color": "secondary", "variant": "filled" },
+            { "value": "user", "labelKey": "mail.scope.user", "color": "info", "variant": "filled" }
+          ]
+        },
+        "card": { "role": "hidden" },
+        "form": {
+          "show": true,
+          "widget": "select",
+          "span": 6,
+          "required": true,
+          "defaultValue": "sys",
+          "options": [
+            { "value": "sys", "labelKey": "mail.scope.sys" },
+            { "value": "biz", "labelKey": "mail.scope.biz" },
+            { "value": "user", "labelKey": "mail.scope.user" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "table": false,
+        "card": false,
+        "filter": false,
+        "form": { "show": false, "defaultValue": true }
+      }
+    },
+    {
+      "name": "tenantId",
+      "schema": { "type": ["number", "null"], "nullable": true, "description": "租户ID（企业级专用）" },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": { "table": false, "card": false, "filter": false, "form": false }
+    },
+    {
+      "name": "userId",
+      "schema": { "type": ["number", "null"], "nullable": true, "description": "用户ID（个人级专用）" },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": { "table": false, "card": false, "filter": false, "form": false }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "column.remark" },
+        "form": { "rows": 3 }
+      }
+    }
+  ]
+}

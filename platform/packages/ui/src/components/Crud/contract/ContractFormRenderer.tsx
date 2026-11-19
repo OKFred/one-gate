@@ -318,7 +318,7 @@ export function ContractFormRenderer<TRecord extends Record<string, unknown>>({
       disabled ||
       Boolean(ui.disabledWhen && evaluateCondition(ui.disabledWhen, formRecord, isEdit));
     const label = ui.labelKey ? t(ui.labelKey) : field.name;
-    const placeholder = ui.placeholderKey ? t(ui.placeholderKey) : undefined;
+    const placeholder = ui.placeholderKey ? t(ui.placeholderKey) : ui.placeholder;
     const helperText = ui.helperTextKey ? t(ui.helperTextKey) : undefined;
     const fieldError = errorContext?.fieldErrors[field.name];
     const value = formRecord[field.name];

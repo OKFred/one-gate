@@ -1,0 +1,233 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/swarm/docker_config",
+  "operations": {
+    "listAll": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "name", "isEnabled", "isDefault", "createTimeUtc"],
+    "showSortControls": false
+  },
+  "actions": [
+    {
+      "key": "verify",
+      "type": "api",
+      "icon": "QuestionMark",
+      "labelKey": "swarm.docker_config.actions.verify",
+      "color": "success",
+      "permissionCodes": ["admin.swarm.docker_config:read"],
+      "url": "/api/v1/admin/swarm/docker_config/verify",
+      "payloadMap": { "id": "$row.id" },
+      "successCheck": "httpOk",
+      "successMessageKey": "swarm.docker_config.verifySuccess"
+    }
+  ],
+  "fields": [
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "配置名称",
+        "examples": ["My Docker Swarm"],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "swarm.docker_config.name",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "title" },
+        "form": { "show": true, "widget": "text", "span": 6, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "apiVersion",
+      "schema": {
+        "type": "string",
+        "description": "Docker API 版本",
+        "examples": ["v1.47"]
+      },
+      "ui": {
+        "labelKey": "swarm.docker_config.apiVersion",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "text", "span": 6, "placeholder": "v1.45", "defaultValue": "" }
+      }
+    },
+    {
+      "name": "host",
+      "schema": {
+        "type": "string",
+        "description": "Docker Host 地址",
+        "examples": ["https://127.0.0.1:2376"]
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "swarm.docker_config.host",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "content", "labelKey": "swarm.docker_config.host" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "placeholderKey": "swarm.docker_config.hostPlaceholder",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "tlsVerify",
+      "schema": {
+        "type": "boolean",
+        "description": "是否启用 TLS 验证"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "swarm.docker_config.tlsVerify",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "column.yes",
+          "falseLabelKey": "column.no",
+          "trueColor": "primary",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "card": {
+          "role": "tag",
+          "hideWhenFalse": true,
+          "trueLabelKey": "swarm.docker_config.tlsVerify",
+          "color": "secondary"
+        },
+        "form": { "show": true, "widget": "switch", "defaultValue": false }
+      }
+    },
+    {
+      "name": "cfMtlsBinding",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "Cloudflare mTLS 证书绑定名称"
+      },
+      "ui": {
+        "labelKey": "swarm.docker_config.cfMtlsBinding",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "placeholderKey": "swarm.docker_config.cfMtlsBindingPlaceholder",
+          "visibleWhen": { "field": "tlsVerify", "truthy": true },
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "caCert",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "CA 证书内容" },
+      "ui": {
+        "labelKey": "swarm.docker_config.caCert",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 4,
+          "placeholder": "-----BEGIN CERTIFICATE-----\n...",
+          "visibleWhen": { "field": "tlsVerify", "truthy": true },
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "clientCert",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "客户端证书内容" },
+      "ui": {
+        "labelKey": "swarm.docker_config.clientCert",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 4,
+          "placeholder": "-----BEGIN CERTIFICATE-----\n...",
+          "visibleWhen": { "field": "tlsVerify", "truthy": true },
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "clientKey",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "客户端私钥" },
+      "ui": {
+        "labelKey": "swarm.docker_config.clientKey",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "password",
+          "rows": 4,
+          "placeholder": "-----BEGIN PRIVATE KEY-----\n...",
+          "visibleWhen": { "field": "tlsVerify", "truthy": true },
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "isDefault",
+      "schema": { "type": "boolean", "description": "是否为默认配置" },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "swarm.docker_config.isDefault",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "hideWhenFalse": true,
+          "trueLabelKey": "swarm.docker_config.defaultLabel",
+          "trueColor": "primary",
+          "variant": "outlined",
+          "fallback": "-"
+        },
+        "card": {
+          "role": "tag",
+          "hideWhenFalse": true,
+          "trueLabelKey": "swarm.docker_config.defaultLabel",
+          "color": "primary"
+        },
+        "form": {
+          "show": true,
+          "widget": "switch",
+          "labelKey": "swarm.docker_config.isDefaultForm",
+          "span": 6,
+          "defaultValue": false
+        }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "filter": false,
+        "form": { "show": true, "widget": "switch", "span": 6, "defaultValue": true }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "ui": { "form": { "showCharCount": false } }
+    }
+  ]
+}

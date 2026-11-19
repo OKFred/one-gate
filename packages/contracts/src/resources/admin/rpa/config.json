@@ -1,0 +1,154 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/rpa/config",
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "search.keyword"
+    },
+    "sortableFields": ["id", "name", "isDefault", "isEnabled", "createTimeUtc"],
+    "showSortControls": false
+  },
+  "actions": [
+    {
+      "key": "verify",
+      "type": "api",
+      "icon": "PlayArrow",
+      "labelKey": "admin.rpa.config.testConnection",
+      "color": "success",
+      "permissionCodes": ["admin.rpa.config:read"],
+      "url": "/api/v1/admin/rpa/config/verify",
+      "payloadMap": { "id": "$row.id" },
+      "successCheck": "truthyData",
+      "successMessageKey": "admin.rpa.config.verifySuccess",
+      "errorMessageKey": "admin.rpa.config.verifyFailed"
+    }
+  ],
+  "fields": [
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "配置名",
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "admin.rpa.config.name",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "title" },
+        "form": { "show": true, "widget": "text", "defaultValue": "" }
+      }
+    },
+    {
+      "name": "cdpUrl",
+      "schema": {
+        "type": "string",
+        "description": "CDP 协议调试连接地址"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "admin.rpa.config.cdpUrlLabel",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "admin.rpa.config.cdpUrlCardLabel" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "labelKey": "admin.rpa.config.cdpUrlFormLabel",
+          "helperTextKey": "admin.rpa.config.cdpUrlHelper",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "authToken",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "认证 Token（可选）",
+        "maxLength": 500
+      },
+      "ui": {
+        "labelKey": "admin.rpa.config.authToken",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "helperTextKey": "admin.rpa.config.authTokenHelper",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "isDefault",
+      "schema": {
+        "type": "boolean",
+        "description": "是否为主配置"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "admin.rpa.config.defaultEnv",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "admin.rpa.config.yes",
+          "falseLabelKey": "admin.rpa.config.no",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "card": {
+          "role": "tag",
+          "hideWhenFalse": true,
+          "trueLabelKey": "admin.rpa.config.default",
+          "color": "success"
+        },
+        "form": {
+          "show": true,
+          "widget": "switch",
+          "labelKey": "admin.rpa.config.setDefaultEnv",
+          "defaultValue": false
+        }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listFilter": true },
+      "ui": {
+        "labelKey": "admin.rpa.config.status",
+        "table": {
+          "show": true,
+          "titleKey": "admin.rpa.config.status",
+          "renderer": "booleanChip",
+          "trueLabelKey": "admin.rpa.config.enabled",
+          "falseLabelKey": "admin.rpa.config.disabled",
+          "trueColor": "success",
+          "falseColor": "error",
+          "variant": "outlined"
+        },
+        "card": { "role": "tag" },
+        "filter": false,
+        "form": { "show": true, "widget": "switch", "labelKey": "admin.rpa.config.enableEnv", "defaultValue": true }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "in": { "list": false, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "admin.rpa.config.remark",
+        "table": false,
+        "form": { "labelKey": "admin.rpa.config.remark" }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "ui": { "table": { "show": false } }
+    }
+  ]
+}

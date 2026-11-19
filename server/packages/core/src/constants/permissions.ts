@@ -28,6 +28,8 @@ export type CheckPermissionSeeds<T, Parent extends string = ""> = {
 export const permissionSeeds = {
   /** 底座 */
   "admin.base": {
+    /** 自动生成: map */
+    map: ["read", "add", "edit", "delete"],
     "": ["read"],
     sys_config: ["read", "add", "edit", "delete"],
     /** Webhook 配置 */
@@ -220,6 +222,8 @@ export const permissionSeeds = {
   },
   /** 移动端管理 */
   "admin.mobile": {
+    /** 自动生成: tiktok_task */
+    tiktok_task: ["read", "add", "edit", "delete"],
     "": ["read"],
     device: ["read", "add", "edit", "delete", "sync", "view"],
     app: ["read", "add", "edit", "delete"],

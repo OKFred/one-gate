@@ -92,10 +92,14 @@ export function compileBackendSchemas(contract: CrudResourceContract): CompiledB
     minimum: 1,
   };
 
-  // 构建 list 筛选参数属性（从字段 ui.filter 与 filters.extraFields 提取）
+  // 构建 list 筛选参数属性（优先遵循显式 in.listFilter，否则从字段 ui.filter 提取）
   const listFilterProps: Record<string, JsonSchemaProperty> = {};
   for (const field of fields) {
-    if (field.ui.filter && field.ui.filter.show !== false && field.name !== 'keyword') {
+    const includeAsFilter =
+      field.in.listFilter !== undefined
+        ? field.in.listFilter
+        : Boolean(field.ui.filter && field.ui.filter.show !== false);
+    if (includeAsFilter && field.name !== 'keyword') {
       listFilterProps[field.name] = sanitizeJsonSchemaProperty(field.schema);
     }
   }

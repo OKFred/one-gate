@@ -1,0 +1,120 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/base/webhook_config",
+  "operations": {
+    "get": false
+  },
+  "api": {
+    "endpoints": {
+      "detail": "/api/v1/admin/base/webhook_config/detail"
+    },
+    "loadDetailOnEdit": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "admin.base.webhookConfig.keywordPlaceholder"
+    },
+    "sortableFields": ["id", "source", "isEnabled", "isPrimary", "createTimeUtc"],
+    "showSortControls": false
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "ui": {
+        "table": { "show": true, "width": 80 },
+        "card": { "role": "hidden" }
+      }
+    },
+    {
+      "name": "source",
+      "schema": {
+        "type": "string",
+        "description": "Webhook 来源，例如 feishu",
+        "minLength": 1,
+        "maxLength": 50,
+        "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listFilter": true },
+      "ui": {
+        "labelKey": "admin.base.webhookConfig.source",
+        "table": { "show": true, "renderer": "enumChip", "color": "info", "variant": "outlined" },
+        "card": { "role": "title" },
+        "filter": { "show": true, "type": "text", "transform": "emptyToUndefined" },
+        "form": { "show": true, "widget": "text", "placeholder": "feishu", "defaultValue": "feishu" }
+      }
+    },
+    {
+      "name": "url",
+      "schema": {
+        "type": "string",
+        "description": "Webhook HTTPS URL",
+        "minLength": 1,
+        "maxLength": 1500,
+        "format": "uri"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "admin.base.webhookConfig.url",
+        "table": { "show": true, "renderer": "code" },
+        "card": { "role": "content", "labelKey": "admin.base.webhookConfig.url" },
+        "form": {
+          "show": true,
+          "widget": "password",
+          "toggleVisibility": true,
+          "placeholder": "https://open.feishu.cn/open-apis/bot/v2/hook/...",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listFilter": true },
+      "ui": {
+        "labelKey": "common.isEnabled",
+        "table": { "titleKey": "common.isEnabled" },
+        "filter": { "show": true, "type": "select", "labelKey": "filter.enabledStatus", "includeAllOption": true },
+        "form": { "labelKey": "common.isEnabled" }
+      }
+    },
+    {
+      "name": "isPrimary",
+      "schema": { "type": "boolean", "description": "是否为当前来源的主配置" },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "admin.base.isPrimary",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "hideWhenFalse": true,
+          "trueLabelKey": "column.yes",
+          "trueColor": "success",
+          "variant": "filled",
+          "fallback": "-"
+        },
+        "card": { "role": "hidden" },
+        "form": { "show": true, "widget": "switch", "defaultValue": true }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc"
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": { "widget": "text", "valueTransform": "emptyToNull", "defaultValue": null }
+      }
+    }
+  ]
+}
