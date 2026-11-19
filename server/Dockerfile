@@ -9,6 +9,7 @@ RUN corepack enable && corepack prepare pnpm@11.5.0 --activate
 
 # 复制根级工作区与后端依赖清单并安装依赖
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY packages/contracts/package.json ./packages/contracts/
 COPY server/package.json ./server/
 COPY server/apps/server/package.json ./server/apps/server/
 COPY server/packages/core/package.json ./server/packages/core/
@@ -25,9 +26,11 @@ COPY platform/apps/personal/package.json ./platform/apps/personal/
 RUN pnpm config set registry https://registry.npmmirror.com && \
     pnpm install --frozen-lockfile --filter "@hodor/server..." --filter rbac-monorepo-root
 
-# 复制后端源代码并构建
+# 复制共享契约与后端源代码并构建
+COPY packages/contracts ./packages/contracts
 COPY server ./server
-RUN pnpm --dir server run build
+RUN pnpm --filter @hodor/contracts build && \
+    pnpm --dir server run build
 
 WORKDIR /app/server
 RUN mkdir -p /app/logs && ln -sfn /app/logs /app/server/logs

@@ -11,7 +11,7 @@
     "build:admin": "pnpm --filter @hodor/web-admin build",
     "build:enterprise": "pnpm --filter @hodor/web-enterprise build",
     "build:personal": "pnpm --filter @hodor/web-personal build",
-    "build:all": "pnpm --filter \"@hodor/web-*\" build",
+    "build:all": "pnpm --filter @hodor/contracts build && pnpm --filter \"@hodor/web-*\" build",
     "build": "pnpm run build:all",
     "test:e2e:auth": "playwright test --project=auth --headed",
     "test:e2e": "playwright test --project=chromium",

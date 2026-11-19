@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Alert, Button, Stack } from '@mui/material';
+import { Alert, Box, Button, Stack } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
 import { PageLayout } from '@/components/Responsive/index';
@@ -48,7 +48,7 @@ export interface CrudState<TRecord, TFilters> {
   isSearching: boolean;
   filterCount: number;
   formOpen: boolean;
-  editId: number | null;
+  editId: number | string | null;
   form: Partial<TRecord>;
   formLoading: boolean;
   deleteConfirmOpen: boolean;
@@ -66,10 +66,13 @@ interface SchemaCrudPageProps<
   TExtra = unknown,
   TAddData = Record<string, unknown>,
   TUpdateData = Record<string, unknown>,
+  TKey extends string | number = number,
 > {
-  config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra, TAddData, TUpdateData>;
+  config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra, TAddData, TUpdateData, TKey>;
   extraContext?: TExtra;
-  customActions?: React.ReactNode;
+  customActions?: React.ReactNode | ((helpers: CrudHelpers<TRecord>) => React.ReactNode);
+  contextParams?: Record<string, unknown>;
+  renderDialogs?: (helpers: CrudHelpers<TRecord>) => React.ReactNode;
 }
 
 export function SchemaCrudPage<
@@ -79,13 +82,24 @@ export function SchemaCrudPage<
   TExtra = unknown,
   TAddData = Record<string, unknown>,
   TUpdateData = Record<string, unknown>,
+  TKey extends string | number = number,
 >({
   config,
   extraContext,
   customActions,
-}: SchemaCrudPageProps<TRecord, TFilters, TApiData, TExtra, TAddData, TUpdateData>) {
+  contextParams,
+  renderDialogs,
+}: SchemaCrudPageProps<TRecord, TFilters, TApiData, TExtra, TAddData, TUpdateData, TKey>) {
   const t = useTranslation();
+  const tRef = useRef(t);
+  tRef.current = t;
   const { isMobile } = useResponsive();
+  const contextParamsKey = contextParams ? JSON.stringify(contextParams) : '';
+  const contextParamsRef = useRef(contextParams);
+  contextParamsRef.current = contextParams;
+  const extraContextRef = useRef(extraContext);
+  extraContextRef.current = extraContext;
+  const detailRequestVersion = useRef(0);
   const resourceIdentity = config.softDelete
     ? `soft:${config.softDelete.resourceType}`
     : `crud:${config.resourceKey ?? 'default'}`;
@@ -103,7 +117,7 @@ export function SchemaCrudPage<
   const deletionSelection = useRef<{
     identity: string;
     row: TRecord;
-    id: number;
+    id: TKey;
     session: AuthSessionSnapshot;
     softDelete: typeof config.softDelete;
     delete: typeof config.api.delete;
@@ -211,14 +225,15 @@ export function SchemaCrudPage<
     typeof config.form.updateSchema === 'string' &&
     !dynamicSchema.loading &&
     !dynamicSchema.updateSchema;
+  const hasEditId = editId !== null && editId !== undefined;
   const usingFallbackSchema =
     !!config.form.renderForm &&
-    (editId
+    (hasEditId
       ? config.form.updateSchema
         ? updateUsesFallbackSchema
         : addUsesFallbackSchema
       : addUsesFallbackSchema);
-  const activeDialogSchema = editId ? resolvedUpdateSchema || resolvedSchema : resolvedSchema;
+  const activeDialogSchema = hasEditId ? resolvedUpdateSchema || resolvedSchema : resolvedSchema;
 
   // AJV 表单验证与校验错误处理 Hook
   const { fieldErrors, handleFormError, clearErrors, setFieldErrors, clearFieldError, rootSchema } =
@@ -268,14 +283,19 @@ export function SchemaCrudPage<
         isCurrentAuthSession(session);
       if (!silent) updateState({ loading: true });
       try {
+        const ctxParams = contextParamsRef.current || {};
         let dataPayload = {
           pageNo: currentQuery.page,
           pageSize: currentQuery.pageSize,
+          ...ctxParams,
           ...currentQuery.filters,
         } as unknown as TApiData;
 
         if (cfg.filter.transformRequest) {
-          dataPayload = cfg.filter.transformRequest(currentQuery.filters);
+          dataPayload = {
+            ...ctxParams,
+            ...cfg.filter.transformRequest(currentQuery.filters),
+          } as TApiData;
           // 确保包含分页字段
           (dataPayload as unknown as { pageNo: number }).pageNo = currentQuery.page;
           (dataPayload as unknown as { pageSize: number }).pageSize = currentQuery.pageSize;
@@ -389,7 +409,7 @@ export function SchemaCrudPage<
     });
   }, [resourceIdentity, clearErrors, updateState]);
 
-  // 初始加载、资源切换及分页大小变化监听
+  // 初始加载、资源切换、上下文参数切换及分页大小变化监听
   useEffect(() => {
     const cfg = configRef.current;
     const newQuery = {
@@ -398,11 +418,14 @@ export function SchemaCrudPage<
       filters: cfg.filter.defaultFilters,
     };
 
-    // 检查关键字字段，如果有则初始化 keywordInput
-    let initialKeyword = '';
-    if ('keyword' in (cfg.filter.defaultFilters as Record<string, unknown>)) {
-      initialKeyword = (cfg.filter.defaultFilters as unknown as { keyword: string }).keyword || '';
-    }
+    const filterFieldsNow = cfg.filter.fields(tRef.current, extraContextRef.current);
+    const kwField = filterFieldsNow.find((f) => f.isKeyword || f.name === 'keyword');
+    const kwName = (kwField?.name as string | undefined) || 'keyword';
+    const defaultFiltersRec = cfg.filter.defaultFilters as Record<string, unknown>;
+    const initialKeyword =
+      kwName in defaultFiltersRec && typeof defaultFiltersRec[kwName] === 'string'
+        ? (defaultFiltersRec[kwName] as string)
+        : '';
 
     updateState({
       query: newQuery,
@@ -411,37 +434,42 @@ export function SchemaCrudPage<
     });
 
     fetchList(newQuery);
-  }, [resourceIdentity, query.pageSize, fetchList, updateState]);
+  }, [resourceIdentity, contextParamsKey, query.pageSize, fetchList, updateState]);
 
   // 关键字搜索防抖
+  const filterFieldsSnapshot = config.filter.fields(t, extraContext);
+  const keywordFieldMeta = filterFieldsSnapshot.find((f) => f.isKeyword || f.name === 'keyword');
+  const keywordFieldName = (keywordFieldMeta?.name as string | undefined) || 'keyword';
+  const keywordDebounceMs = keywordFieldMeta?.debounceMs ?? 500;
+
   useEffect(() => {
     const filtersRecord = query.filters as unknown as Record<string, unknown>;
-    if ('keyword' in filtersRecord) {
-      const currentKeyword = filtersRecord.keyword as string;
+    if (keywordFieldName in filtersRecord) {
+      const currentKeyword = (filtersRecord[keywordFieldName] as string) ?? '';
       if (keywordInput !== currentKeyword) {
         updateState({ isSearching: true });
         const timer = setTimeout(() => {
           const newQuery = {
             ...query,
             page: 1,
-            filters: { ...query.filters, keyword: keywordInput },
+            filters: { ...query.filters, [keywordFieldName]: keywordInput },
           };
           updateState({ query: newQuery, cursorMap: {} });
           fetchList(newQuery);
-        }, 500);
+        }, keywordDebounceMs);
 
         return () => clearTimeout(timer);
       }
     }
-  }, [keywordInput, query, fetchList, updateState]);
+  }, [keywordInput, keywordFieldName, keywordDebounceMs, query, fetchList, updateState]);
 
   // 筛选事件处理
   const handleFilterChange = (
     key: keyof TFilters,
     value: boolean | string | number | undefined,
   ) => {
-    if (key === 'keyword') {
-      updateState({ keywordInput: value as string });
+    if (key === keywordFieldName || key === 'keyword') {
+      updateState({ keywordInput: (value as string) ?? '' });
     } else {
       const newQuery = {
         ...query,
@@ -470,35 +498,73 @@ export function SchemaCrudPage<
     const defaultRecord = configRef.current.filter.defaultFilters as Record<string, unknown>;
     const currentRecord = query.filters as Record<string, unknown>;
     return Object.keys(currentRecord).some((key) => {
-      if (key === 'keyword') return !!keywordInput;
+      if (key === keywordFieldName || key === 'keyword') return !!keywordInput;
       return currentRecord[key] !== defaultRecord[key];
     });
   };
 
   // 表单操作处理
   const handleOpenAdd = () => {
-    let initialForm = { ...configRef.current.form.defaultForm };
+    detailRequestVersion.current += 1;
+    let initialForm = {
+      ...configRef.current.form.defaultForm,
+      ...(contextParamsRef.current || {}),
+    } as Partial<TRecord>;
     if (configRef.current.form.afterOpen) {
-      initialForm = configRef.current.form.afterOpen(initialForm, false);
+      initialForm = configRef.current.form.afterOpen(
+        initialForm,
+        false,
+        undefined,
+        extraContextRef.current,
+      );
     }
     clearErrors();
-    updateState({ editId: null, form: initialForm, formOpen: true });
+    updateState({ editId: null, form: initialForm, formOpen: true, formLoading: false });
   };
 
-  const handleOpenEdit = (row: TRecord) => {
-    const idKey = (configRef.current.apiKeyName || 'id') as keyof TRecord;
-    const recordId = row[idKey] as unknown as number;
-    let initialForm = { ...row } as Partial<TRecord>;
-    if (configRef.current.form.afterOpen) {
-      initialForm = configRef.current.form.afterOpen(initialForm, true, row);
-    }
+  const handleOpenEdit = async (row: TRecord) => {
+    const cfg = configRef.current;
+    const idKey = (cfg.apiKeyName || 'id') as keyof TRecord;
+    const recordId = row[idKey] as unknown as number | string;
+    const reqVersion = ++detailRequestVersion.current;
     clearErrors();
-    updateState({ editId: recordId, form: initialForm, formOpen: true });
+
+    const applyRow = (targetRow: TRecord) => {
+      let initialForm = { ...targetRow } as Partial<TRecord>;
+      if (cfg.form.afterOpen) {
+        initialForm = cfg.form.afterOpen(initialForm, true, targetRow, extraContextRef.current);
+      }
+      updateState({ editId: recordId, form: initialForm, formOpen: true, formLoading: false });
+    };
+
+    if (cfg.api.detail?.loadOnEdit && cfg.api.detail.fn) {
+      updateState({ editId: recordId, form: { ...row }, formOpen: true, formLoading: true });
+      try {
+        const payloadKey = cfg.api.detail.payloadKey || (idKey as string);
+        const res = await cfg.api.detail.fn({ data: { [payloadKey]: recordId } });
+        if (!mounted.current || reqVersion !== detailRequestVersion.current) return;
+        const detailData = res.data?.data;
+        const mergedRow = detailData ? ({ ...row, ...detailData } as TRecord) : row;
+        applyRow(mergedRow);
+      } catch {
+        if (!mounted.current || reqVersion !== detailRequestVersion.current) return;
+        updateState({ formLoading: false });
+      }
+      return;
+    }
+
+    applyRow(row);
   };
 
   const handleCloseForm = () => {
+    detailRequestVersion.current += 1;
     clearErrors();
-    updateState({ editId: null, form: configRef.current.form.defaultForm, formOpen: false });
+    updateState({
+      editId: null,
+      form: configRef.current.form.defaultForm,
+      formOpen: false,
+      formLoading: false,
+    });
   };
 
   const setForm = (newForm: React.SetStateAction<Partial<TRecord>>) => {
@@ -521,27 +587,27 @@ export function SchemaCrudPage<
       generation === resourceGenerationRef.current &&
       isCurrentAuthSession(session);
 
-    const isEdit = !!editId;
+    const isEdit = editId !== null && editId !== undefined;
     // 根据操作类型选择对应的 schema 和验证器
     const activeSchema = isEdit ? resolvedUpdateSchema || resolvedSchema : resolvedSchema;
     const validate = isEdit ? validateUpdate : validateAdd;
 
-    // 前端预验证
-    const clientErrors = validate(form);
-    if (Object.keys(clientErrors).length > 0) {
-      console.warn('Form validation failed:', clientErrors);
-      setFieldErrors(clientErrors);
-      return;
+    if (!cfg.form.validateAfterTransform) {
+      const clientErrors = validate(form);
+      if (Object.keys(clientErrors).length > 0) {
+        setFieldErrors(clientErrors);
+        return;
+      }
     }
 
     updateState({ formLoading: true });
     try {
       let submitForm = { ...form };
       if (cfg.form.beforeSubmit) {
-        submitForm = cfg.form.beforeSubmit(submitForm, isEdit);
+        submitForm = await cfg.form.beforeSubmit(submitForm, isEdit, extraContextRef.current);
       }
 
-      // 根据 schema 的 properties 过滤掉多余字段（如审计字段）
+      // 先根据 activeSchema.properties 过滤多余字段（如审计字段），再拼装最终提交体并执行转换后校验
       const allowedKeys = Object.keys(
         (activeSchema as { properties?: Record<string, unknown> }).properties || {},
       );
@@ -557,27 +623,43 @@ export function SchemaCrudPage<
         submitForm = filtered;
       }
 
-      if (editId) {
-        const idKey = (cfg.apiKeyName || 'id') as keyof TRecord;
+      const idKey = (cfg.apiKeyName || 'id') as keyof TRecord;
+      const finalPayload = isEdit
+        ? { ...(contextParamsRef.current || {}), ...submitForm, [idKey]: editId }
+        : { ...(contextParamsRef.current || {}), ...submitForm };
+
+      if (cfg.form.validateAfterTransform) {
+        const clientErrors = validate(finalPayload);
+        if (Object.keys(clientErrors).length > 0) {
+          setFieldErrors(clientErrors);
+          return;
+        }
+      }
+
+      if (isEdit) {
         if (cfg.api.update) {
           await cfg.api.update({
-            data: { ...submitForm, [idKey]: editId } as never,
+            data: finalPayload as never,
           });
         }
       } else {
         if (cfg.api.add) {
-          await cfg.api.add({
-            data: submitForm as never,
+          const addRes = await cfg.api.add({
+            data: finalPayload as never,
           });
+          if (cfg.form.afterAdd && acceptsSubmit()) {
+            await cfg.form.afterAdd(addRes, finalPayload as Partial<TRecord>, helpersRef.current);
+          }
         }
       }
 
       if (!acceptsSubmit()) return;
       handleCloseForm();
-      if (editId) {
-        fetchList(query);
+      const latestQuery = stateRef.current.query;
+      if (isEdit) {
+        fetchList(latestQuery);
       } else {
-        const newQuery = { ...query, page: 1 };
+        const newQuery = { ...latestQuery, page: 1 };
         updateState({ query: newQuery });
         fetchList(newQuery);
       }
@@ -595,7 +677,7 @@ export function SchemaCrudPage<
     deletionSelection.current = {
       identity: resourceIdentityRef.current,
       row,
-      id: row[idKey] as unknown as number,
+      id: row[idKey] as unknown as TKey,
       session: captureAuthSession(),
       softDelete: cfg.softDelete,
       delete: cfg.api.delete,
@@ -702,8 +784,10 @@ export function SchemaCrudPage<
   const helpers: CrudHelpers<TRecord> = {
     openEdit: handleOpenEdit,
     deleteRow: async (row) => handleOpenDeleteConfirm(row),
-    refreshTable: () => fetchList(query),
+    refreshTable: () => fetchList(stateRef.current.query),
   };
+  const helpersRef = useRef(helpers);
+  helpersRef.current = helpers;
 
   // 自定义与标准操作按钮合并
   const renderRowActions = (row: TRecord) => {
@@ -745,7 +829,9 @@ export function SchemaCrudPage<
     }
 
     // 处理配置的自定义操作
-    const customActionsConfig = config.table.actions ? config.table.actions(t, extraContext) : [];
+    const customActionsConfig = config.table.actions
+      ? config.table.actions(t, extraContext, helpers)
+      : [];
     const customActions = customActionsConfig
       .filter((act) => !act.visible || act.visible(row))
       .map((act) => (
@@ -755,6 +841,8 @@ export function SchemaCrudPage<
           color={act.color || 'primary'}
           size="small"
           permissionCodes={act.permissionCodes}
+          aria-label={act.label}
+          title={act.label}
           disabled={typeof act.disabled === 'function' ? act.disabled(row) : act.disabled}
         >
           {typeof act.icon === 'function' ? act.icon(row) : act.icon}
@@ -771,7 +859,7 @@ export function SchemaCrudPage<
 
   // 表格列扩展：自动拼接操作列
   const columns = (() => {
-    const rawColumns = config.table.columns(t, extraContext);
+    const rawColumns = config.table.columns(t, extraContext, helpers);
     const hasActions =
       config.api.update || config.api.delete || config.softDelete || config.table.actions;
 
@@ -793,24 +881,31 @@ export function SchemaCrudPage<
 
   const filterFields = config.filter.fields(t, extraContext);
 
-  return (
-    <PageLayout
-      actions={
-        <Stack direction="row" spacing={1}>
-          {customActions}
-          {config.api.add && (
-            <ResponsiveButton
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleOpenAdd}
-              permissionCodes={config.permissions?.add || []}
-            >
-              {t('dialog.add')}
-            </ResponsiveButton>
-          )}
-        </Stack>
-      }
-    >
+  const resolvedCustomActions =
+    typeof customActions === 'function' ? customActions(helpers) : customActions;
+
+  const toolbarContent =
+    resolvedCustomActions || config.api.add ? (
+      <Stack direction="row" spacing={1}>
+        {resolvedCustomActions}
+        {config.api.add && (
+          <ResponsiveButton
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenAdd}
+            permissionCodes={config.permissions?.add || []}
+          >
+            {t('dialog.add')}
+          </ResponsiveButton>
+        )}
+      </Stack>
+    ) : undefined;
+
+  const bodyContent = (
+    <>
+      {config.embedded && toolbarContent && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>{toolbarContent}</Box>
+      )}
       {/* 1. 筛选组件 (Filter) */}
       <Filter
         filterFields={filterFields}
@@ -870,7 +965,7 @@ export function SchemaCrudPage<
       )}
 
       {/* 3. 新增/编辑表单对话框 */}
-      <FormDialog<TRecord, TFilters, TApiData, TExtra>
+      <FormDialog<TRecord, TFilters, TApiData, TExtra, TKey>
         open={sameResource && formOpen}
         onClose={handleCloseForm}
         editId={editId}
@@ -896,6 +991,14 @@ export function SchemaCrudPage<
         loading={deleteLoading}
         content={rowToDelete ? config.softDelete?.confirmationContent(rowToDelete, t) : undefined}
       />
-    </PageLayout>
+
+      {renderDialogs?.(helpers)}
+    </>
   );
+
+  if (config.embedded) {
+    return bodyContent;
+  }
+
+  return <PageLayout actions={toolbarContent}>{bodyContent}</PageLayout>;
 }

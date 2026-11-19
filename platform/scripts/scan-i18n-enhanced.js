@@ -68,6 +68,74 @@ function getAllFiles(dir, fileList = []) {
   return fileList;
 }
 
+const CONTRACT_I18N_KEYS = new Set([
+  'titleKey',
+  'labelKey',
+  'placeholderKey',
+  'helperTextKey',
+  'fallbackKey',
+  'trueLabelKey',
+  'falseLabelKey',
+  'confirmMessageKey',
+  'successMessageKey',
+  'errorMessageKey',
+]);
+
+function getAllJsonFiles(dir, fileList = []) {
+  if (!existsSync(dir)) return fileList;
+  const items = readdirSync(dir);
+  for (const item of items) {
+    const filePath = join(dir, item);
+    const stat = statSync(filePath);
+    if (stat.isDirectory()) {
+      getAllJsonFiles(filePath, fileList);
+    } else if (item.endsWith('.json')) {
+      fileList.push(filePath);
+    }
+  }
+  return fileList;
+}
+
+function collectContractKeys(node, found) {
+  if (Array.isArray(node)) {
+    for (const item of node) collectContractKeys(item, found);
+    return;
+  }
+  if (!node || typeof node !== 'object') return;
+  for (const [k, v] of Object.entries(node)) {
+    if (k === 'sortFieldLabelKeys' && v && typeof v === 'object') {
+      for (const val of Object.values(v)) {
+        if (typeof val === 'string' && isValidTranslationKey(val)) {
+          found.push(val);
+        }
+      }
+      continue;
+    }
+    if (CONTRACT_I18N_KEYS.has(k) && typeof v === 'string' && isValidTranslationKey(v)) {
+      found.push(v);
+    } else if (v && typeof v === 'object') {
+      collectContractKeys(v, found);
+    }
+  }
+}
+
+function extractContractTranslationKeys(filePath) {
+  try {
+    const content = readFileSync(filePath, 'utf-8');
+    const parsed = JSON.parse(content);
+    const found = [];
+    collectContractKeys(parsed, found);
+    return found.map((key) => ({
+      key,
+      line: 1,
+      context: `contract:${key}`,
+    }));
+  } catch (error) {
+    console.error(`Error reading contract file ${filePath}:`, error.message);
+    return [];
+  }
+}
+
 /**
  * 从前端文件中提取所有多语言键
  */
@@ -426,6 +494,26 @@ async function main() {
 
   const usedKeys = new Set();
   const keyLocations = {};
+
+  // 1b. 扫描顶层共享契约 JSON 中的多语言键
+  const contractsResourcesDir = resolve(baseDir, '../packages/contracts/src/resources');
+  const contractJsonFiles = getAllJsonFiles(contractsResourcesDir);
+  contractJsonFiles.forEach((filePath) => {
+    const keyData = extractContractTranslationKeys(filePath);
+    const relativePath = relative(resolve(baseDir, '..'), filePath);
+    keyData.forEach((item) => {
+      usedKeys.add(item.key);
+      if (!keyLocations[item.key]) {
+        keyLocations[item.key] = [];
+      }
+      keyLocations[item.key].push({
+        file: relativePath,
+        line: item.line,
+        context: item.context,
+      });
+    });
+  });
+  console.log(`✓ 扫描 ${contractJsonFiles.length} 个契约 JSON 文件\n`);
 
   files.forEach((filePath) => {
     const keyData = extractTranslationKeys(filePath);

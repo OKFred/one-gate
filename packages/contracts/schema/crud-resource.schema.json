@@ -1,0 +1,602 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hodor CRUD Resource Contract",
+  "type": "object",
+  "required": ["version", "resource", "fields"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1 },
+    "resource": {
+      "type": "string",
+      "pattern": "^(admin|enterprise|personal)/[a-zA-Z0-9_/-]+$"
+    },
+    "app": { "type": "string", "enum": ["admin", "enterprise", "personal"] },
+    "route": { "type": "string" },
+    "mountRoute": { "type": "boolean" },
+    "titleKey": { "type": "string" },
+    "resourceKey": { "type": "string" },
+    "embedded": { "type": "boolean" },
+    "apiKeyName": { "type": "string" },
+    "auditFields": { "type": "boolean" },
+    "showIdColumn": { "type": "boolean" },
+    "idInListRequired": { "type": "boolean" },
+    "cardMode": { "type": "string", "enum": ["auto", "custom", "none"] },
+    "readonly": { "type": "boolean" },
+    "refreshIntervalMs": { "type": "number", "minimum": 1000 },
+    "pagination": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "type": "string", "enum": ["offset", "cursor"] },
+        "defaultPageSize": { "type": "integer", "minimum": 1, "maximum": 1000 }
+      }
+    },
+    "permissionNamespace": { "type": "string" },
+    "permissions": {
+      "oneOf": [
+        { "const": "none" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "read": { "oneOf": [{ "const": false }, { "type": "array", "items": { "type": "string" } }] },
+            "add": { "oneOf": [{ "const": false }, { "type": "array", "items": { "type": "string" } }] },
+            "edit": { "oneOf": [{ "const": false }, { "type": "array", "items": { "type": "string" } }] },
+            "delete": { "oneOf": [{ "const": false }, { "type": "array", "items": { "type": "string" } }] }
+          }
+        }
+      ]
+    },
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "list": { "type": "boolean" },
+        "listAll": { "type": "boolean" },
+        "get": { "type": "boolean" },
+        "add": { "type": "boolean" },
+        "update": { "type": "boolean" },
+        "delete": { "type": "boolean" },
+        "deleteWithUndo": { "type": "boolean" }
+      }
+    },
+    "api": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "basePath": { "type": "string" },
+        "endpoints": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "list": { "type": "string" },
+            "listAll": { "type": "string" },
+            "get": { "type": "string" },
+            "add": { "type": "string" },
+            "update": { "type": "string" },
+            "delete": { "type": "string" },
+            "deleteWithUndo": { "type": "string" },
+            "detail": { "type": "string" }
+          }
+        },
+        "loadDetailOnEdit": { "type": "boolean" },
+        "fixedParams": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        },
+        "summaries": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "list": { "type": "string" },
+            "listAll": { "type": "string" },
+            "get": { "type": "string" },
+            "add": { "type": "string" },
+            "update": { "type": "string" },
+            "delete": { "type": "string" },
+            "deleteWithUndo": { "type": "string" }
+          }
+        }
+      }
+    },
+    "schemaNames": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "add": { "type": "string" },
+        "update": { "type": "string" }
+      }
+    },
+    "softDelete": {
+      "type": "object",
+      "required": ["resourceType", "displayNameField", "confirmMessageKey"],
+      "additionalProperties": false,
+      "properties": {
+        "resourceType": { "type": "string" },
+        "displayNameField": { "type": "string" },
+        "expectedUpdateTimeField": { "type": "string" },
+        "confirmMessageKey": { "type": "string" },
+        "deletePath": { "type": "string" },
+        "getPath": { "type": "string" },
+        "recycleBinPermissions": { "type": "array", "items": { "type": "string" } },
+        "verifyReadPermissions": { "type": "array", "items": { "type": "string" } },
+        "retryableErrorCodes": { "type": "array", "items": { "type": "string" } },
+        "stateChangedErrorCodes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "filters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "keyword": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "fieldName": { "type": "string" },
+            "labelKey": { "type": "string" },
+            "placeholderKey": { "type": "string" },
+            "debounceMs": { "type": "integer", "minimum": 0 },
+            "searchIcon": { "type": "boolean" },
+            "transform": { "type": "string", "enum": ["trim", "emptyToUndefined"] }
+          }
+        },
+        "sortableFields": { "type": "array", "items": { "type": "string" } },
+        "showSortControls": { "type": "boolean" },
+        "defaultSort": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "orderBy": { "type": "string" },
+            "descend": { "type": "boolean" }
+          }
+        },
+        "sortFieldLabelKeys": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "defaultFilters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        },
+        "extraFields": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/filterFieldSpec" }
+        }
+      }
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "preset": {
+            "type": "string",
+            "enum": ["id", "isEnabled", "remark", "createTimeUtc", "updateTimeUtc"]
+          },
+          "schema": { "type": "object" },
+          "requiredOn": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["add", "update", "list", "detail", "get"] }
+          },
+          "in": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "list": { "type": "boolean" },
+              "detail": { "type": "boolean" },
+              "add": { "type": "boolean" },
+              "update": { "type": "boolean" },
+              "get": { "type": "boolean" },
+              "listAll": { "type": "boolean" }
+            }
+          },
+          "ui": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "labelKey": { "type": "string" },
+              "table": { "oneOf": [{ "const": false }, { "$ref": "#/$defs/tableColUi" }] },
+              "card": { "oneOf": [{ "const": false }, { "$ref": "#/$defs/cardFieldUi" }] },
+              "filter": { "oneOf": [{ "const": false }, { "$ref": "#/$defs/filterFieldUi" }] },
+              "form": { "oneOf": [{ "const": false }, { "$ref": "#/$defs/formFieldUi" }] },
+              "detail": { "oneOf": [{ "const": false }, { "$ref": "#/$defs/detailFieldUi" }] }
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "type", "icon"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string" },
+          "type": { "type": "string", "enum": ["api", "detail"] },
+          "icon": { "type": "string" },
+          "labelKey": { "type": "string" },
+          "color": { "type": "string", "enum": ["primary", "secondary", "error", "success", "warning", "info", "inherit"] },
+          "permissionCodes": { "type": "array", "items": { "type": "string" } },
+          "url": { "type": "string" },
+          "payloadMap": {
+            "type": "object",
+            "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+          },
+          "confirmMessageKey": { "type": "string" },
+          "successCheck": { "type": "string", "enum": ["httpOk", "truthyData"] },
+          "successMessageKey": { "type": "string" },
+          "errorMessageKey": { "type": "string" },
+          "refreshAfter": { "type": "boolean" },
+          "visibleWhen": { "$ref": "#/$defs/conditionSpec" },
+          "disabledWhen": { "$ref": "#/$defs/conditionSpec" }
+        }
+      }
+    },
+    "detailDialog": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxWidth": { "type": "string", "enum": ["xs", "sm", "md", "lg", "xl"] },
+        "titleKey": { "type": "string" },
+        "titleIcon": { "type": "string" },
+        "fetchUrl": { "type": "string" },
+        "fetchPayloadMap": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["items"],
+            "additionalProperties": false,
+            "properties": {
+              "titleKey": { "type": "string" },
+              "icon": { "type": "string" },
+              "visibleWhen": { "$ref": "#/$defs/conditionSpec" },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["field"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "field": { "type": "string" },
+                    "labelKey": { "type": "string" },
+                    "renderer": { "type": "string", "enum": ["text", "datetime", "booleanChip", "enumChip", "jsonPre", "alert", "codePre"] },
+                    "severity": { "type": "string", "enum": ["error", "warning", "info", "success"] },
+                    "format": { "type": "string" },
+                    "fallback": { "type": "string" },
+                    "fallbackKey": { "type": "string" },
+                    "trueLabelKey": { "type": "string" },
+                    "falseLabelKey": { "type": "string" },
+                    "trueColor": { "type": "string", "enum": ["primary", "secondary", "error", "success", "warning", "info", "default"] },
+                    "falseColor": { "type": "string", "enum": ["primary", "secondary", "error", "success", "warning", "info", "default"] },
+                    "options": { "type": "object" },
+                    "visibleWhen": { "$ref": "#/$defs/conditionSpec" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "muiColor": {
+      "type": "string",
+      "enum": ["primary", "secondary", "error", "success", "warning", "info", "default"]
+    },
+    "conditionSpec": {
+      "oneOf": [
+        { "enum": ["add", "edit"] },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "field": { "type": "string" },
+            "equals": { "type": ["string", "number", "boolean", "null"] },
+            "notEquals": { "type": ["string", "number", "boolean", "null"] },
+            "truthy": { "type": "boolean" },
+            "falsy": { "type": "boolean" },
+            "in": { "type": "array", "items": { "type": ["string", "number", "boolean", "null"] } }
+          },
+          "required": ["field"]
+        },
+        {
+          "type": "object",
+          "required": ["all"],
+          "additionalProperties": false,
+          "properties": { "all": { "type": "array", "items": { "$ref": "#/$defs/conditionSpec" } } }
+        },
+        {
+          "type": "object",
+          "required": ["any"],
+          "additionalProperties": false,
+          "properties": { "any": { "type": "array", "items": { "$ref": "#/$defs/conditionSpec" } } }
+        },
+        {
+          "type": "object",
+          "required": ["not"],
+          "additionalProperties": false,
+          "properties": { "not": { "$ref": "#/$defs/conditionSpec" } }
+        }
+      ]
+    },
+    "optionItem": {
+      "type": "object",
+      "required": ["value"],
+      "additionalProperties": false,
+      "properties": {
+        "value": { "type": ["string", "number", "boolean", "null"] },
+        "label": { "type": "string" },
+        "labelKey": { "type": "string" },
+        "color": { "$ref": "#/$defs/muiColor" },
+        "variant": { "type": "string", "enum": ["filled", "outlined"] }
+      }
+    },
+    "tableColUi": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "show": { "type": "boolean" },
+        "titleKey": { "type": "string" },
+        "title": { "type": "string" },
+        "dataPath": { "type": "string" },
+        "width": { "type": ["number", "string"] },
+        "align": { "type": "string", "enum": ["left", "center", "right"] },
+        "fixed": { "type": "string", "enum": ["left", "right"] },
+        "renderer": {
+          "type": "string",
+          "enum": [
+            "text",
+            "code",
+            "datetime",
+            "booleanChip",
+            "booleanText",
+            "booleanSwitch",
+            "enumChip",
+            "enumText",
+            "jsonArrayChips",
+            "jsonText",
+            "linkButton",
+            "stackedText",
+            "mediaStackedText"
+          ]
+        },
+        "fallback": { "type": "string" },
+        "fallbackKey": { "type": "string" },
+        "truncate": { "type": "integer", "minimum": 1 },
+        "tooltip": { "type": "boolean" },
+        "ellipsis": { "type": "boolean" },
+        "maxWidth": { "type": ["number", "string"] },
+        "bold": { "type": "boolean" },
+        "template": { "type": "string" },
+        "prefix": { "type": "string" },
+        "suffix": { "type": "string" },
+        "stripHtml": { "type": "boolean" },
+        "format": { "type": "string" },
+        "visibleWhen": { "$ref": "#/$defs/conditionSpec" },
+        "trueLabelKey": { "type": "string" },
+        "falseLabelKey": { "type": "string" },
+        "trueColor": { "$ref": "#/$defs/muiColor" },
+        "falseColor": { "$ref": "#/$defs/muiColor" },
+        "variant": { "type": "string", "enum": ["filled", "outlined"] },
+        "color": { "$ref": "#/$defs/muiColor" },
+        "hideWhenFalse": { "type": "boolean" },
+        "showIcon": { "type": "boolean" },
+        "falseTooltipField": { "type": "string" },
+        "options": { "type": "array", "items": { "$ref": "#/$defs/optionItem" } },
+        "rangeColors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["color"],
+            "additionalProperties": false,
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "maxExclusive": { "type": "number" },
+              "color": { "$ref": "#/$defs/muiColor" }
+            }
+          }
+        },
+        "hashColor": { "type": "boolean" },
+        "maxDisplay": { "type": "integer", "minimum": 1 },
+        "tooltipPre": { "type": "boolean" },
+        "hrefField": { "type": "string" },
+        "labelKey": { "type": "string" },
+        "icon": { "type": "string" },
+        "imageField": { "type": "string" },
+        "imageSize": { "type": "number" },
+        "primaryField": { "type": "string" },
+        "primaryTemplate": { "type": "string" },
+        "secondaryField": { "type": "string" },
+        "secondaryTemplate": { "type": "string" }
+      }
+    },
+    "cardFieldUi": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": { "type": "string", "enum": ["title", "subtitle", "content", "tag", "hidden"] },
+        "labelKey": { "type": "string" },
+        "template": { "type": "string" },
+        "hideWhenFalse": { "type": "boolean" },
+        "trueLabelKey": { "type": "string" },
+        "falseLabelKey": { "type": "string" },
+        "trueColor": { "$ref": "#/$defs/muiColor" },
+        "falseColor": { "$ref": "#/$defs/muiColor" },
+        "color": { "$ref": "#/$defs/muiColor" },
+        "variant": { "type": "string", "enum": ["filled", "outlined"] },
+        "prefix": { "type": "string" },
+        "fallback": { "type": "string" },
+        "truncate": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "filterFieldSpec": {
+      "type": "object",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["text", "select", "switch"] },
+        "labelKey": { "type": "string" },
+        "placeholderKey": { "type": "string" },
+        "defaultValue": { "type": ["string", "number", "boolean", "null"] },
+        "options": { "type": "array", "items": { "$ref": "#/$defs/optionItem" } },
+        "includeAllOption": { "type": "boolean" },
+        "transform": { "type": "string", "enum": ["trim", "emptyToUndefined", "number", "boolean"] },
+        "isKeyword": { "type": "boolean" }
+      }
+    },
+    "filterFieldUi": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "show": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["text", "select", "switch"] },
+        "labelKey": { "type": "string" },
+        "placeholderKey": { "type": "string" },
+        "defaultValue": { "type": ["string", "number", "boolean", "null"] },
+        "options": { "type": "array", "items": { "$ref": "#/$defs/optionItem" } },
+        "includeAllOption": { "type": "boolean" },
+        "transform": { "type": "string", "enum": ["trim", "emptyToUndefined", "number", "boolean"] }
+      }
+    },
+    "formFieldUi": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "show": { "type": "boolean" },
+        "widget": {
+          "type": "string",
+          "enum": [
+            "text",
+            "email",
+            "number",
+            "textarea",
+            "password",
+            "code",
+            "switch",
+            "checkbox",
+            "select",
+            "multiSelect",
+            "treeFlatMultiSelect",
+            "tagInput",
+            "date",
+            "time",
+            "datetime",
+            "dynamicSubForm",
+            "divider"
+          ]
+        },
+        "labelKey": { "type": "string" },
+        "placeholderKey": { "type": "string" },
+        "helperTextKey": { "type": "string" },
+        "span": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1, "maximum": 12 },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "xs": { "type": "integer", "minimum": 1, "maximum": 12 },
+                "sm": { "type": "integer", "minimum": 1, "maximum": 12 },
+                "md": { "type": "integer", "minimum": 1, "maximum": 12 }
+              }
+            }
+          ]
+        },
+        "dividerBefore": { "type": "boolean" },
+        "required": { "type": "boolean" },
+        "defaultValue": {},
+        "rows": { "type": "integer", "minimum": 1 },
+        "maxLength": { "type": "integer", "minimum": 1 },
+        "showCharCount": { "type": "boolean" },
+        "toggleVisibility": { "type": "boolean" },
+        "theme": { "type": "string", "enum": ["light", "dark"] },
+        "validateJson": { "type": "boolean" },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "step": { "type": "number" },
+        "options": { "type": "array", "items": { "$ref": "#/$defs/optionItem" } },
+        "optionsSource": {
+          "type": "object",
+          "required": ["url", "valueField"],
+          "additionalProperties": false,
+          "properties": {
+            "url": { "type": "string" },
+            "params": { "type": "object" },
+            "listPath": { "type": "string" },
+            "labelField": { "type": "string" },
+            "labelTemplate": { "type": "string" },
+            "valueField": { "type": "string" },
+            "parentIdField": { "type": "string" },
+            "childrenField": { "type": "string" }
+          }
+        },
+        "dynamicSubForm": {
+          "type": "object",
+          "required": ["schemaUrl"],
+          "additionalProperties": false,
+          "properties": {
+            "schemaUrl": { "type": "string" },
+            "namespaceField": { "type": "string" },
+            "fixedNamespace": { "type": "string" },
+            "namespaceParamKey": { "type": "string" },
+            "valueField": { "type": "string" },
+            "titleKey": { "type": "string" }
+          }
+        },
+        "visibleWhen": { "$ref": "#/$defs/conditionSpec" },
+        "disabledWhen": { "$ref": "#/$defs/conditionSpec" },
+        "valueTransform": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": ["emptyToNull", "emptyToUndefined", "trim", "uppercase", "jsonStringArray", "base64", "epochMs", "number"]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["emptyToNull", "emptyToUndefined", "trim", "uppercase", "jsonStringArray", "base64", "epochMs", "number"]
+              }
+            }
+          ]
+        },
+        "jsonStringArrayOptions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "defaultOnAdd": { "type": "array", "items": { "type": ["string", "number"] } },
+            "nullWhenEmpty": { "type": "boolean" },
+            "nullUnless": { "$ref": "#/$defs/conditionSpec" }
+          }
+        },
+        "bindToTempField": { "type": "string" }
+      }
+    },
+    "detailFieldUi": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "show": { "type": "boolean" },
+        "labelKey": { "type": "string" },
+        "renderer": { "type": "string", "enum": ["text", "datetime", "booleanChip", "enumChip", "jsonPre", "alert", "codePre"] }
+      }
+    }
+  }
+}

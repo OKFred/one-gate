@@ -283,4 +283,36 @@ const axiosPlus = async <U extends keyof paths, M extends keyof UrlGeneric<U>>(
   return await service(config);
 };
 
+export interface DynamicApiRequestOptions {
+  data?: Record<string, unknown>;
+  errorPresentation?: 'global' | 'local';
+  shouldPresentError?: () => boolean;
+  ignoreAbort?: boolean;
+}
+
+export async function postApiJson<TData = unknown>(
+  url: string,
+  options: DynamicApiRequestOptions = {},
+): Promise<
+  Omit<AxiosResponse, 'data'> & {
+    data: { ok?: boolean; data?: TData; message?: string };
+  }
+> {
+  const config: AxiosRequestConfig & {
+    authSession: AuthSessionSnapshot;
+    errorPresentation?: 'global' | 'local';
+    shouldPresentError?: () => boolean;
+    ignoreAbort?: boolean;
+  } = {
+    url,
+    method: 'post',
+    data: options.data ?? {},
+    errorPresentation: options.errorPresentation,
+    shouldPresentError: options.shouldPresentError,
+    ignoreAbort: options.ignoreAbort,
+    authSession: captureRequestAuthSession(),
+  };
+  return await service(config);
+}
+
 export { axiosPlus };

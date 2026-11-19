@@ -52,6 +52,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1029.0",
     "@cfworker/json-schema": "^4.1.1",
     "@hodor/admin": "workspace:*",
+    "@hodor/contracts": "workspace:*",
     "@hodor/core": "workspace:*",
     "@hodor/enterprise": "workspace:*",
     "@hodor/personal": "workspace:*",

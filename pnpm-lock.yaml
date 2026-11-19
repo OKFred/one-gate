@@ -8,6 +8,27 @@ importers:
 
   .: {}
 
+  packages/contracts:
+    devDependencies:
+      '@cfworker/json-schema':
+        specifier: ^4.1.1
+        version: 4.1.6
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.5
+      json-schema-to-ts:
+        specifier: ^3.1.1
+        version: 3.1.1
+      tsx:
+        specifier: ^4.21.0
+        version: 4.23.15
+      typescript:
+        specifier: ~5.8.3
+        version: 5.8.3
+      vitest:
+        specifier: ~4.1.8
+        version: 4.1.12(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.4.2)(tsx@4.23.15)(yaml@2.9.1))
+
   platform:
     devDependencies:
       '@eslint/js':
@@ -88,6 +109,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1))(@types/react@19.3.0)(react@19.3.1)
+      '@hodor/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@hodor/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -188,6 +212,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1))(@types/react@19.3.0)(react@19.3.1)
+      '@hodor/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@hodor/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -243,6 +270,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1))(@types/react@19.3.0)(react@19.3.1)
+      '@hodor/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@hodor/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -298,6 +328,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.3.0)(react@19.3.1))(@types/react@19.3.0)(react@19.3.1)
+      '@hodor/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@iconify-icons/material-symbols':
         specifier: ^1.2.58
         version: 1.2.59
@@ -552,6 +585,9 @@ importers:
       '@hodor/admin':
         specifier: workspace:*
         version: link:../../packages/admin
+      '@hodor/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@hodor/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -703,6 +739,9 @@ importers:
 
   server/packages/admin:
     dependencies:
+      '@hodor/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@hodor/core':
         specifier: workspace:*
         version: link:../core
@@ -730,6 +769,9 @@ importers:
       '@cfworker/json-schema':
         specifier: ^4.1.1
         version: 4.1.6
+      '@hodor/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@hono/node-server':
         specifier: ^1.13.8
         version: 1.19.19(hono@4.13.19)
@@ -799,6 +841,9 @@ importers:
       '@hodor/admin':
         specifier: workspace:*
         version: link:../admin
+      '@hodor/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@hodor/core':
         specifier: workspace:*
         version: link:../core
@@ -814,6 +859,9 @@ importers:
       '@hodor/admin':
         specifier: workspace:*
         version: link:../admin
+      '@hodor/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@hodor/core':
         specifier: workspace:*
         version: link:../core
@@ -7940,7 +7988,7 @@ snapshots:
 
   '@types/node-fetch@2.6.13':
     dependencies:
-      '@types/node': 22.20.5
+      '@types/node': 24.19.2
       form-data: 4.0.6
 
   '@types/node@18.19.130':
@@ -7957,13 +8005,13 @@ snapshots:
 
   '@types/nodemailer@6.4.24':
     dependencies:
-      '@types/node': 22.20.5
+      '@types/node': 24.19.2
 
   '@types/parse-json@4.0.2': {}
 
   '@types/pg@8.23.1':
     dependencies:
-      '@types/node': 22.20.5
+      '@types/node': 24.19.2
       pg-protocol: 1.16.1
       pg-types: 2.2.0
 
@@ -7973,7 +8021,7 @@ snapshots:
 
   '@types/qrcode@1.5.6':
     dependencies:
-      '@types/node': 22.20.5
+      '@types/node': 24.19.2
 
   '@types/react-dom@19.3.0(@types/react@19.3.0)':
     dependencies:

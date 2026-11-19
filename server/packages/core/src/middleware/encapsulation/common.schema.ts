@@ -1,4 +1,4 @@
-import { JSONSchema } from "json-schema-to-ts";
+import type { JSONSchema } from "json-schema-to-ts";
 
 export const listAllReqBase = {
   descend: {
@@ -51,28 +51,26 @@ export function orderByWrapper<T extends readonly string[]>(fields: T) {
   } as const;
 }
 
-export function listWrapper<T extends readonly string[]>(
-  itemProperties: Record<string, JSONSchema>,
-  requiredKeys: T = [] as unknown as T
-) {
+export function listWrapper<
+  TReq extends readonly string[] = readonly string[],
+  TProps extends Record<string, JSONSchema> = Record<string, JSONSchema>,
+>(itemProperties: TProps, requiredKeys: TReq = [] as unknown as TReq) {
   return {
     type: "array",
     minItems: 0,
     items: {
       type: "object",
-      properties: {
-        ...itemProperties,
-      },
-      required: [...requiredKeys],
+      properties: itemProperties,
+      required: requiredKeys,
       additionalProperties: false,
     },
-  } as const satisfies JSONSchema;
+  } as const;
 }
 
-export function listRequestWrapper<T extends readonly string[]>(
-  orderByFields: T,
-  otherProps: Record<string, JSONSchema> = {}
-) {
+export function listRequestWrapper<
+  T extends readonly string[],
+  TOther extends Record<string, JSONSchema> = Record<string, JSONSchema>,
+>(orderByFields: T, otherProps: TOther = {} as TOther) {
   return {
     type: "object",
     properties: {
@@ -82,20 +80,26 @@ export function listRequestWrapper<T extends readonly string[]>(
     },
     required: [],
     additionalProperties: false,
-  } as const satisfies JSONSchema;
+  } as const;
 }
 
-export function listResponseWrapper<T extends readonly string[]>(
-  itemProperties: Record<string, JSONSchema>,
-  requiredKeys: T = [] as unknown as T
-) {
+export function listResponseWrapper<
+  TReq extends readonly string[] = readonly string[],
+  TProps extends Record<string, JSONSchema> = Record<string, JSONSchema>,
+>(itemProperties: TProps, requiredKeys: TReq = [] as unknown as TReq) {
   return {
     type: "object",
     properties: {
       ...listResBase,
-      list: listWrapper<T>(itemProperties, requiredKeys),
+      list: listWrapper<TReq, TProps>(itemProperties, requiredKeys),
     },
-    required: ["total", "totalPage", "currentPage", "pageSize", "list"],
+    required: [
+      "total",
+      "totalPage",
+      "currentPage",
+      "pageSize",
+      "list",
+    ] as const,
     additionalProperties: false,
-  } as const satisfies JSONSchema;
+  } as const;
 }

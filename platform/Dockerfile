@@ -8,6 +8,7 @@ RUN corepack enable && corepack prepare pnpm@11.5.0 --activate
 
 # 复制根级工作区与前端依赖清单并安装依赖
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY packages/contracts/package.json ./packages/contracts/
 COPY server/package.json ./server/
 COPY server/apps/server/package.json ./server/apps/server/
 COPY server/packages/core/package.json ./server/packages/core/
@@ -24,7 +25,8 @@ COPY platform/apps/personal/package.json ./platform/apps/personal/
 RUN pnpm config set registry https://registry.npmmirror.com && \
     pnpm install --frozen-lockfile --filter "@hodor/web-*" --filter platform-root
 
-# 复制前端源代码并构建三端应用
+# 复制共享契约与前端源代码并构建三端应用
+COPY packages/contracts ./packages/contracts
 COPY platform ./platform
 RUN pnpm --dir platform run build:all
 

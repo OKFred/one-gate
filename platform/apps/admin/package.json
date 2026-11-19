@@ -13,6 +13,7 @@
     "@cloudflare/realtimekit-react-ui": "^2.0.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@hodor/contracts": "workspace:*",
     "@hodor/ui": "workspace:*",
     "@iconify-icons/material-symbols": "^1.2.58",
     "@iconify/react": "^6.0.2",

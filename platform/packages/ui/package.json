@@ -10,6 +10,7 @@
     "./hooks/*": "./src/hooks/*",
     "./contexts/*": "./src/contexts/*",
     "./layout/*": "./src/layout/*",
+    "./routes/*": "./src/routes/*",
     "./theme": "./src/theme.tsx",
     "./utils/*": "./src/utils/*",
     "./types/*": "./src/types/*",
@@ -18,6 +19,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@hodor/contracts": "workspace:*",
     "@iconify-icons/material-symbols": "^1.2.58",
     "@iconify/react": "^6.0.2",
     "@module-federation/enhanced": "^2.6.0",

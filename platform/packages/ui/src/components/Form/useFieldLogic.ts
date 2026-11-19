@@ -10,24 +10,27 @@ export function useFieldLogic(name: string, manualSchema?: Record<string, unknow
   // 1. 自动从 rootSchema 中检索匹配的规则
   const autoSchema = useMemo(() => {
     const properties = context?.rootSchema?.properties as
-      | Record<string, Record<string, unknown>>
-      | undefined;
+      Record<string, Record<string, unknown>> | undefined;
     if (!properties) return null;
     return properties[name];
   }, [context?.rootSchema, name]);
 
   const schema = manualSchema || autoSchema;
 
-  // 2. 映射常用校验属性
+  // 2. 映射常用校验属性（优先依据 rootSchema.required 判定是否必填）
   const fieldProps = useMemo(() => {
+    const rootRequired = context?.rootSchema?.required;
+    const isRequired = Array.isArray(rootRequired)
+      ? rootRequired.includes(name)
+      : !!(schema && !schema.nullable);
     return {
-      required: !!(schema && !schema.nullable),
+      required: isRequired,
       maxLength: schema?.maxLength as number | undefined,
       pattern: schema?.pattern as string | undefined,
       min: schema?.minimum as number | undefined,
       max: schema?.maximum as number | undefined,
     };
-  }, [schema]);
+  }, [context?.rootSchema?.required, name, schema]);
 
   const errorText = context?.fieldErrors[name];
 

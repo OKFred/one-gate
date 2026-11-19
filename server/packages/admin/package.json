@@ -7,6 +7,7 @@
     "./*": "./src/*"
   },
   "dependencies": {
+    "@hodor/contracts": "workspace:*",
     "@hodor/core": "workspace:*",
     "@hono/zod-openapi": "^1.3.0",
     "hono": "^4.12.12",

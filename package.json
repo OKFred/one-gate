@@ -4,6 +4,11 @@
   "private": true,
   "scripts": {
     "cr:status": "npx tsx scripts/cr-status.ts",
-    "cr:review": "npx tsx scripts/code-review.ts"
+    "cr:review": "npx tsx scripts/code-review.ts",
+    "contracts:generate": "pnpm --filter @hodor/contracts generate",
+    "contracts:build": "pnpm --filter @hodor/contracts build",
+    "contracts:check": "pnpm --filter @hodor/contracts validate",
+    "sync:openapi": "node scripts/sync-openapi.mjs",
+    "sync:all": "pnpm run contracts:generate && pnpm run contracts:build && pnpm --dir server run sync:business && pnpm --dir server run sync:permissions && pnpm run sync:openapi && pnpm run contracts:check"
   }
 }

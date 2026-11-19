@@ -3,6 +3,7 @@ import { lazy, Suspense, type ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import RootRedirect from '@/components/RootRedirect';
+import { buildContractRoutes } from '@/routes/buildContractRoutes';
 import CalendarReminderHost from './components/CalendarReminderHost';
 
 const modules = import.meta.glob('./pages/**/index.tsx');
@@ -51,15 +52,18 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
   return routes;
 }
 
-const childrenRoutes: RouteObject[] = [
-  ...buildRouteTree(
-    (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
-      ([filePath]) =>
-        !filePath.startsWith('./pages/error/') &&
-        !filePath.startsWith('./pages/login/') &&
-        !filePath.startsWith('./pages/sso-callback/'),
-    ),
+const physicalRoutes = buildRouteTree(
+  (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
+    ([filePath]) =>
+      !filePath.startsWith('./pages/error/') &&
+      !filePath.startsWith('./pages/login/') &&
+      !filePath.startsWith('./pages/sso-callback/'),
   ),
+);
+
+const childrenRoutes: RouteObject[] = [
+  ...physicalRoutes,
+  ...buildContractRoutes('admin', physicalRoutes),
   {
     path: 'enterprise/*',
     element: <div />,
