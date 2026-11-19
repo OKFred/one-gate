@@ -15,7 +15,7 @@ fi
 echo "📦 Updating VERSION to: $VERSION"
 
 # --- 1. Update wrangler.jsonc (committed, used by Cloudflare Worker) ---
-WRANGLER_FILE="server/wrangler.jsonc"
+WRANGLER_FILE="server/apps/server/wrangler.jsonc"
 if [ -f "$WRANGLER_FILE" ]; then
   if grep -q '"VERSION"' "$WRANGLER_FILE"; then
     # Replace existing VERSION line

@@ -50,9 +50,8 @@ jobs:
           node-version-file: .nvmrc
       - name: Enable pnpm
         run: corepack enable && corepack install --global pnpm@11.5.0
-      - name: Install backend
+      - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: server
       - name: Check PostgreSQL DDL against models
         run: pnpm run db:generate:postgresql
         working-directory: server
@@ -80,9 +79,8 @@ jobs:
           node-version-file: .nvmrc
       - name: Enable pnpm
         run: corepack enable && corepack install --global pnpm@11.5.0
-      - name: Install backend
+      - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: server
       - name: Check asset DDL matches current models
         run: |
           pnpm exec tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ESNext --types node scripts/generate-enterprise-assets.ts
@@ -138,9 +136,8 @@ jobs:
           node-version-file: .nvmrc
       - name: Enable pnpm
         run: corepack enable && corepack install --global pnpm@11.5.0
-      - name: Install frontend
+      - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: platform
       - name: Reject native browser dialogs
         run: pnpm run check:native-dialogs
         working-directory: platform

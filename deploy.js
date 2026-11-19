@@ -157,19 +157,19 @@ async function main() {
   }
 
   const apps = [
-    { name: "server", dir: "./server" },
-    { name: "platform", dir: "./platform" },
+    { name: "server", dockerfile: "server/Dockerfile" },
+    { name: "platform", dockerfile: "platform/Dockerfile" },
   ];
 
   for (const app of apps) {
     const imageName = `${registryUrl}-${app.name}`;
     console.log(`\n🛠️  正在处理: ${app.name} -> ${imageName}`);
 
-    // Build
+    // Build (统一以仓库根目录为构建上下文，以支持跨子项目共享顶层契约包)
     const buildCode = await runCommand(
       "docker",
-      ["build", "-t", imageName, "."],
-      app.dir,
+      ["build", "-f", app.dockerfile, "-t", imageName, "."],
+      __dirname,
     );
     if (buildCode !== 0) {
       console.error(`❌ ${app.name} 构建失败 (代码: ${buildCode})`);
