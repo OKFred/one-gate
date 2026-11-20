@@ -1,0 +1,155 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/maintenance/loginLog",
+  "readonly": true,
+  "auditFields": false,
+  "permissions": "none",
+  "api": {
+    "basePath": "/api/v1/admin/maintenance/login_log",
+    "summaries": {
+      "list": "获取登录审计列表"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": false,
+    "add": false,
+    "update": false,
+    "delete": false
+  },
+  "filters": {
+    "keyword": { "enabled": false },
+    "sortableFields": ["id", "userId", "loginTimeUtc", "createTimeUtc"],
+    "showSortControls": true,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    },
+    "sortFieldLabelKeys": {
+      "id": "columns.id",
+      "userId": "maintenance.loginLog.column.userId",
+      "loginTimeUtc": "maintenance.loginLog.column.loginTime",
+      "createTimeUtc": "columns.createTime"
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": false, "get": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "userId",
+      "schema": {
+        "type": "number",
+        "description": "用户ID",
+        "examples": [1],
+        "minimum": 1
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listFilter": true },
+      "ui": {
+        "labelKey": "maintenance.loginLog.column.userId",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "title", "template": "User ID: ${userId}" },
+        "filter": {
+          "show": true,
+          "type": "text",
+          "placeholderKey": "maintenance.loginLog.column.userId",
+          "transform": "number"
+        }
+      }
+    },
+    {
+      "name": "loginTimeUtc",
+      "schema": {
+        "type": "number",
+        "description": "登录时间（UTC毫秒时间戳）",
+        "examples": [1672531199000]
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": {
+        "labelKey": "maintenance.loginLog.column.loginTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": { "role": "content", "labelKey": "maintenance.loginLog.column.loginTime" }
+      }
+    },
+    {
+      "name": "ip",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "客户端IP地址",
+        "examples": ["127.0.0.1"],
+        "maxLength": 50
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": {
+        "labelKey": "maintenance.loginLog.column.ip",
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "maintenance.loginLog.column.ip", "fallback": "-" }
+      }
+    },
+    {
+      "name": "userAgent",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "客户端User-Agent",
+        "examples": ["Mozilla/5.0..."],
+        "maxLength": 500
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": {
+        "labelKey": "maintenance.loginLog.column.userAgent",
+        "table": { "show": true, "ellipsis": true, "maxWidth": 300, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "maintenance.loginLog.column.userAgent", "fallback": "-" }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": [],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "hidden" }
+      }
+    },
+    {
+      "name": "creatorId",
+      "schema": { "type": "number", "description": "创建人ID" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "creatorName",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "创建人名称" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": false
+      }
+    }
+  ]
+}

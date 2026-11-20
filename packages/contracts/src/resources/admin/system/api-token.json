@@ -1,0 +1,246 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/system/api-token",
+  "permissionNamespace": "admin.system.api_token",
+  "permissions": "none",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取 API 令牌列表",
+      "get": "获取 API 令牌详情",
+      "add": "创建 API 令牌",
+      "update": "更新 API 令牌",
+      "delete": "删除 API 令牌"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "apiToken.searchPlaceholder"
+    },
+    "sortableFields": ["id", "name", "status", "lastUsedTimeUtc", "expireTimeUtc", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": false
+      }
+    },
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "令牌名称（描述性）",
+        "examples": ["CI/CD 部署令牌", "监控系统只读令牌"],
+        "maxLength": 200
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "apiToken.name",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${name}" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "required": true,
+          "placeholderKey": "apiToken.namePlaceholder",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "tokenPrefix",
+      "schema": {
+        "type": "string",
+        "description": "令牌前缀（前 12 字符），用于列表展示标识",
+        "maxLength": 20
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": {
+        "labelKey": "apiToken.tokenPrefix",
+        "table": { "show": true, "renderer": "code", "template": "${tokenPrefix}••••" },
+        "card": { "role": "subtitle", "labelKey": "apiToken.tokenPrefix", "template": "${tokenPrefix}••••" },
+        "form": false
+      }
+    },
+    {
+      "name": "permissions",
+      "schema": {
+        "type": "string",
+        "description": "权限 code 列表（JSON 数组字符串）",
+        "examples": ["[\"admin.system.user:read\"]"]
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "apiToken.permissions",
+        "table": { "show": true },
+        "card": { "role": "content", "labelKey": "apiToken.permissions" },
+        "form": {
+          "show": true,
+          "widget": "multiSelect",
+          "placeholderKey": "apiToken.selectPermissions",
+          "optionsSource": {
+            "url": "/api/v1/admin/system/permission/listAll",
+            "valueField": "code",
+            "labelTemplate": "${name} (${code})"
+          },
+          "valueTransform": "jsonStringArray",
+          "jsonStringArrayOptions": {
+            "defaultOnAdd": [],
+            "nullWhenEmpty": false
+          },
+          "defaultValue": "[]"
+        }
+      }
+    },
+    {
+      "name": "ipWhitelist",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "允许的 IP 列表（JSON 数组字符串），null 表示不限制",
+        "examples": ["[\"192.168.1.0/24\"]"]
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "apiToken.ipWhitelist",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "tagInput",
+          "helperTextKey": "apiToken.ipWhitelistHint",
+          "placeholder": "192.168.1.0/24",
+          "valueTransform": "jsonStringArray",
+          "jsonStringArrayOptions": {
+            "nullWhenEmpty": true
+          },
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "startTimeUtc",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "生效时间（毫秒时间戳），null 表示立即生效",
+        "examples": [1672531199000]
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "apiToken.startTime",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "datetime",
+          "span": 6,
+          "valueTransform": "epochMs",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "lastUsedTimeUtc",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "上次使用时间（毫秒时间戳）",
+        "examples": [1672531199000]
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": {
+        "labelKey": "apiToken.lastUsed",
+        "table": { "show": true, "renderer": "datetime", "format": "YYYY-MM-DD HH:mm", "fallback": "--" },
+        "card": { "role": "content", "labelKey": "apiToken.lastUsed", "fallback": "--" },
+        "form": false
+      }
+    },
+    {
+      "name": "expireTimeUtc",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "过期时间（毫秒时间戳），null 表示永不过期",
+        "examples": [1704067199000]
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "apiToken.expireTime",
+        "table": { "show": true, "renderer": "datetime", "format": "YYYY-MM-DD HH:mm", "fallbackKey": "apiToken.never" },
+        "card": { "role": "content", "labelKey": "apiToken.expireTime" },
+        "form": {
+          "show": true,
+          "widget": "datetime",
+          "span": 6,
+          "valueTransform": "epochMs",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "status",
+      "schema": {
+        "type": "string",
+        "enum": ["active", "revoked"],
+        "description": "令牌状态：active-活跃 / revoked-已吊销"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listFilter": true },
+      "ui": {
+        "labelKey": "apiToken.status",
+        "table": { "show": true },
+        "card": { "role": "tag" },
+        "filter": false,
+        "form": false
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 3,
+          "maxLength": 500,
+          "showCharCount": true,
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    }
+  ]
+}

@@ -1,42 +1,27 @@
-import {
-  IndexVO,
-  BaseSysConfigVO,
-  BaseSysConfigListVO,
-  BaseSysConfigAddVO,
-  BaseSysConfigUpdateVO,
-  BaseSysConfigListKeys,
-  BaseSysConfigDetailKeys,
-  BaseSysConfigGetKeys,
-  BaseSysConfigDeleteKeys,
-  BaseSysConfigAddKeys,
-  BaseSysConfigUpdateKeys,
-  BaseSysConfigSortableKeys,
-  NamespacesResVO,
-  NamespacesResKeys,
-  type BaseSysConfigPOLike,
-  type IDomainConfigProvider,
-} from "./model";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
-import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
-import {
-  bodyAdapter,
-  bodyUserAdapter,
-  queryAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
+import { adminBaseSysConfigBackendSchemas } from "@hodor/contracts/resources";
+import type { UserObj } from "@hodor/core/types/app";
 import type { API } from "@hodor/core/middleware/encapsulation";
+import { bodyAdapter } from "@hodor/core/middleware/encapsulation/adapter";
+import {
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
-import * as baseSysConfigRepository from "./repository";
 import {
   isPostgresBackend,
   withPostgresTransaction,
 } from "@hodor/core/db/postgresql/runtime";
-
 import { registry, type IAdminServices } from "../../common/registry";
+import {
+  NamespacesResKeys,
+  NamespacesResVO,
+  type BaseSysConfigInsertPOLike,
+  type IDomainConfigProvider,
+} from "./model";
+import * as baseSysConfigRepository from "./repository";
+
+const S = adminBaseSysConfigBackendSchemas;
 
 /**
  * 从注册中心动态查找指定命名空间的 IDomainConfigProvider。
@@ -45,10 +30,8 @@ import { registry, type IAdminServices } from "../../common/registry";
  */
 export function getProvider(namespace: string): IDomainConfigProvider | null {
   try {
-    const domainService = registry[namespace as keyof IAdminServices] as Record<
-      string,
-      unknown
-    >;
+    const domainService = registry[namespace as keyof IAdminServices] as
+      Record<string, unknown> | undefined;
     if (domainService?.configProvider) {
       return domainService.configProvider as IDomainConfigProvider;
     }
@@ -68,13 +51,14 @@ export async function getMergedConfig(namespace: string) {
     await baseSysConfigRepository.findPrimaryByNamespace(namespace);
 
   if (dbConfig) {
-    let parsedValue = {};
+    let parsedValue: Record<string, unknown> = {};
     try {
-      parsedValue =
+      parsedValue = (
         typeof dbConfig.configValue === "string"
           ? JSON.parse(dbConfig.configValue)
-          : dbConfig.configValue;
-    } catch (e) {
+          : dbConfig.configValue
+      ) as Record<string, unknown>;
+    } catch {
       // ignore JSON parse error
     }
     return { ...defaultValues, ...parsedValue };
@@ -98,77 +82,32 @@ export async function getConfigByKey(namespace: string, configKey: string) {
   };
 }
 
-// ======================= API: LIST =======================
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    namespace: BaseSysConfigVO["namespace"],
-    isEnabled: BaseSysConfigVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof BaseSysConfigPOLike)[]>(
-      BaseSysConfigSortableKeys
-    ),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<BaseSysConfigPOLike>[]>(
-    { ...BaseSysConfigListVO },
-    [...BaseSysConfigListKeys]
-  ),
-} as const satisfies JSONSchema;
-
-async function onList(params: FromSchema<typeof listReq>) {
+async function onList(params: FromSchema<typeof S.listReq>) {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+  const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
   const { total, list } = await baseSysConfigRepository.findPage({
     ...params,
+    orderBy,
+    descend,
     pageNo,
     pageSize: finalPageSize,
   });
 
-  return {
-    total,
-    totalPage: Math.ceil(total / finalPageSize),
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list: list.map((item) => ({
-      ...item,
-      configValue:
-        typeof item.configValue === "string"
-          ? JSON.parse(item.configValue)
-          : item.configValue,
-    })),
-  };
+  const mappedList = list.map((item) => ({
+    ...item,
+    configValue: (typeof item.configValue === "string"
+      ? JSON.parse(item.configValue)
+      : item.configValue) as Record<string, unknown>,
+  }));
+
+  return buildPagedListResult(mappedList, total, pageNo, finalPageSize);
 }
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: { path: "/list", method: "post", summary: "分页获取系统配置" },
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
-
-// ======================= API: ADD =======================
-const addReq = {
-  type: "object",
-  properties: { ...BaseSysConfigAddVO },
-  required: [...BaseSysConfigAddKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const addRes = { ...IndexVO["id"] } as const satisfies JSONSchema;
-
 async function addConfiguration(
-  obj: FromSchema<typeof addReq>,
+  obj: FromSchema<typeof S.addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
+): Promise<number | null> {
   const { userId: creatorId } = userObj;
 
   if (obj.isPrimary) {
@@ -189,34 +128,17 @@ async function addConfiguration(
 }
 
 export function onAdd(
-  obj: FromSchema<typeof addReq>,
+  obj: FromSchema<typeof S.addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
+): Promise<number | null> {
   const operation = () => addConfiguration(obj, userObj);
   return isPostgresBackend()
     ? withPostgresTransaction(operation, { write: true })
     : operation();
 }
 
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: { path: "/add", method: "post", summary: "添加配置" },
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
-
-// ======================= API: UPDATE =======================
-const updateReq = {
-  type: "object",
-  properties: { ...BaseSysConfigUpdateVO },
-  required: [...BaseSysConfigUpdateKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 async function updateConfiguration(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
 ): Promise<number | null> {
   const { userId: updaterId } = userObj;
@@ -229,7 +151,7 @@ async function updateConfiguration(
     await baseSysConfigRepository.resetPrimaryFlags(existing.namespace, id);
   }
 
-  const updateData: Partial<import("./model").BaseSysConfigInsertPOLike> = {
+  const updateData: Partial<BaseSysConfigInsertPOLike> = {
     ...rest,
     updaterId,
     updateTimeUtc: Date.now(),
@@ -248,7 +170,7 @@ async function updateConfiguration(
 }
 
 export function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
 ): Promise<number | null> {
   const operation = () => updateConfiguration(params, userObj);
@@ -257,67 +179,35 @@ export function onUpdate(
     : operation();
 }
 
-const updateApi = {
-  req: updateReq,
-  res: addRes,
-  pathInfo: { path: "/update", method: "post", summary: "更新配置" },
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
-
-// ======================= API: DETAIL =======================
-const getReq = {
-  type: "object",
-  properties: { ...IndexVO },
-  required: [...BaseSysConfigGetKeys],
-} as const satisfies JSONSchema;
-
-async function onDetail(params: FromSchema<typeof getReq>) {
-  const row = await baseSysConfigRepository.findById(params.id as number);
+async function onDetail(params: FromSchema<typeof S.getReq>) {
+  const row = await baseSysConfigRepository.findById(params.id);
   preventEmpty(row);
   return {
     ...row,
-    configValue:
-      typeof row.configValue === "string"
-        ? JSON.parse(row.configValue)
-        : row.configValue,
+    configValue: (typeof row.configValue === "string"
+      ? JSON.parse(row.configValue)
+      : row.configValue) as Record<string, unknown>,
   };
 }
 
 const detailApi = {
-  req: getReq,
-  res: {
-    type: "object",
-    properties: { ...BaseSysConfigVO },
-    required: [...BaseSysConfigDetailKeys],
-  },
+  req: S.getReq,
+  res: S.getRes,
   pathInfo: { path: "/detail", method: "post", summary: "获取配置详情" },
   adapter: bodyAdapter,
   service: onDetail,
   permission: { action: "read" },
 } satisfies API;
 
-// ======================= API: DELETE =======================
-async function onDelete(obj: FromSchema<typeof getReq>) {
-  const deletedRow = await baseSysConfigRepository.onDelete(obj.id as number);
+async function onDelete(obj: FromSchema<typeof S.deleteReq>) {
+  const deletedRow = await baseSysConfigRepository.onDelete(obj.id);
   preventEmpty(deletedRow);
   return deletedRow.id;
 }
 
-const deleteApi = {
-  req: getReq,
-  res: addRes,
-  pathInfo: { path: "/delete", method: "post", summary: "删除配置" },
-  adapter: bodyAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
-
-// ======================= API: SCHEMA =======================
 const schemaReq = {
   type: "object",
-  properties: { namespace: BaseSysConfigVO["namespace"] },
+  properties: { namespace: { type: "string", description: "命名空间" } },
   required: ["namespace"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
@@ -349,7 +239,6 @@ const schemaApi = {
   permission: { action: "read" },
 } satisfies API;
 
-// ======================= API: NAMESPACES =======================
 const namespacesApi = {
   req: {
     type: "object",
@@ -372,8 +261,13 @@ const namespacesApi = {
   service: async () => {
     const namespaces: { namespace: string }[] = [];
     for (const key of Object.keys(registry)) {
-      const domainService = registry[key as keyof typeof registry] as any;
-      if (domainService?.configProvider) {
+      const domainService = registry[key as keyof IAdminServices];
+      if (
+        domainService &&
+        typeof domainService === "object" &&
+        "configProvider" in domainService &&
+        domainService.configProvider
+      ) {
         namespaces.push({ namespace: key });
       }
     }
@@ -393,12 +287,14 @@ export const utils = {
   delete: onDelete,
 };
 
-export default {
-  list: listApi,
-  detail: detailApi,
-  add: addApi,
-  update: updateApi,
-  delete: deleteApi,
-  schema: schemaApi,
-  namespaces: namespacesApi,
-};
+export default createCrudApis(S, {
+  list: { handler: onList, summary: "分页获取系统配置" },
+  add: { handler: onAdd, summary: "添加配置" },
+  update: { handler: onUpdate, summary: "更新配置" },
+  delete: { handler: onDelete, summary: "删除配置" },
+  extra: {
+    detail: detailApi,
+    schema: schemaApi,
+    namespaces: namespacesApi,
+  },
+});

@@ -1,0 +1,264 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/mail/template",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "listAll": "获取所有邮件模板（不分页）",
+      "list": "获取邮件模板列表",
+      "add": "添加邮件模板",
+      "update": "更新邮件模板",
+      "delete": "删除邮件模板",
+      "get": "获取邮件模板"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": true,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "name", "title", "isEnabled", "createTimeUtc"],
+    "showSortControls": true,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    },
+    "sortFieldLabelKeys": {
+      "id": "columns.id",
+      "name": "template.table.name",
+      "title": "template.table.title",
+      "createTimeUtc": "columns.createTime"
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": true },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": false
+      }
+    },
+    {
+      "name": "title",
+      "schema": {
+        "type": "string",
+        "description": "邮件标题",
+        "examples": ["Welcome to our service!"]
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "template.table.title",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${title}" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 6,
+          "required": true,
+          "labelKey": "template.table.subject",
+          "helperTextKey": "template.table.subjectHelp",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "邮件模板名称",
+        "examples": ["welcome_email"]
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "template.table.name",
+        "table": { "show": true },
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 6,
+          "required": true,
+          "helperTextKey": "template.table.nameHelp",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "content",
+      "schema": {
+        "type": "string",
+        "description": "邮件内容"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "dialog.title.preview",
+        "table": { "show": true },
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "required": true,
+          "labelKey": "template.table.contentLabel",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "scope",
+      "schema": {
+        "type": "string",
+        "enum": ["sys", "biz", "user"],
+        "description": "作用域：sys(系统级)/biz(企业级)/user(个人级)",
+        "default": "sys"
+      },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "mail.scope",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "options": [
+            { "value": "sys", "labelKey": "mail.scope.sys", "color": "primary" },
+            { "value": "biz", "labelKey": "mail.scope.biz", "color": "secondary" },
+            { "value": "user", "labelKey": "mail.scope.user", "color": "info" }
+          ]
+        },
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "select",
+          "span": 4,
+          "required": true,
+          "defaultValue": "sys",
+          "options": [
+            { "value": "sys", "labelKey": "mail.scope.sys" },
+            { "value": "biz", "labelKey": "mail.scope.biz" },
+            { "value": "user", "labelKey": "mail.scope.user" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "langCode",
+      "schema": {
+        "type": "string",
+        "description": "语言代码",
+        "examples": ["en-US"]
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "translation.table.langCode",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 4,
+          "placeholderKey": "form.pleaseEnter",
+          "helperTextKey": "template.table.langCodeHelp",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "category",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "邮件分类"
+      },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "template.table.category",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 4,
+          "placeholderKey": "form.pleaseEnter",
+          "helperTextKey": "template.table.categoryHelp",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "tenantId",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "租户ID（企业级专用）"
+      },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "userId",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "用户ID（个人级专用）"
+      },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "table": false,
+        "card": false,
+        "filter": false,
+        "form": { "show": false, "defaultValue": true }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": false
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 2,
+          "maxLength": 500,
+          "showCharCount": true,
+          "placeholderKey": "form.pleaseEnter",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    }
+  ]
+}

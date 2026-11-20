@@ -39,16 +39,19 @@ export interface FilterFieldConfig<TFilters> {
   label?: string;
   placeholder?: string;
   options?: { label: string; value: boolean | string | number | undefined }[];
+  isKeyword?: boolean;
+  debounceMs?: number;
+  searchIcon?: boolean;
 }
 
 /** A resource opts into the shared receipt, undo and refresh lifecycle. */
-export interface CrudSoftDeleteConfig<TRecord> {
+export interface CrudSoftDeleteConfig<TRecord, TKey extends string | number = number> {
   resourceType: string;
   displayName: (row: TRecord, t: (key: string) => string) => string;
   expectedUpdateTimeUtc: (row: TRecord) => number | null;
   confirmationContent: (row: TRecord, t: (key: string) => string) => ReactNode;
   delete: (args: {
-    data: { id: number; expectedUpdateTimeUtc: number | null };
+    data: { id: TKey; expectedUpdateTimeUtc: number | null };
     errorPresentation: 'local';
   }) => Promise<{ data: { ok?: boolean; data?: unknown } }>;
   canOpenRecycleBin: () => boolean;
@@ -67,7 +70,11 @@ export interface SchemaCrudConfig<
   TExtra = unknown,
   TAddData = never,
   TUpdateData = never,
+  TKey extends string | number = number,
 > {
+  /** 嵌入式模式（省去 PageLayout 壳，供 Tabs 或 Drawer 内嵌使用） */
+  embedded?: boolean;
+
   /** 页面可见时静默刷新间隔；不设置则不轮询。 */
   refreshIntervalMs?: number;
 
@@ -75,7 +82,7 @@ export interface SchemaCrudConfig<
   cursorPagination?: boolean;
 
   /** Omit this option to retain the existing hard-delete interaction. */
-  softDelete?: CrudSoftDeleteConfig<TRecord>;
+  softDelete?: CrudSoftDeleteConfig<TRecord, TKey>;
 
   /**
    * Reused instances that switch ordinary CRUD resources must supply a stable business key.
@@ -91,9 +98,19 @@ export interface SchemaCrudConfig<
         data?: { list?: TRecord[]; total?: number; hasMore?: boolean; cursor?: string };
       };
     }>;
+    detail?: {
+      fn: (args: {
+        data: Record<string, unknown>;
+        errorPresentation?: 'global' | 'local';
+      }) => Promise<{
+        data: { ok?: boolean; data?: Partial<TRecord> };
+      }>;
+      loadOnEdit?: boolean;
+      payloadKey?: string;
+    };
     add?: (args: { data: TAddData }) => Promise<unknown>;
     update?: (args: { data: TUpdateData }) => Promise<unknown>;
-    delete?: (args: { data: { id: number } }) => Promise<unknown>;
+    delete?: (args: { data: { id: TKey } }) => Promise<unknown>;
   };
 
   // 国际化与标识符主键定义
@@ -115,9 +132,17 @@ export interface SchemaCrudConfig<
 
   // 表格与卡片配置
   table: {
-    columns: (t: (key: string) => string, extraContext?: TExtra) => TableColumn<TRecord>[];
+    columns: (
+      t: (key: string) => string,
+      extraContext?: TExtra,
+      helpers?: CrudHelpers<TRecord>,
+    ) => TableColumn<TRecord>[];
     cardFields: (t: (key: string) => string, extraContext?: TExtra) => CardField<TRecord>[];
-    actions?: (t: (key: string) => string, extraContext?: TExtra) => RowAction<TRecord>[];
+    actions?: (
+      t: (key: string) => string,
+      extraContext?: TExtra,
+      helpers?: CrudHelpers<TRecord>,
+    ) => RowAction<TRecord>[];
   };
 
   // 表单与 JSON Schema 渲染配置
@@ -125,6 +150,8 @@ export interface SchemaCrudConfig<
     schema: Record<string, unknown> | string;
     updateSchema?: Record<string, unknown> | string;
     defaultForm: Partial<TRecord>;
+    /** 若开启，则先执行 beforeSubmit 转换后再做 AJV 客户端校验 */
+    validateAfterTransform?: boolean;
     afterOpen?: (
       form: Partial<TRecord>,
       isEdit: boolean,
@@ -135,13 +162,19 @@ export interface SchemaCrudConfig<
       form: Partial<TRecord>,
       isEdit: boolean,
       extraContext?: TExtra,
-    ) => Partial<TRecord>;
+    ) => Partial<TRecord> | Promise<Partial<TRecord>>;
+    afterAdd?: (
+      response: unknown,
+      submittedForm: Partial<TRecord>,
+      helpers: { refreshTable: () => void },
+    ) => void | Promise<void>;
     renderForm?: (
       form: Partial<TRecord>,
       setForm: Dispatch<SetStateAction<Partial<TRecord>>>,
       isMobile: boolean,
       t: (key: string) => string,
       extraContext?: TExtra,
+      isEdit?: boolean,
     ) => ReactNode;
   };
 }

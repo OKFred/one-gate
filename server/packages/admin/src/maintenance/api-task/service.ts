@@ -1,33 +1,13 @@
-import {
-  IndexVO,
-  ApiTaskVO,
-  ApiTaskListVO,
-  ApiTaskAddVO,
-  ApiTaskUpdateVO,
-  ApiTaskListKeys,
-  ApiTaskDetailKeys,
-  ApiTaskGetKeys,
-  ApiTaskDeleteKeys,
-  ApiTaskAddKeys,
-  ApiTaskUpdateKeys,
-  ApiTaskSortableKeys,
-  type ApiTaskPOLike,
-  type ApiTaskVOLike,
-  type ApiTaskAddVOLike,
-  type ApiTaskUpdateVOLike,
-  type ApiTaskDeleteVOLike,
-  type ApiTaskGetVOLike,
-} from "./model";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
+import type { UserObj } from "@hodor/core/types/app";
+import { validate } from "@cfworker/json-schema";
+import { adminMaintenanceApiTaskBackendSchemas } from "@hodor/contracts/resources";
 import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import { validate } from "@cfworker/json-schema";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -36,28 +16,13 @@ import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { executeApiTask } from "../cron/executor.js";
 import * as apiTaskRepository from "./repository";
 
-//----------------- 1. 获取任务列表 ----------------//
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    isEnabled: { type: "boolean", description: "是否启用" },
-    orderBy: orderByWrapper<(keyof ApiTaskPOLike)[]>(ApiTaskSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<ApiTaskPOLike>[]>({ ...ApiTaskListVO }, [
-    ...ApiTaskListKeys,
-  ]),
-} as const satisfies JSONSchema;
+const S = adminMaintenanceApiTaskBackendSchemas;
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 async function onList(
-  params: FromSchema<typeof listReq>,
-  userObj?: UserObj
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>,
+  _userObj?: UserObj
+): Promise<FromSchema<typeof S.listRes>> {
   const { pageNo = 1, pageSize = 10 } = params;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
@@ -68,48 +33,21 @@ async function onList(
     pageSize: finalPageSize,
   });
 
-  return {
+  return buildPagedListResult(
+    list.map((row) => ({
+      ...row,
+      method: row.method as HttpMethod,
+    })),
     total,
-    totalPage: Math.ceil(total / finalPageSize),
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list: list as any,
-  };
+    pageNo,
+    finalPageSize
+  );
 }
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取 API Task 列表",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
-
-//----------------- 2. 新增任务 ----------------//
-const addReq = {
-  type: "object",
-  properties: {
-    ...ApiTaskAddVO,
-  } satisfies Partial<Record<keyof ApiTaskAddVOLike, JSONSchema>>,
-  required: [
-    ...ApiTaskAddKeys,
-  ] as const satisfies RequiredKeys<ApiTaskAddVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const addRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onAdd(
-  params: FromSchema<typeof addReq>,
+  params: FromSchema<typeof S.addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
+): Promise<number | null> {
   const { userId: creatorId } = userObj;
   const {
     taskKey,
@@ -150,37 +88,10 @@ async function onAdd(
   return insertedId || null;
 }
 
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加 API Task",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
-
-//----------------- 3. 更新任务 ----------------//
-const updateReq = {
-  type: "object",
-  properties: { ...ApiTaskUpdateVO },
-  required: [
-    ...ApiTaskUpdateKeys,
-  ] as const satisfies RequiredKeys<ApiTaskUpdateVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const updateRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof updateRes> | null> {
+): Promise<number> {
   const { userId: updaterId } = userObj;
   const {
     id,
@@ -229,37 +140,10 @@ async function onUpdate(
   return updateRow.id;
 }
 
-const updateApi = {
-  req: updateReq,
-  res: updateRes,
-  pathInfo: {
-    path: "/update",
-    method: "post",
-    summary: "更新 API Task",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
-
-//----------------- 4. 删除任务 ----------------//
-const deleteReq = {
-  type: "object",
-  properties: { ...IndexVO },
-  required: [
-    ...ApiTaskDeleteKeys,
-  ] as const satisfies RequiredKeys<ApiTaskDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onDelete(
-  params: FromSchema<typeof deleteReq>,
-  userObj: UserObj
-): Promise<FromSchema<typeof deleteRes> | null> {
+  params: FromSchema<typeof S.deleteReq>,
+  _userObj: UserObj
+): Promise<number> {
   const { id } = params;
   const existRow = await apiTaskRepository.findById(id);
   preventEmpty(existRow);
@@ -269,60 +153,18 @@ async function onDelete(
   return deleteRow.id;
 }
 
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除 API Task",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
-
-//----------------- 5. 获取任务详情 ----------------//
-const getReq = {
-  type: "object",
-  properties: { ...IndexVO },
-  required: [
-    ...ApiTaskGetKeys,
-  ] as const satisfies RequiredKeys<ApiTaskGetVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const getRes = {
-  type: "object",
-  properties: { ...ApiTaskVO },
-  required: [
-    ...ApiTaskDetailKeys,
-  ] as const satisfies RequiredKeys<ApiTaskVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 async function onGet(
-  params: FromSchema<typeof getReq>,
-  userObj?: UserObj
-): Promise<FromSchema<typeof getRes> | null> {
+  params: FromSchema<typeof S.getReq>,
+  _userObj?: UserObj
+): Promise<FromSchema<typeof S.getRes>> {
   const { id } = params;
   const row = await apiTaskRepository.findById(id);
   preventEmpty(row);
-  return row;
+  return {
+    ...row,
+    method: row.method as HttpMethod,
+  };
 }
-
-const getApi = {
-  req: getReq,
-  res: getRes,
-  pathInfo: {
-    path: "/get",
-    method: "post",
-    summary: "获取 API Task 详情",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onGet,
-  permission: { action: "read" },
-} satisfies API;
 
 //----------------- 6. 立即测试执行 ----------------//
 const runTestReq = {
@@ -374,7 +216,7 @@ const runTestRes = {
 
 async function onRunTest(
   params: FromSchema<typeof runTestReq>,
-  userObj?: UserObj
+  _userObj?: UserObj
 ): Promise<FromSchema<typeof runTestRes>> {
   const { id, parameters } = params;
 
@@ -412,7 +254,7 @@ async function onRunTest(
         try {
           dataObj = JSON.parse(result.responseBody);
           isJson = true;
-        } catch (e) {
+        } catch {
           // not valid JSON
         }
       }
@@ -554,7 +396,7 @@ async function onBulkAdd(
         description: task.description || null,
         baseUrl: task.baseUrl,
         path: task.path,
-        method: (task.method || "GET") as any,
+        method: (task.method || "GET") as HttpMethod,
         headers: task.headers || null,
         requestSchema: task.requestSchema || null,
         responseSchema: task.responseSchema || null,
@@ -564,10 +406,10 @@ async function onBulkAdd(
       });
 
       successCount++;
-    } catch (err: any) {
+    } catch (err: unknown) {
       errors.push({
         taskKey: task.taskKey,
-        message: err.message || String(err),
+        message: err instanceof Error ? err.message : String(err),
       });
       failedCount++;
     }
@@ -593,13 +435,26 @@ const bulkAddApi = {
   permission: { action: "add" },
 } satisfies API;
 
-//----------------- 统一导出 ----------------//
-export default {
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  delete: deleteApi,
-  get: getApi,
-  runTest: runTestApi,
-  bulkAdd: bulkAddApi,
-};
+export default createCrudApis(S, {
+  list: {
+    adapter: bodyUserAdapter,
+    summary: "获取 API Task 列表",
+    handler: onList,
+  },
+  add: { summary: "添加 API Task", handler: onAdd },
+  update: { summary: "更新 API Task", handler: onUpdate },
+  delete: {
+    adapter: bodyUserAdapter,
+    summary: "删除 API Task",
+    handler: onDelete,
+  },
+  get: {
+    adapter: bodyUserAdapter,
+    summary: "获取 API Task 详情",
+    handler: onGet,
+  },
+  extra: {
+    runTest: runTestApi,
+    bulkAdd: bulkAddApi,
+  },
+});

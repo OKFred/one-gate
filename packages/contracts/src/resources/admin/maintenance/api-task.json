@@ -1,0 +1,345 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/maintenance/api-task",
+  "permissionNamespace": "admin.maintenance.api_task",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取 API Task 列表",
+      "add": "添加 API Task",
+      "update": "更新 API Task",
+      "delete": "删除 API Task",
+      "get": "获取 API Task 详情"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "apiTask.filter.keywordPlaceholder"
+    },
+    "sortableFields": ["id", "name", "taskKey", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": false
+      }
+    },
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "任务名称",
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.name",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${name}" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 6,
+          "required": true,
+          "placeholderKey": "form.pleaseEnter",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "taskKey",
+      "schema": {
+        "type": "string",
+        "description": "任务唯一标识键",
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.taskKey",
+        "table": { "show": true },
+        "card": { "role": "subtitle", "labelKey": "apiTask.field.taskKey" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 6,
+          "required": true,
+          "disabledWhen": "edit",
+          "placeholder": "e.g. collect_weather",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "description",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "任务描述",
+        "maxLength": 500
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.description",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 2,
+          "placeholderKey": "form.pleaseEnter",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "method",
+      "schema": {
+        "type": "string",
+        "description": "HTTP 方法",
+        "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.method",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "outlined",
+          "options": [
+            { "value": "GET", "label": "GET", "color": "info" },
+            { "value": "POST", "label": "POST", "color": "success" },
+            { "value": "PUT", "label": "PUT", "color": "warning" },
+            { "value": "PATCH", "label": "PATCH", "color": "warning" },
+            { "value": "DELETE", "label": "DELETE", "color": "error" }
+          ]
+        },
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "select",
+          "span": 3,
+          "required": true,
+          "dividerBefore": true,
+          "defaultValue": "GET",
+          "options": [
+            { "value": "GET", "label": "GET" },
+            { "value": "POST", "label": "POST" },
+            { "value": "PUT", "label": "PUT" },
+            { "value": "PATCH", "label": "PATCH" },
+            { "value": "DELETE", "label": "DELETE" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "baseUrl",
+      "schema": {
+        "type": "string",
+        "description": "请求基础 URL，例如 https://api.example.com",
+        "maxLength": 500
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.baseUrl",
+        "table": { "show": true, "title": "URL" },
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 5,
+          "required": true,
+          "placeholder": "https://api.example.com",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "path",
+      "schema": {
+        "type": "string",
+        "description": "API 路径，例如 /v1/data",
+        "maxLength": 500
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.path",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 4,
+          "required": true,
+          "placeholder": "/v1/data",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "timeoutMs",
+      "schema": {
+        "type": "number",
+        "description": "请求超时时间（毫秒），默认 30000"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.timeoutMs",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "number",
+          "span": 6,
+          "required": true,
+          "defaultValue": 5000
+        }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false, "listFilter": true },
+      "ui": {
+        "labelKey": "apiTask.field.status",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "card": {
+          "role": "tag",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "filter": {
+          "show": true,
+          "type": "select",
+          "labelKey": "filter.enabledStatus",
+          "includeAllOption": true
+        },
+        "form": {
+          "show": true,
+          "widget": "switch",
+          "span": 6,
+          "labelKey": "apiTask.field.status",
+          "defaultValue": true
+        }
+      }
+    },
+    {
+      "name": "headers",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "JSON 字符串，默认请求头（如 Authorization）"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.headers",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "code",
+          "theme": "dark",
+          "rows": 3,
+          "placeholder": "{\n  \"Authorization\": \"Bearer YOUR_TOKEN\"\n}",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "requestSchema",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "OAS3 Schema JSON 字符串，描述请求入参结构"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.requestSchema",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "code",
+          "theme": "dark",
+          "rows": 5,
+          "placeholder": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"q\": { \"type\": \"string\" }\n  }\n}",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "responseSchema",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "OAS3 Schema JSON 字符串，描述响应结构（可选，仅供文档参考）"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiTask.field.responseSchema",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "code",
+          "theme": "dark",
+          "rows": 4,
+          "placeholder": "{\n  \"type\": \"object\"\n}",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": false
+      }
+    }
+  ]
+}

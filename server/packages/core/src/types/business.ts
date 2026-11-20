@@ -186,6 +186,8 @@ export const BUSINESS = {
   "admin.mobile.client_deployment": "admin.mobile.client_deployment",
   /** 每设备网络分流 */
   "admin.mobile.network_routing": "admin.mobile.network_routing",
+  /** 自动生成: admin.mobile.tiktok_task */
+  "admin.mobile.tiktok_task": "admin.mobile.tiktok_task",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;

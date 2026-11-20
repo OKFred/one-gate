@@ -86,6 +86,7 @@ test('uses the authorized resource catalogue and preserves string IDs without de
   await page.getByRole('button', { name: 'Restore', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('Reports');
   await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(page.getByRole('cell', { name: row.name, exact: true })).toHaveCount(0);
   expect(requests).toEqual([
     {

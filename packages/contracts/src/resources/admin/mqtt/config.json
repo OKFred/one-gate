@@ -1,0 +1,193 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/mqtt/config",
+  "permissions": "none",
+  "cardMode": "custom",
+  "api": {
+    "basePath": "/api/v1/admin/base/sys_config",
+    "fixedParams": {
+      "namespace": "mqtt"
+    }
+  },
+  "operations": {
+    "get": false
+  },
+  "filters": {
+    "keyword": { "enabled": false },
+    "defaultFilters": {
+      "namespace": "mqtt"
+    }
+  },
+  "actions": [
+    {
+      "key": "test",
+      "type": "api",
+      "icon": "Sensors",
+      "labelKey": "admin.mqtt.config.testConnection",
+      "color": "primary",
+      "url": "/api/v1/admin/mqtt/testConnection",
+      "payloadMap": { "id": "$row.id" },
+      "successCheck": "httpOk",
+      "successMessageKey": "admin.mqtt.config.testSuccess"
+    }
+  ],
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "ui": {
+        "table": { "show": true, "width": 70 },
+        "card": false
+      }
+    },
+    {
+      "name": "namespace",
+      "schema": { "type": "string", "description": "命名空间" },
+      "requiredOn": ["add"],
+      "in": { "list": true, "detail": true, "add": true, "update": false },
+      "ui": {
+        "labelKey": "admin.base.namespace",
+        "table": false,
+        "card": false,
+        "filter": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "defaultValue": "mqtt",
+          "disabledWhen": { "any": ["add", "edit"] }
+        }
+      }
+    },
+    {
+      "name": "configKey",
+      "schema": { "type": "string", "description": "配置键" },
+      "requiredOn": ["add"],
+      "ui": {
+        "labelKey": "admin.base.configKey",
+        "table": { "show": true, "width": 180, "renderer": "text", "bold": true },
+        "card": false,
+        "form": { "show": true, "widget": "text", "defaultValue": "" }
+      }
+    },
+    {
+      "name": "mqttProvider",
+      "in": { "list": false, "detail": false, "add": false, "update": false },
+      "ui": {
+        "labelKey": "admin.mqtt.config.provider",
+        "table": {
+          "show": true,
+          "width": 130,
+          "dataPath": "configValue.provider",
+          "renderer": "enumChip",
+          "variant": "outlined",
+          "options": [
+            { "value": "Aliyun", "labelKey": "admin.mqtt.config.providerAliyun", "color": "warning" },
+            { "value": "Emqx", "labelKey": "admin.mqtt.config.providerEmqx", "color": "info" }
+          ]
+        },
+        "card": false,
+        "filter": false,
+        "form": false
+      }
+    },
+    {
+      "name": "mqttEndpoint",
+      "in": { "list": false, "detail": false, "add": false, "update": false },
+      "ui": {
+        "labelKey": "admin.mqtt.config.hostPort",
+        "table": {
+          "show": true,
+          "width": 220,
+          "renderer": "code",
+          "template": "${configValue.protocol}://${configValue.host}:${configValue.port}"
+        },
+        "card": false,
+        "filter": false,
+        "form": false
+      }
+    },
+    {
+      "name": "mqttClientId",
+      "in": { "list": false, "detail": false, "add": false, "update": false },
+      "ui": {
+        "labelKey": "admin.mqtt.config.clientId",
+        "table": {
+          "show": true,
+          "width": 180,
+          "dataPath": "configValue.clientId",
+          "renderer": "code",
+          "fallback": "-"
+        },
+        "card": false,
+        "filter": false,
+        "form": false
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "ui": {
+        "labelKey": "common.isEnabled",
+        "table": { "show": true, "width": 90, "titleKey": "common.isEnabled", "renderer": "booleanSwitch" },
+        "card": false,
+        "filter": false,
+        "form": { "labelKey": "common.isEnabled", "defaultValue": true }
+      }
+    },
+    {
+      "name": "isPrimary",
+      "schema": { "type": "boolean", "description": "主配置" },
+      "ui": {
+        "labelKey": "admin.base.isPrimary",
+        "table": {
+          "show": true,
+          "width": 100,
+          "renderer": "booleanChip",
+          "hideWhenFalse": true,
+          "trueLabelKey": "admin.mqtt.config.primary",
+          "trueColor": "primary",
+          "fallback": ""
+        },
+        "card": false,
+        "form": { "show": true, "widget": "switch", "defaultValue": false }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": { "widget": "text", "valueTransform": "emptyToNull", "defaultValue": null }
+      }
+    },
+    {
+      "name": "configValue",
+      "schema": { "type": "object", "additionalProperties": true },
+      "ui": {
+        "labelKey": "admin.base.configValue",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "dynamicSubForm",
+          "defaultValue": {},
+          "dynamicSubForm": {
+            "schemaUrl": "/api/v1/admin/base/sys_config/schema",
+            "fixedNamespace": "mqtt",
+            "valueField": "configValue",
+            "titleKey": "admin.base.configValue"
+          }
+        }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "ui": {
+        "table": { "show": true, "width": 170, "renderer": "datetime", "fallback": "--" }
+      }
+    }
+  ]
+}

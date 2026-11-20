@@ -1,0 +1,245 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/base/log-http",
+  "mountRoute": false,
+  "embedded": true,
+  "readonly": true,
+  "auditFields": false,
+  "permissions": "none",
+  "permissionNamespace": "admin.base.log",
+  "api": {
+    "basePath": "/api/v1/admin/base/log/http",
+    "summaries": {
+      "list": "HTTP外网请求日志列表"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": false,
+    "add": false,
+    "update": false,
+    "delete": false
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "log.url",
+      "placeholderKey": "common.searchPlaceholder",
+      "transform": "trim"
+    },
+    "sortableFields": ["id", "namespace", "method", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": false, "get": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "hidden" }
+      }
+    },
+    {
+      "name": "namespace",
+      "schema": { "type": "string", "description": "命名空间" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "log.namespace",
+        "table": { "show": true },
+        "card": { "role": "hidden" },
+        "filter": false
+      }
+    },
+    {
+      "name": "method",
+      "schema": { "type": "string", "description": "请求方式 (GET/POST/PUT/DELETE)" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "log.method",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "filled",
+          "options": [
+            { "value": "POST", "label": "POST", "color": "primary" },
+            { "value": "GET", "label": "GET", "color": "info" }
+          ]
+        },
+        "card": { "role": "title", "template": "[${method}] ${url}" },
+        "filter": {
+          "show": true,
+          "type": "select",
+          "defaultValue": "",
+          "transform": "emptyToUndefined",
+          "options": [
+            { "labelKey": "log.allMethod", "value": "" },
+            { "label": "GET", "value": "GET" },
+            { "label": "POST", "value": "POST" },
+            { "label": "PUT", "value": "PUT" },
+            { "label": "DELETE", "value": "DELETE" },
+            { "label": "PATCH", "value": "PATCH" },
+            { "label": "HEAD", "value": "HEAD" },
+            { "label": "OPTIONS", "value": "OPTIONS" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "url",
+      "schema": { "type": "string", "description": "完整URL" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "log.url",
+        "table": { "show": true },
+        "card": { "role": "hidden" }
+      }
+    },
+    {
+      "name": "responseStatus",
+      "schema": { "type": ["number", "null"], "nullable": true, "description": "响应状态码" },
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "log.status",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "filled",
+          "fallback": "N/A",
+          "color": "error",
+          "rangeColors": [
+            { "min": 200, "maxExclusive": 300, "color": "success" }
+          ]
+        },
+        "card": { "role": "content", "labelKey": "log.status", "fallback": "N/A" },
+        "filter": false
+      }
+    },
+    {
+      "name": "durationMs",
+      "schema": { "type": ["number", "null"], "nullable": true, "description": "耗时(ms)" },
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "log.duration",
+        "table": { "show": true, "suffix": "ms", "fallback": "--" },
+        "card": { "role": "hidden" }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "--" },
+        "card": { "role": "subtitle", "labelKey": "columns.createTime" }
+      }
+    },
+    {
+      "name": "protocol",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "协议 (http/https)" },
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "log.protocol",
+        "table": false,
+        "card": false,
+        "filter": {
+          "show": true,
+          "type": "select",
+          "defaultValue": "",
+          "transform": "emptyToUndefined",
+          "options": [
+            { "labelKey": "log.allProtocol", "value": "" },
+            { "label": "https", "value": "https" },
+            { "label": "http", "value": "http" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "host",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "主机" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "path",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "路径" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "query",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "查询参数" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "requestHeaders",
+      "schema": { "type": ["object", "null"], "nullable": true, "additionalProperties": true, "description": "请求头" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "requestBody",
+      "schema": { "type": ["object", "string", "null"], "nullable": true, "description": "请求体" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "responseHeaders",
+      "schema": { "type": ["object", "null"], "nullable": true, "additionalProperties": true, "description": "响应头" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "responseBody",
+      "schema": { "type": ["object", "string", "null"], "nullable": true, "description": "响应体" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "errorMessage",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "错误信息" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "tenantId",
+      "schema": { "type": ["number", "null"], "nullable": true, "description": "租户ID" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": [],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "creatorId",
+      "schema": { "type": "number", "description": "创建人ID" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "creatorName",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "创建人名称" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    }
+  ]
+}

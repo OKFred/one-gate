@@ -1,46 +1,23 @@
-import { useState, useMemo } from 'react';
-import { SchemaCrudPage } from '@/components/Crud';
-import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
-import { tableConfig, type AttendanceContext } from './components/TheTable';
-import TheDetail from './components/TheDetail';
-import { formConfig } from './components/TheForm';
-import * as AttendanceAPI from '@/api/enterprise/organization/attendance';
-import type { ListAttendanceReq, AttendanceObj } from '@/api/enterprise/type';
-import type { SchemaCrudConfig } from '@/components/Crud';
+import { useState } from 'react';
+import dayjs from 'dayjs';
 import { Button } from '@mui/material';
 import { FileDownload as DownloadIcon } from '@mui/icons-material';
-import { useTranslation } from '@/hooks/useTranslation';
-import dayjs from 'dayjs';
+import { enterpriseOrganizationAttendanceContract } from '@hodor/contracts/resources';
+import { ContractCrudPage, type CrudExtensions } from '@/components/Crud/contract';
+import { TextField } from '@/components/Form';
+import * as AttendanceAPI from '@/api/enterprise/organization/attendance';
+import type { AttendanceObj, ListAttendanceReq } from '@/api/enterprise/type';
 
-/** 考勤记录扩展类型，增加 UI 专用时间字符串字段 */
-export type AttendanceRecord = AttendanceObj & {
-  /** UI 专用：打卡时间的 HH:mm:ss 字符串 */
+type AttendanceRecord = AttendanceObj & {
+  employeeId?: number;
   _checkInStr?: string;
-  /** UI 专用：下班时间的 HH:mm:ss 字符串 */
   _checkOutStr?: string;
-};
-
-// ─── 页面组件 ──────────────────────────────────────────────────────
+} & Record<string, unknown>;
 
 export default function AttendanceManagement() {
-  const t = useTranslation();
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [detailRow, setDetailRow] = useState<AttendanceRecord | null>(null);
   const [exportLoading, setExportLoading] = useState(false);
 
-  // 1. 详情回调 Context
-  const extraContext = useMemo<AttendanceContext>(
-    () => ({
-      onShowDetails: (row) => {
-        setDetailRow(row as AttendanceRecord);
-        setDetailsOpen(true);
-      },
-    }),
-    [],
-  );
-
-  // 2. 编写 1000 条最大限制 CSV 前端智能格式化大批量异步下载
-  const handleExportCSV = async () => {
+  const handleExportCSV = async (translate: (key: string) => string) => {
     setExportLoading(true);
     try {
       const res = await AttendanceAPI.listFn({
@@ -54,27 +31,27 @@ export default function AttendanceManagement() {
       if (list.length === 0) return;
 
       const headers = [
-        t('columns.id'),
-        t('organization.attendance.employee'),
-        t('organization.attendance.date'),
-        t('organization.attendance.checkInTime'),
-        t('organization.attendance.checkOutTime'),
-        t('organization.attendance.status'),
-        t('column.remark'),
+        translate('columns.id'),
+        translate('organization.attendance.employee'),
+        translate('organization.attendance.date'),
+        translate('organization.attendance.checkInTime'),
+        translate('organization.attendance.checkOutTime'),
+        translate('organization.attendance.status'),
+        translate('column.remark'),
       ];
+
+      const statusMap: Record<number, string> = {
+        0: translate('organization.attendance.status.normal'),
+        1: translate('organization.attendance.status.late'),
+        2: translate('organization.attendance.status.earlyLeave'),
+        3: translate('organization.attendance.status.absent'),
+      };
 
       const csvContent = [
         headers.join(','),
         ...list.map((row) => {
           const checkIn = row.checkInTime ? dayjs(row.checkInTime).format('HH:mm:ss') : '-';
           const checkOut = row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm:ss') : '-';
-          const statusMap: Record<number, string> = {
-            0: t('organization.attendance.status.normal'),
-            1: t('organization.attendance.status.late'),
-            2: t('organization.attendance.status.earlyLeave'),
-            3: t('organization.attendance.status.absent'),
-          };
-
           return [
             row.id,
             `"${row.employeeObj?.label || '-'}"`,
@@ -87,7 +64,7 @@ export default function AttendanceManagement() {
         }),
       ].join('\n');
 
-      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([`\ufeff${csvContent}`], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -95,78 +72,91 @@ export default function AttendanceManagement() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (error) {
-      console.error('Failed to export CSV:', error);
+      URL.revokeObjectURL(url);
+    } catch {
+      // 全局 HTTP 拦截器统一展示错误
     } finally {
       setExportLoading(false);
     }
   };
 
-  const config: SchemaCrudConfig<
-    AttendanceRecord,
-    FilterState,
-    ListAttendanceReq,
-    AttendanceContext
-  > = {
-    apiKeyName: 'id',
-    permissions: {},
-    api: {
-      list: AttendanceAPI.listFn as unknown as SchemaCrudConfig<
-        AttendanceRecord,
-        FilterState,
-        ListAttendanceReq
-      >['api']['list'],
-      add: AttendanceAPI.addFn as unknown as SchemaCrudConfig<
-        AttendanceRecord,
-        FilterState,
-        ListAttendanceReq
-      >['api']['add'],
-      update: AttendanceAPI.updateFn as unknown as SchemaCrudConfig<
-        AttendanceRecord,
-        FilterState,
-        ListAttendanceReq
-      >['api']['update'],
-      delete: AttendanceAPI.deleteFn,
+  const renderTimeField =
+    (
+      fieldKey: '_checkInStr' | '_checkOutStr',
+      labelKey: string,
+    ): NonNullable<CrudExtensions<AttendanceRecord>['customFormFields']>[string] =>
+    (ctx) => (
+      <TextField
+        name={fieldKey}
+        label={ctx.t(labelKey)}
+        type="time"
+        value={ctx.form[fieldKey] ?? ''}
+        disabled={ctx.disabled}
+        onChange={(e) => ctx.setForm((prev) => ({ ...prev, [fieldKey]: e.target.value }))}
+        fullWidth
+        slotProps={{
+          inputLabel: { shrink: true },
+          htmlInput: { step: 1 },
+        }}
+      />
+    );
+
+  const extensions: CrudExtensions<AttendanceRecord> = {
+    toolbarActions: (_helpers, translate) => (
+      <Button
+        variant="outlined"
+        startIcon={<DownloadIcon />}
+        onClick={() => void handleExportCSV(translate)}
+        loading={exportLoading}
+      >
+        {translate('organization.attendance.exportCsv')}
+      </Button>
+    ),
+    afterOpen: (form, isEdit, row) => {
+      if (!isEdit || !row) {
+        return {
+          ...form,
+          date: form.date || dayjs().format('YYYY-MM-DD'),
+          _checkInStr: '',
+          _checkOutStr: '',
+        };
+      }
+      return {
+        id: row.id,
+        employeeId: row.employeeObj?.value ?? row.employeeId,
+        date: row.date,
+        _checkInStr: row.checkInTime ? dayjs(row.checkInTime).format('HH:mm:ss') : '',
+        _checkOutStr: row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm:ss') : '',
+        status: row.status,
+        remark: row.remark ?? null,
+      };
     },
-    filter: {
-      defaultFilters,
-      fields: filterConfig.fields,
-      transformRequest: (filters) =>
-        ({
-          keyword: filters.keyword || undefined,
-        }) as ListAttendanceReq,
+    beforeSubmitAsync: async (form) => {
+      const checkInStr = form._checkInStr;
+      const checkOutStr = form._checkOutStr;
+      return {
+        id: form.id,
+        employeeId:
+          form.employeeId !== undefined &&
+          form.employeeId !== null &&
+          String(form.employeeId).trim() !== ''
+            ? Number(form.employeeId)
+            : undefined,
+        date: form.date,
+        checkInTime: checkInStr && form.date ? dayjs(`${form.date} ${checkInStr}`).valueOf() : null,
+        checkOutTime:
+          checkOutStr && form.date ? dayjs(`${form.date} ${checkOutStr}`).valueOf() : null,
+        status: form.status,
+        remark: form.remark,
+      };
     },
-    table: {
-      columns: tableConfig.columns,
-      cardFields: tableConfig.cardFields,
-      actions: tableConfig.actions,
+    customFormFields: {
+      checkInTime: renderTimeField('_checkInStr', 'organization.attendance.checkInTime'),
+      checkOutTime: renderTimeField('_checkOutStr', 'organization.attendance.checkOutTime'),
     },
-    form: formConfig,
   };
 
-  const customActions = (
-    <Button
-      variant="outlined"
-      startIcon={<DownloadIcon />}
-      onClick={handleExportCSV}
-      loading={exportLoading}
-    >
-      {t('organization.attendance.exportCsv')}
-    </Button>
-  );
-
   return (
-    <>
-      <SchemaCrudPage config={config} extraContext={extraContext} customActions={customActions} />
-
-      <TheDetail
-        open={detailsOpen}
-        onClose={() => {
-          setDetailsOpen(false);
-          setDetailRow(null);
-        }}
-        detail={detailRow}
-      />
-    </>
+    <ContractCrudPage contract={enterpriseOrganizationAttendanceContract} extensions={extensions} />
   );
 }

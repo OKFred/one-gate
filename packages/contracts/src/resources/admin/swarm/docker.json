@@ -1,0 +1,186 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/swarm/docker",
+  "apiKeyName": "ID",
+  "auditFields": false,
+  "showIdColumn": false,
+  "cardMode": "custom",
+  "api": {
+    "endpoints": {
+      "list": "/api/v1/admin/swarm/docker/list",
+      "get": "/api/v1/admin/swarm/docker/inspect",
+      "add": "/api/v1/admin/swarm/docker/create",
+      "update": "/api/v1/admin/swarm/docker/update",
+      "delete": "/api/v1/admin/swarm/docker/remove"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "swarm.docker.searchLabel",
+      "placeholderKey": "swarm.docker.searchPlaceholder",
+      "transform": "emptyToUndefined"
+    },
+    "showSortControls": false
+  },
+  "fields": [
+    {
+      "name": "ID",
+      "schema": {
+        "type": "string",
+        "description": "服务 ID",
+        "minLength": 1
+      },
+      "requiredOn": ["update", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.docker.id",
+        "table": { "show": true },
+        "card": false,
+        "form": false
+      }
+    },
+    {
+      "name": "Name",
+      "schema": {
+        "type": "string",
+        "description": "服务名称",
+        "minLength": 1
+      },
+      "requiredOn": ["add", "update"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.docker.name",
+        "table": { "show": true, "dataPath": "Spec.Name", "fallback": "-" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "required": true,
+          "placeholderKey": "swarm.docker.namePlaceholder",
+          "span": 12,
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "Image",
+      "schema": {
+        "type": "string",
+        "description": "容器镜像",
+        "minLength": 1
+      },
+      "requiredOn": ["add", "update"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.docker.image",
+        "table": { "show": true, "dataPath": "Spec.TaskTemplate.ContainerSpec.Image", "fallback": "-" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "required": true,
+          "placeholderKey": "swarm.docker.imagePlaceholder",
+          "span": 8,
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "Replicas",
+      "schema": {
+        "type": "number",
+        "description": "副本数",
+        "minimum": 1,
+        "maximum": 100
+      },
+      "requiredOn": ["add", "update"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.docker.replicas",
+        "table": {
+          "show": true,
+          "dataPath": "Spec.Mode.Replicated.Replicas",
+          "fallbackKey": "swarm.docker.globalMode"
+        },
+        "form": {
+          "show": true,
+          "widget": "number",
+          "required": true,
+          "min": 1,
+          "max": 100,
+          "defaultValue": 1,
+          "span": 4
+        }
+      }
+    },
+    {
+      "name": "CreatedAt",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true
+      },
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.docker.createdAt",
+        "table": {
+          "show": true,
+          "renderer": "datetime",
+          "format": "YYYY-MM-DD HH:mm:ss",
+          "fallback": "-"
+        },
+        "form": false
+      }
+    },
+    {
+      "name": "EnvPairs",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "value": { "type": "string" }
+          },
+          "required": ["key", "value"],
+          "additionalProperties": false
+        }
+      },
+      "in": { "list": false, "detail": false, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": { "show": true, "span": 12, "defaultValue": [] }
+      }
+    },
+    {
+      "name": "PortMappings",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Protocol": { "type": "string", "enum": ["tcp", "udp"] },
+            "PublishedPort": { "type": "number" },
+            "TargetPort": { "type": "number" }
+          },
+          "required": ["Protocol", "PublishedPort", "TargetPort"],
+          "additionalProperties": false
+        }
+      },
+      "in": { "list": false, "detail": false, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": { "show": true, "span": 12, "defaultValue": [] }
+      }
+    }
+  ]
+}

@@ -1,0 +1,216 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/ai/config",
+  "operations": {
+    "listAll": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "name", "isEnabled", "isDefault", "createTimeUtc"],
+    "showSortControls": false
+  },
+  "actions": [
+    {
+      "key": "verify",
+      "type": "api",
+      "icon": "QuestionMark",
+      "labelKey": "ai.config.verify",
+      "color": "success",
+      "permissionCodes": ["admin.ai.config:read"],
+      "url": "/api/v1/admin/ai/config/verify",
+      "payloadMap": { "id": "$row.id" },
+      "successCheck": "truthyData",
+      "successMessageKey": "ai.config.verifySuccess",
+      "errorMessageKey": "ai.config.verifyFailed"
+    }
+  ],
+  "fields": [
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "配置名称",
+        "examples": ["My DeepSeek"],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "ai.config.name",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "title" },
+        "form": { "show": true, "widget": "text", "defaultValue": "" }
+      }
+    },
+    {
+      "name": "provider",
+      "schema": {
+        "type": "string",
+        "description": "提供商类型 (OpenAI, DeepSeek, Ollama 等)"
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "ai.config.provider",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "template": "${provider} - ${model}" },
+        "form": {
+          "show": true,
+          "widget": "select",
+          "span": 6,
+          "defaultValue": "OpenAI",
+          "options": [
+            { "value": "OpenAI", "label": "OpenAI" },
+            { "value": "DeepSeek", "label": "DeepSeek" },
+            { "value": "Ollama", "label": "Ollama" },
+            { "value": "Anthropic", "label": "Anthropic" },
+            { "value": "Other", "label": "Other" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "model",
+      "schema": {
+        "type": "string",
+        "description": "模型名称",
+        "examples": ["deepseek-chat"]
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "ai.config.model",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "hidden" },
+        "form": { "show": true, "widget": "text", "span": 6, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "baseUrl",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "API 基础地址",
+        "examples": ["https://api.deepseek.com/v1"]
+      },
+      "ui": {
+        "labelKey": "ai.config.baseUrl",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "placeholder": "https://api.openai.com/v1",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "apiKey",
+      "schema": {
+        "type": "string",
+        "description": "API 密钥"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "ai.config.apiKey",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "password", "defaultValue": "" }
+      }
+    },
+    {
+      "name": "capabilities",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "模型支持的能力 (JSON 数组，如 ['text', 'image'])"
+      },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "ai.config.capabilities",
+        "table": { "show": true, "renderer": "jsonArrayChips" },
+        "card": { "role": "content", "labelKey": "ai.config.capabilities" },
+        "form": {
+          "show": true,
+          "widget": "multiSelect",
+          "defaultValue": "[\"text\"]",
+          "jsonStringArrayOptions": {
+            "defaultOnAdd": ["text"]
+          },
+          "options": [
+            { "value": "text", "label": "text" },
+            { "value": "image", "label": "image" },
+            { "value": "audio", "label": "audio" },
+            { "value": "video", "label": "video" },
+            { "value": "file", "label": "file" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "isDefault",
+      "schema": {
+        "type": "boolean",
+        "description": "是否为默认配置"
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "ai.config.isDefault",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "column.yes",
+          "falseLabelKey": "column.no",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "filled"
+        },
+        "card": {
+          "role": "tag",
+          "hideWhenFalse": true,
+          "trueLabelKey": "ai.config.isDefault",
+          "color": "success"
+        },
+        "form": { "show": true, "widget": "switch", "span": 6, "defaultValue": false }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "error",
+          "variant": "outlined"
+        },
+        "card": { "role": "tag" },
+        "filter": false,
+        "form": { "show": true, "widget": "switch", "span": 6, "defaultValue": true }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "ui": { "form": false }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "ui": { "table": { "show": false } }
+    }
+  ]
+}

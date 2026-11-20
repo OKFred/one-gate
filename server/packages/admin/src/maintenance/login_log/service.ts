@@ -1,18 +1,11 @@
+import type { LoginAuditPOLike } from "./model";
+import type { FromSchema } from "json-schema-to-ts";
+import { adminMaintenanceLoginLogBackendSchemas } from "@hodor/contracts/resources";
 import {
-  LoginAuditVO,
-  LoginAuditListKeys,
-  LoginAuditSortableKeys,
-  type LoginAuditPOLike,
-} from "./model";
-import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
-import type { API } from "@hodor/core/middleware/encapsulation";
-import type { RequiredKeys } from "@hodor/core/types/app";
 import { registry } from "../../common/registry";
 
 /**
@@ -47,29 +40,11 @@ async function recordLogin(
 
 // --- API ---
 
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    userId: LoginAuditVO.userId,
-    orderBy: orderByWrapper<(keyof LoginAuditPOLike)[]>(LoginAuditSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<LoginAuditPOLike>[]>(
-    {
-      ...LoginAuditVO,
-    },
-    [...LoginAuditListKeys]
-  ),
-} as const satisfies JSONSchema;
+const S = adminMaintenanceLoginLogBackendSchemas;
 
 async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
   const {
     orderBy = "id",
     descend = true,
@@ -92,7 +67,7 @@ async function onList(
   });
 
   // Map back to LoginAuditPOLike
-  const mappedList = list.map((item) => {
+  const mappedList: LoginAuditPOLike[] = list.map((item) => {
     const val = (item.logValue || {}) as Record<string, unknown>;
     return {
       id: item.id,
@@ -100,48 +75,33 @@ async function onList(
       loginTimeUtc: Number(val.loginTimeUtc || item.createTimeUtc),
       ip: String(val.ip || ""),
       userAgent: String(val.userAgent || ""),
-      remark: item.remark,
+      remark: item.remark ?? null,
       creatorId: item.creatorId,
-      creatorName: item.creatorName,
+      creatorName: item.creatorName ?? null,
       createTimeUtc: item.createTimeUtc,
-    } satisfies LoginAuditPOLike;
+    };
   });
 
   // For mapped sort where the sort wasn't handled natively by DB because it's a JSON field
   if (orderBy === "userId" || orderBy === "loginTimeUtc") {
     mappedList.sort((a, b) => {
-      const aVal = (a[orderBy] as number) || 0;
-      const bVal = (b[orderBy] as number) || 0;
+      const aVal = a[orderBy] || 0;
+      const bVal = b[orderBy] || 0;
       return descend ? bVal - aVal : aVal - bVal;
     });
   }
 
-  return {
-    total,
-    totalPage: Math.ceil(total / finalPageSize),
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list: mappedList,
-  };
+  return buildPagedListResult(mappedList, total, pageNo, finalPageSize);
 }
-
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取登录审计列表",
-  } as const,
-  adapter: bodyUserAdapter, // 需要登录才能查看审计记录
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
 
 export const utils = {
   recordLogin,
 };
 
-export default {
-  list: listApi,
-};
+export default createCrudApis(S, {
+  list: {
+    adapter: bodyUserAdapter, // 需要登录才能查看审计记录
+    summary: "获取登录审计列表",
+    handler: onList,
+  },
+});

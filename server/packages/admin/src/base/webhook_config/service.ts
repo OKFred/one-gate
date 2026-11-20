@@ -1,34 +1,20 @@
-import type { FromSchema, JSONSchema } from "json-schema-to-ts";
+import type { FromSchema } from "json-schema-to-ts";
+import { adminBaseWebhookConfigBackendSchemas } from "@hodor/contracts/resources";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import type { RequiredKeys, UserObj } from "@hodor/core/types/app";
+import type { UserObj } from "@hodor/core/types/app";
+import { bodyAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import {
-  bodyAdapter,
-  bodyUserAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
-import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import {
   BusinessError,
   BusinessErrorCode,
 } from "@hodor/core/middleware/errorHandler/businessError/index";
-import {
-  IndexVO,
-  WebhookConfigAddKeys,
-  WebhookConfigAddVO,
-  WebhookConfigDetailKeys,
-  WebhookConfigGetKeys,
-  WebhookConfigListKeys,
-  WebhookConfigPO,
-  WebhookConfigSortableKeys,
-  WebhookConfigUpdateKeys,
-  WebhookConfigUpdateVO,
-  type WebhookConfigPOLike,
-} from "./model.js";
 import * as repository from "./repository.js";
+
+const S = adminBaseWebhookConfigBackendSchemas;
 
 function normalizeSource(source: string): string {
   return source.trim().toLowerCase();
@@ -56,27 +42,7 @@ export function maskWebhookUrl(value: string): string {
   }
 }
 
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    source: WebhookConfigPO.source,
-    isEnabled: WebhookConfigPO.isEnabled,
-    orderBy: orderByWrapper<(keyof WebhookConfigPOLike)[]>(
-      WebhookConfigSortableKeys
-    ),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<WebhookConfigPOLike>[]>(
-    { ...WebhookConfigPO },
-    [...WebhookConfigListKeys]
-  ),
-} as const satisfies JSONSchema;
-
-async function onList(params: FromSchema<typeof listReq>) {
+async function onList(params: FromSchema<typeof S.listReq>) {
   const pageNo = params.pageNo ?? 1;
   const pageSize = Math.min(params.pageSize ?? 10, 1000);
   const { total, list } = await repository.findPage({
@@ -85,33 +51,15 @@ async function onList(params: FromSchema<typeof listReq>) {
     pageNo,
     pageSize,
   });
-  return {
+  return buildPagedListResult(
+    list.map((item) => ({ ...item, url: maskWebhookUrl(item.url) })),
     total,
-    totalPage: Math.ceil(total / pageSize),
-    currentPage: pageNo,
-    pageSize,
-    list: list.map((item) => ({ ...item, url: maskWebhookUrl(item.url) })),
-  };
+    pageNo,
+    pageSize
+  );
 }
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: { path: "/list", method: "post", summary: "分页获取 Webhook 配置" },
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
-
-const addReq = {
-  type: "object",
-  properties: { ...WebhookConfigAddVO },
-  required: [...WebhookConfigAddKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const indexRes = { ...IndexVO.id } as const satisfies JSONSchema;
-
-async function onAdd(params: FromSchema<typeof addReq>, userObj: UserObj) {
+async function onAdd(params: FromSchema<typeof S.addReq>, userObj: UserObj) {
   const source = normalizeSource(params.source);
   if (params.isPrimary) await repository.resetPrimaryFlags(source);
   return repository.onInsert({
@@ -122,24 +70,8 @@ async function onAdd(params: FromSchema<typeof addReq>, userObj: UserObj) {
   });
 }
 
-const addApi = {
-  req: addReq,
-  res: indexRes,
-  pathInfo: { path: "/add", method: "post", summary: "添加 Webhook 配置" },
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
-
-const updateReq = {
-  type: "object",
-  properties: { ...WebhookConfigUpdateVO },
-  required: [...WebhookConfigUpdateKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 async function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
 ) {
   const existing = await repository.findById(params.id);
@@ -166,37 +98,15 @@ async function onUpdate(
   return row.id;
 }
 
-const updateApi = {
-  req: updateReq,
-  res: indexRes,
-  pathInfo: { path: "/update", method: "post", summary: "更新 Webhook 配置" },
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
-
-const getReq = {
-  type: "object",
-  properties: { ...IndexVO },
-  required: [...WebhookConfigGetKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const detailRes = {
-  type: "object",
-  properties: { ...WebhookConfigPO },
-  required: [...WebhookConfigDetailKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-async function onDetail(params: FromSchema<typeof getReq>) {
+async function onDetail(params: FromSchema<typeof S.getReq>) {
   const row = await repository.findById(params.id);
   preventEmpty(row);
   return row;
 }
 
 const detailApi = {
-  req: getReq,
-  res: detailRes,
+  req: S.getReq,
+  res: S.getRes,
   pathInfo: {
     path: "/detail",
     method: "post",
@@ -207,25 +117,16 @@ const detailApi = {
   permission: { action: "edit" },
 } satisfies API;
 
-async function onDelete(params: FromSchema<typeof getReq>) {
+async function onDelete(params: FromSchema<typeof S.deleteReq>) {
   const row = await repository.onDelete(params.id);
   preventEmpty(row);
   return row.id;
 }
 
-const deleteApi = {
-  req: getReq,
-  res: indexRes,
-  pathInfo: { path: "/delete", method: "post", summary: "删除 Webhook 配置" },
-  adapter: bodyAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
-
-export default {
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  detail: detailApi,
-  delete: deleteApi,
-};
+export default createCrudApis(S, {
+  list: { handler: onList, summary: "分页获取 Webhook 配置" },
+  add: { handler: onAdd, summary: "添加 Webhook 配置" },
+  update: { handler: onUpdate, summary: "更新 Webhook 配置" },
+  delete: { handler: onDelete, summary: "删除 Webhook 配置" },
+  extra: { detail: detailApi },
+});

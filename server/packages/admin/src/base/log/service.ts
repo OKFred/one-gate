@@ -1,7 +1,12 @@
 import * as baseLogRepository from "./repository";
 import type { SysLogPOLike, AuditLogPOLike, BizLogPOLike } from "./model";
 import type { InferInsertModel } from "drizzle-orm";
-import { baseSysLogTable, baseAuditLogTable, baseBizLogTable, baseHttpRequestLogTable } from "./model";
+import {
+  baseSysLogTable,
+  baseAuditLogTable,
+  baseBizLogTable,
+  baseHttpRequestLogTable,
+} from "./model";
 
 /**
  * Base Log Services
@@ -100,93 +105,210 @@ export default baseLogService;
 
 // ----------------- HTTP APIs -----------------
 import type { FromSchema } from "json-schema-to-ts";
+import {
+  adminBaseLogAuditBackendSchemas,
+  adminBaseLogBizBackendSchemas,
+  adminBaseLogHttpBackendSchemas,
+  adminBaseLogSysBackendSchemas,
+} from "@hodor/contracts/resources";
+import {
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import { bodyAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import {
-  LogSysListReq,
-  LogSysListRes,
-  LogAuditListReq,
-  LogAuditListRes,
-  LogBizListReq,
-  LogBizListRes,
-  LogHttpListReq,
-  LogHttpListRes,
-  LogTimelineReq,
-  LogTimelineRes,
-  type LogTimelineResItem,
-} from "./model";
+import { LogTimelineReq, LogTimelineRes } from "./model";
 
-const sysListApi = {
-  req: LogSysListReq,
-  res: LogSysListRes,
-  pathInfo: { path: "/sys/list", method: "post", summary: "系统日志列表" },
-  adapter: bodyAdapter,
-  service: async (obj: FromSchema<typeof LogSysListReq>) => {
-    return await sys.list({
-      namespace: obj.namespace,
-      pageNo: obj.pageNo,
-      pageSize: obj.pageSize,
-      orderBy: obj.orderBy,
-      descend: obj.descend,
-    });
+const sysApis = createCrudApis(adminBaseLogSysBackendSchemas, {
+  list: {
+    path: "/sys/list",
+    adapter: bodyAdapter,
+    summary: "系统日志列表",
+    handler: async (
+      obj: FromSchema<typeof adminBaseLogSysBackendSchemas.listReq>
+    ) => {
+      const pageNo = obj.pageNo ?? 1;
+      const pageSize = obj.pageSize ?? 10;
+      const { total, list } = await sys.list({
+        namespace: obj.namespace,
+        pageNo,
+        pageSize,
+        orderBy: obj.orderBy,
+        descend: obj.descend,
+      });
+      return buildPagedListResult(
+        list.map((row) => ({
+          id: row.id,
+          namespace: row.namespace,
+          logLevel: row.logLevel,
+          createTimeUtc: row.createTimeUtc,
+          logValue: row.logValue as FromSchema<
+            typeof adminBaseLogSysBackendSchemas.listRes
+          >["list"][number]["logValue"],
+          payloadType: row.payloadType,
+          tenantId: row.tenantId ?? null,
+          remark: row.remark ?? null,
+          creatorId: row.creatorId,
+          creatorName: row.creatorName ?? null,
+        })),
+        total,
+        pageNo,
+        pageSize
+      );
+    },
   },
-  permission: { action: "read" },
-} satisfies API;
+});
 
-const auditListApi = {
-  req: LogAuditListReq,
-  res: LogAuditListRes,
-  pathInfo: { path: "/audit/list", method: "post", summary: "审计日志列表" },
-  adapter: bodyAdapter,
-  service: async (obj: FromSchema<typeof LogAuditListReq>) => {
-    return await audit.list({
-      namespace: obj.namespace,
-      pageNo: obj.pageNo,
-      pageSize: obj.pageSize,
-      orderBy: obj.orderBy,
-      descend: obj.descend,
-    });
+const auditApis = createCrudApis(adminBaseLogAuditBackendSchemas, {
+  list: {
+    path: "/audit/list",
+    adapter: bodyAdapter,
+    summary: "审计日志列表",
+    handler: async (
+      obj: FromSchema<typeof adminBaseLogAuditBackendSchemas.listReq>
+    ) => {
+      const pageNo = obj.pageNo ?? 1;
+      const pageSize = obj.pageSize ?? 10;
+      const { total, list } = await audit.list({
+        namespace: obj.namespace,
+        pageNo,
+        pageSize,
+        orderBy: obj.orderBy,
+        descend: obj.descend,
+      });
+      return buildPagedListResult(
+        list.map((row) => ({
+          id: row.id,
+          namespace: row.namespace,
+          action: row.action,
+          createTimeUtc: row.createTimeUtc,
+          creatorName: row.creatorName ?? null,
+          beforeData: (row.beforeData ?? null) as FromSchema<
+            typeof adminBaseLogAuditBackendSchemas.listRes
+          >["list"][number]["beforeData"],
+          afterData: (row.afterData ?? null) as FromSchema<
+            typeof adminBaseLogAuditBackendSchemas.listRes
+          >["list"][number]["afterData"],
+          targetId: row.targetId ?? null,
+          payloadType: row.payloadType,
+          tenantId: row.tenantId ?? null,
+          remark: row.remark ?? null,
+          creatorId: row.creatorId,
+        })),
+        total,
+        pageNo,
+        pageSize
+      );
+    },
   },
-  permission: { action: "read" },
-} satisfies API;
+});
 
-const bizListApi = {
-  req: LogBizListReq,
-  res: LogBizListRes,
-  pathInfo: { path: "/biz/list", method: "post", summary: "业务日志列表" },
-  adapter: bodyAdapter,
-  service: async (obj: FromSchema<typeof LogBizListReq>) => {
-    return await biz.list({
-      namespace: obj.namespace,
-      pageNo: obj.pageNo,
-      pageSize: obj.pageSize,
-      orderBy: obj.orderBy,
-      descend: obj.descend,
-    });
+const bizApis = createCrudApis(adminBaseLogBizBackendSchemas, {
+  list: {
+    path: "/biz/list",
+    adapter: bodyAdapter,
+    summary: "业务日志列表",
+    handler: async (
+      obj: FromSchema<typeof adminBaseLogBizBackendSchemas.listReq>
+    ) => {
+      const pageNo = obj.pageNo ?? 1;
+      const pageSize = obj.pageSize ?? 10;
+      const { total, list } = await biz.list({
+        namespace: obj.namespace,
+        pageNo,
+        pageSize,
+        orderBy: obj.orderBy,
+        descend: obj.descend,
+      });
+      return buildPagedListResult(
+        list.map((row) => ({
+          id: row.id,
+          namespace: row.namespace,
+          status: row.status ?? null,
+          payloadType: row.payloadType,
+          createTimeUtc: row.createTimeUtc,
+          logValue: row.logValue as FromSchema<
+            typeof adminBaseLogBizBackendSchemas.listRes
+          >["list"][number]["logValue"],
+          tenantId: row.tenantId ?? null,
+          remark: row.remark ?? null,
+          creatorId: row.creatorId,
+          creatorName: row.creatorName ?? null,
+        })),
+        total,
+        pageNo,
+        pageSize
+      );
+    },
   },
-  permission: { action: "read" },
-} satisfies API;
+});
 
-const httpListApi = {
-  req: LogHttpListReq,
-  res: LogHttpListRes,
-  pathInfo: { path: "/http/list", method: "post", summary: "HTTP外网请求日志列表" },
-  adapter: bodyAdapter,
-  service: async (obj: FromSchema<typeof LogHttpListReq>) => {
-    return await http.list({
-      namespace: obj.namespace,
-      method: obj.method,
-      protocol: obj.protocol,
-      responseStatus: obj.responseStatus,
-      keyword: obj.keyword,
-      pageNo: obj.pageNo,
-      pageSize: obj.pageSize,
-      orderBy: obj.orderBy,
-      descend: obj.descend,
-    });
+const httpApis = createCrudApis(adminBaseLogHttpBackendSchemas, {
+  list: {
+    path: "/http/list",
+    adapter: bodyAdapter,
+    summary: "HTTP外网请求日志列表",
+    handler: async (
+      obj: FromSchema<typeof adminBaseLogHttpBackendSchemas.listReq>
+    ) => {
+      const pageNo = obj.pageNo ?? 1;
+      const pageSize = obj.pageSize ?? 10;
+      const { total, list } = await http.list({
+        namespace: obj.namespace,
+        method: obj.method,
+        protocol: obj.protocol ?? undefined,
+        responseStatus: obj.responseStatus ?? undefined,
+        keyword: obj.keyword,
+        pageNo,
+        pageSize,
+        orderBy: obj.orderBy,
+        descend: obj.descend,
+      });
+      return buildPagedListResult(
+        list.map((row) => ({
+          id: row.id,
+          namespace: row.namespace,
+          method: row.method,
+          url: row.url,
+          responseStatus: row.responseStatus ?? null,
+          durationMs: row.durationMs ?? null,
+          createTimeUtc: row.createTimeUtc,
+          protocol: row.protocol ?? null,
+          host: row.host ?? null,
+          path: row.path ?? null,
+          query: row.query ?? null,
+          requestHeaders: (row.requestHeaders ?? null) as Record<
+            string,
+            unknown
+          > | null,
+          requestBody: (row.requestBody ?? null) as FromSchema<
+            typeof adminBaseLogHttpBackendSchemas.listRes
+          >["list"][number]["requestBody"],
+          responseHeaders: (row.responseHeaders ?? null) as Record<
+            string,
+            unknown
+          > | null,
+          responseBody: (row.responseBody ?? null) as FromSchema<
+            typeof adminBaseLogHttpBackendSchemas.listRes
+          >["list"][number]["responseBody"],
+          errorMessage: row.errorMessage ?? null,
+          tenantId: row.tenantId ?? null,
+          remark: row.remark ?? null,
+          creatorId: row.creatorId,
+          creatorName: row.creatorName ?? null,
+        })),
+        total,
+        pageNo,
+        pageSize
+      );
+    },
   },
-  permission: { action: "read" },
-} satisfies API;
+});
+
+const sysListApi = sysApis.list;
+const auditListApi = auditApis.list;
+const bizListApi = bizApis.list;
+const httpListApi = httpApis.list;
 
 async function onGetTimeline(obj: FromSchema<typeof LogTimelineReq>) {
   const {

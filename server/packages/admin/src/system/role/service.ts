@@ -1,48 +1,23 @@
 import {
-  IndexVO,
-  RoleVO,
-  RoleListVO,
-  RoleAddVO,
-  RoleUpdateVO,
-  RoleListKeys,
-  RoleDetailKeys,
-  RoleGetKeys,
-  RoleDeleteKeys,
-  RoleAddKeys,
-  RoleUpdateKeys,
-  RoleSortableKeys,
-  type RolePOLike,
-  type RoleVOLike,
-  type RoleAddVOLike,
-  type RoleUpdateVOLike,
-  type RoleDeleteVOLike,
-  type RoleGetVOLike,
-  RoleBaseVO,
-  RoleUniqueKeys,
-  RoleUniqueVO,
   RoleDeleteWithUndoReq,
   RoleDeleteWithUndoRes,
+  type RolePOLike,
 } from "./model";
-import { DataScope, DataScopeValues } from "@hodor/core/types/dataScope";
+import { DataScope } from "@hodor/core/types/dataScope";
 import { invalidateAuthCache } from "@hodor/core/middleware/auth/cache-invalidation";
-import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
+import type { FromSchema } from "json-schema-to-ts";
+import type { UserObj } from "@hodor/core/types/app";
+import { adminSystemRoleBackendSchemas } from "@hodor/contracts/resources";
+import {
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import {
   preventSuperAdminDelete,
   preventSuperAdminUpdate,
   preventMissingRoles,
 } from "./prevention";
-import {
-  listAllReqBase,
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
-import {
-  bodyAdapter,
-  bodyUserAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
-import type { API } from "@hodor/core/middleware/encapsulation";
+import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { roleRepository } from "./repository";
 import { can } from "@hodor/core/middleware/auth/permission";
@@ -60,70 +35,17 @@ import {
   BusinessErrorCode,
 } from "@hodor/core/middleware/errorHandler/businessError";
 
-const listAllReq = {
-  type: "object",
-  properties: {
-    ...listAllReqBase,
-    isEnabled: RoleVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof RolePOLike)[]>(RoleSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const listAllRes = {
-  type: "array",
-  items: {
-    type: "object",
-    properties: {
-      ...IndexVO,
-      ...RoleBaseVO,
-      ...RoleUniqueVO,
-      updateTimeUtc: RoleVO.updateTimeUtc,
-    },
-    required: [...RoleGetKeys, ...RoleUniqueKeys, "updateTimeUtc"],
-    additionalProperties: false,
-  },
-} as const satisfies JSONSchema;
+const S = adminSystemRoleBackendSchemas;
+
 async function onListAll(
-  params: FromSchema<typeof listAllReq>
-): Promise<FromSchema<typeof listAllRes>> {
+  params: FromSchema<typeof S.listAllReq>
+): Promise<FromSchema<typeof S.listAllRes>> {
   return await roleRepository.findAll(params);
 }
-const listAllApi = {
-  req: listAllReq,
-  res: listAllRes,
-  pathInfo: {
-    path: "/listAll",
-    method: "post",
-    summary: "获取所有角色（不分页）",
-  } as const,
-  adapter: bodyAdapter,
-  service: onListAll,
-  permission: { action: "read" },
-} satisfies API;
-
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    isEnabled: RoleVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof RolePOLike)[]>(RoleSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<RolePOLike>[]>(
-    {
-      ...RoleListVO,
-    },
-    [...RoleListKeys]
-  ),
-} as const satisfies JSONSchema;
 
 async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
@@ -136,59 +58,22 @@ async function onList(
     pageSize: finalPageSize,
   });
 
-  const totalPage = Math.ceil(total / finalPageSize);
-  return {
-    total,
-    totalPage,
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list,
-  };
+  return buildPagedListResult(list, total, pageNo, finalPageSize);
 }
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取角色列表",
-  } as const,
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
 
-const addReq = {
-  type: "object",
-  properties: {
-    ...RoleAddVO,
-    dataScope: {
-      type: "string",
-      enum: DataScopeValues,
-      description: "数据访问范围",
-      default: DataScope.SELF_ONLY,
-    },
-    customDeptIds: {
-      type: ["string", "null"],
-      nullable: true,
-      description: "自定义部门ID列表（JSON序列化）",
-    },
-  } satisfies Partial<Record<keyof RoleAddVOLike, JSONSchema>>,
-  required: [...RoleAddKeys] as const satisfies RequiredKeys<RoleAddVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const addRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
 async function onAdd(
-  obj: FromSchema<typeof addReq>,
+  obj: FromSchema<typeof S.addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
+): Promise<number> {
   const { userId: creatorId } = userObj;
 
   const insertedId = await roleRepository.onInsert({
     permissionCount: 0,
-    ...obj,
+    remark: obj.remark ?? null,
+    dataScope: obj.dataScope ?? DataScope.SELF_ONLY,
+    customDeptIds: obj.customDeptIds ?? null,
+    name: obj.name,
+    isEnabled: obj.isEnabled,
     creatorId,
     isDeleted: false,
     deletedTimeUtc: null,
@@ -197,46 +82,11 @@ async function onAdd(
   await invalidateAuthCache();
   return insertedId;
 }
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加角色",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
 
-const updateReq = {
-  type: "object",
-  properties: {
-    ...RoleUpdateVO,
-    dataScope: {
-      type: "string",
-      enum: DataScopeValues,
-      description: "数据访问范围",
-    },
-    customDeptIds: {
-      type: ["string", "null"],
-      nullable: true,
-      description: "自定义部门ID列表（JSON序列化）",
-    },
-  },
-  required: [
-    ...RoleUpdateKeys,
-  ] as const satisfies RequiredKeys<RoleUpdateVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const updateRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
 async function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof updateRes> | null> {
+): Promise<number> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
 
@@ -252,36 +102,11 @@ async function onUpdate(
   await invalidateAuthCache();
   return updatedId;
 }
-const updateApi = {
-  req: updateReq,
-  res: updateRes,
-  pathInfo: {
-    path: "/update",
-    method: "post",
-    summary: "更新角色",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
 
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...RoleDeleteKeys,
-  ] as const satisfies RequiredKeys<RoleDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
 async function onDelete(
-  obj: FromSchema<typeof deleteReq>,
+  obj: FromSchema<typeof S.deleteReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof deleteRes> | null> {
+): Promise<number> {
   const { id } = obj;
   requireActor(userObj.userId);
   // 前置校验
@@ -290,18 +115,6 @@ async function onDelete(
   await invalidateAuthCache();
   return deletedId;
 }
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除角色",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
 
 async function onDeleteWithUndo(
   params: FromSchema<typeof RoleDeleteWithUndoReq>,
@@ -325,55 +138,14 @@ async function onDeleteWithUndo(
   } satisfies SoftDeleteUndoReceipt;
 }
 
-const deleteWithUndoApi = {
-  req: RoleDeleteWithUndoReq,
-  res: RoleDeleteWithUndoRes,
-  pathInfo: {
-    path: "/deleteWithUndo",
-    method: "post",
-    summary: "删除角色并返回短时撤销收据",
-  },
-  adapter: bodyUserAdapter,
-  service: onDeleteWithUndo,
-  permission: { action: "delete" },
-} satisfies API;
-
-const getReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [...RoleGetKeys] as const satisfies RequiredKeys<RoleGetVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const getRes = {
-  type: "object",
-  properties: {
-    ...RoleVO,
-  },
-  required: [...RoleDetailKeys] as const satisfies RequiredKeys<RoleVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
 async function onGet(
-  obj: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes> | null> {
+  obj: FromSchema<typeof S.getReq>
+): Promise<FromSchema<typeof S.getRes>> {
   const { id } = obj;
-  const row = await roleRepository.findById(id);
+  const row: RolePOLike | null = await roleRepository.findById(id);
   preventEmpty(row);
   return row;
 }
-const getApi = {
-  req: getReq,
-  res: getRes,
-  pathInfo: {
-    path: "/get",
-    method: "post",
-    summary: "获取角色",
-  } as const,
-  adapter: bodyAdapter,
-  service: onGet,
-  permission: { action: "read" },
-} satisfies API;
 
 async function getRolesByIds(
   ids: number[]
@@ -527,12 +299,20 @@ export async function purgeDeletedRole(
   return purged;
 }
 
-export default {
-  listAll: listAllApi,
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  delete: deleteApi,
-  deleteWithUndo: deleteWithUndoApi,
-  get: getApi,
-};
+export default createCrudApis(S, {
+  listAll: { summary: "获取所有角色（不分页）", handler: onListAll },
+  list: { summary: "获取角色列表", handler: onList },
+  add: { summary: "添加角色", handler: onAdd },
+  update: { summary: "更新角色", handler: onUpdate },
+  delete: {
+    adapter: bodyUserAdapter,
+    summary: "删除角色",
+    handler: onDelete,
+  },
+  deleteWithUndo: {
+    adapter: bodyUserAdapter,
+    summary: "删除角色并返回短时撤销收据",
+    handler: onDeleteWithUndo,
+  },
+  get: { summary: "获取角色", handler: onGet },
+});

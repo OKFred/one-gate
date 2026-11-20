@@ -5,13 +5,7 @@ import { AutocompleteField, type AutocompleteFieldProps } from './inputs/Autocom
 import { CheckboxField, type CheckboxFieldProps } from './inputs/CheckboxField';
 
 export type FieldType =
-  | 'text'
-  | 'number'
-  | 'password'
-  | 'switch'
-  | 'select'
-  | 'autocomplete'
-  | 'checkbox';
+  'text' | 'email' | 'number' | 'password' | 'switch' | 'select' | 'autocomplete' | 'checkbox';
 
 // 联合 Props 类型
 type MergedProps =
@@ -42,6 +36,7 @@ export const Field = (props: MergedProps) => {
       );
     case 'number':
     case 'password':
+    case 'email':
     case 'text':
     default:
       return <TextField type={type} {...(rest as TextFieldProps)} />;

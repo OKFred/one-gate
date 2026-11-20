@@ -1,10 +1,10 @@
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { Context, UserObj } from "@hodor/core/types/app";
+import { adminMobileAsyncTaskBackendSchemas } from "@hodor/contracts/resources";
 import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import {
   bodyAdapter,
   bodyUserAdapter,
@@ -17,9 +17,7 @@ import { verifyDeviceReportToken } from "../device/facade.js";
 import { adaptDeviceHttpError } from "../device/interfaces/http/error.js";
 import {
   MobileAsyncTaskVO,
-  MobileAsyncTaskListKeys,
   MobileAsyncTaskDetailKeys,
-  MobileAsyncTaskSortableKeys,
   MobileAsyncTaskDispatchReqVO,
   MobileAsyncTaskDispatchResVO,
   MobileAsyncTaskCallbackReqVO,
@@ -44,28 +42,12 @@ import {
   MobileTaskRuntimeCancelResSchema,
 } from "./runtime/model.js";
 
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    clientId: MobileAsyncTaskVO.clientId,
-    status: MobileAsyncTaskVO.status,
-    priority: MobileAsyncTaskVO.priority,
-    orderBy: orderByWrapper<(typeof MobileAsyncTaskSortableKeys)[number][]>([
-      ...MobileAsyncTaskSortableKeys,
-    ]),
-  },
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper(MobileAsyncTaskVO, [...MobileAsyncTaskListKeys]),
-} as const satisfies JSONSchema;
+const S = adminMobileAsyncTaskBackendSchemas;
 
 /** 分页查询设备异步任务。 */
 async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
   const result = await listDeviceTasks({
     keyword: params.keyword,
     clientId: params.clientId,
@@ -76,20 +58,41 @@ async function onList(
     pageNo: params.pageNo,
     pageSize: params.pageSize,
   });
-  return {
-    ...result,
-    list: result.list as unknown as FromSchema<typeof listRes>["list"],
-  };
+  const mappedList = result.list.map((row) => ({
+    id: row.id,
+    taskId: row.taskId,
+    clientId: row.clientId,
+    cat: row.cat,
+    status: row.status,
+    priority: row.priority,
+    preemptRunning: row.preemptRunning,
+    preemptedByTaskId: row.preemptedByTaskId ?? null,
+    createTimeUtc: row.createTimeUtc,
+    resultMessage: row.resultMessage ?? null,
+    remark: row.remark ?? null,
+    script: row.script,
+    protocolVersion: row.protocolVersion ?? null,
+    scriptId: row.scriptId ?? null,
+    scriptVersion: row.scriptVersion ?? null,
+    paramsJson: row.paramsJson ?? null,
+    timeoutMs: row.timeoutMs ?? null,
+    traceId: row.traceId ?? null,
+    resultCode: row.resultCode ?? null,
+    resultDataJson: row.resultDataJson ?? null,
+    startedAtUtc: row.startedAtUtc ?? null,
+    finishedAtUtc: row.finishedAtUtc ?? null,
+    expiresAtUtc: row.expiresAtUtc,
+    creatorId: row.creatorId,
+    updaterId: row.updaterId ?? null,
+    updateTimeUtc: row.updateTimeUtc ?? null,
+  }));
+  return buildPagedListResult(
+    mappedList,
+    result.total,
+    params.pageNo,
+    params.pageSize
+  );
 }
-
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: { path: "/list", method: "post", summary: "分页获取异步任务" },
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
 
 const dispatchReq = {
   type: "object",
@@ -256,11 +259,16 @@ const cancelApi = {
   permission: { action: "dispatch" },
 } satisfies API;
 
-export default {
-  list: listApi,
-  dispatch: dispatchApi,
-  get: getApi,
-  callback: callbackApi,
-  state: stateApi,
-  cancel: cancelApi,
-};
+export default createCrudApis(S, {
+  list: {
+    summary: "分页获取异步任务",
+    handler: onList,
+  },
+  extra: {
+    dispatch: dispatchApi,
+    get: getApi,
+    callback: callbackApi,
+    state: stateApi,
+    cancel: cancelApi,
+  },
+});

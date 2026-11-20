@@ -210,5 +210,7 @@ export const mobile = {
   'common.searchPlaceholder': 'Please enter search keyword',
   'mobile.app.appName': 'App Name',
   'mobile.appVersion.download': 'Download',
+  'mobile.deviceApp.app': 'App',
+  'mobile.deviceApp.appId': 'App ID',
   'status.label': 'Status',
 };

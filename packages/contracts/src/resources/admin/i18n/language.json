@@ -1,0 +1,123 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/i18n/language",
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "langCode", "sortOrder", "createTimeUtc"],
+    "showSortControls": true,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": false
+    },
+    "sortFieldLabelKeys": {
+      "id": "columns.id",
+      "createTimeUtc": "columns.createTime"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": true,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": true },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "langCode",
+      "schema": {
+        "type": "string",
+        "description": "语言代码",
+        "pattern": "^[a-z]{2}-[A-Z]{2}$",
+        "examples": ["zh-CN", "en-US"],
+        "maxLength": 10
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "language.table.langCode",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "content", "labelKey": "language.table.langCode" },
+        "form": { "show": true, "widget": "text", "placeholder": "zh-CN", "span": 6, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "nativeName",
+      "schema": {
+        "type": "string",
+        "description": "本地名称",
+        "examples": ["中文（中国）", "English (US)"],
+        "maxLength": 50
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "language.table.nativeName",
+        "table": { "show": true, "renderer": "text", "fallback": "-" },
+        "card": { "role": "title", "template": "${nativeName}" },
+        "form": { "show": true, "widget": "text", "placeholder": "简体中文", "span": 6, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "sortOrder",
+      "schema": {
+        "type": "integer",
+        "description": "排序",
+        "examples": [1, 2, 3],
+        "minimum": 1
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "filter.sortOrder",
+        "table": { "show": true, "renderer": "text", "titleKey": "filter.sortOrder" },
+        "card": { "role": "content", "labelKey": "filter.sortOrder" },
+        "form": { "show": true, "widget": "number", "labelKey": "menu.table.sort", "min": 1, "defaultValue": 1, "placeholder": "1" }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "filter.enabledStatus",
+        "table": {
+          "show": true,
+          "titleKey": "filter.enabledStatus",
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "card": { "role": "tag" },
+        "filter": { "show": true, "type": "select", "includeAllOption": true },
+        "form": { "show": true, "widget": "switch", "labelKey": "status.enabled", "defaultValue": true }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "column.remark" }
+      }
+    }
+  ]
+}

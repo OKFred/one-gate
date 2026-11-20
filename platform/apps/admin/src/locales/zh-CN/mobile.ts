@@ -198,5 +198,7 @@ export const mobile = {
   'common.searchPlaceholder': '请输入搜索关键字',
   'mobile.app.appName': '应用名称',
   'mobile.appVersion.download': '下载',
+  'mobile.deviceApp.app': 'App',
+  'mobile.deviceApp.appId': 'App ID',
   'status.label': '状态',
 };

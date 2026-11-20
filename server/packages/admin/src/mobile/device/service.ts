@@ -1,5 +1,6 @@
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-
+import { adminMobileDeviceBackendSchemas } from "@hodor/contracts/resources";
+import { createCrudApis } from "@hodor/core/middleware/encapsulation/crud";
 import {
   bodyAdapter,
   bodyUserContextAdapter,
@@ -9,7 +10,6 @@ import {
 import {
   listReqBase,
   listResponseWrapper,
-  orderByWrapper,
 } from "@hodor/core/middleware/encapsulation/common.schema";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import type { Context, UserObj } from "@hodor/core/types/app";
@@ -41,6 +41,8 @@ import { ClientDeploymentReportVO } from "../client-deployment/model.js";
 import { parseNetworkRoutingStatusEvent } from "../network-routing/domain.js";
 import { processNetworkRoutingStatus } from "../network-routing/facade.js";
 import { NetworkRoutingStatusReportVO } from "../network-routing/model.js";
+import type { DeviceReportedStatus } from "./domain/device.js";
+import type { DeviceSortKey } from "./application/ports.js";
 import { DeviceApplicationError } from "./application/error.js";
 import { adaptDeviceHttpError } from "./interfaces/http/error.js";
 import { reportTokenFromContext } from "./interfaces/http/report-token.js";
@@ -57,139 +59,82 @@ import {
   DeviceInfoReportVO,
   DevicePresenceReportVO,
   IndexVO,
-  MobileDeviceAddKeys,
-  MobileDeviceAddVO,
-  MobileDeviceDetailKeys,
-  MobileDeviceListKeys,
   MobileDeviceSortableKeys,
-  MobileDeviceUpdateKeys,
-  MobileDeviceUpdateVO,
-  MobileDeviceVO,
 } from "./model.js";
 
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    isEnabled: MobileDeviceVO.isEnabled,
-    onlineStatus: {
-      type: ["string", "null"],
-      enum: ["ONLINE", "OFFLINE", null],
-      nullable: true,
-    },
-    orderBy: orderByWrapper<(typeof MobileDeviceSortableKeys)[number][]>([
-      ...MobileDeviceSortableKeys,
-    ]),
+const S = adminMobileDeviceBackendSchemas;
+
+function toDeviceSortKey(val?: string): DeviceSortKey | undefined {
+  return MobileDeviceSortableKeys.find((k) => k === val);
+}
+
+function toOnlineStatus(val?: string | null): DeviceReportedStatus | undefined {
+  if (val === "ONLINE" || val === "OFFLINE") return val;
+  return undefined;
+}
+
+const crudApis = createCrudApis(S, {
+  list: {
+    summary: "分页获取移动设备",
+    handler: (params: FromSchema<typeof S.listReq>) =>
+      adaptDeviceHttpError(() =>
+        listDevices({
+          pageNo: params.pageNo ?? 1,
+          pageSize: params.pageSize ?? 10,
+          keyword: params.keyword,
+          isEnabled: params.isEnabled,
+          onlineStatus: toOnlineStatus(params.onlineStatus),
+          orderBy: toDeviceSortKey(params.orderBy),
+          descend: params.descend,
+        })
+      ),
   },
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const listRes = {
-  ...listResponseWrapper(MobileDeviceVO, [...MobileDeviceListKeys]),
-} as const satisfies JSONSchema;
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: { path: "/list", method: "post", summary: "分页获取移动设备" },
-  adapter: bodyAdapter,
-  service: (params: FromSchema<typeof listReq>) =>
-    adaptDeviceHttpError(() =>
-      listDevices({
-        pageNo: params.pageNo,
-        pageSize: params.pageSize,
-        keyword: params.keyword,
-        isEnabled: params.isEnabled,
-        onlineStatus: params.onlineStatus ?? undefined,
-        orderBy: params.orderBy,
-        descend: params.descend,
-      })
-    ),
-  permission: { action: "read" },
-} satisfies API;
-
-const addReq = {
-  type: "object",
-  properties: { ...MobileDeviceAddVO },
-  required: [...MobileDeviceAddKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const idRes = { ...IndexVO.id } as const satisfies JSONSchema;
-const addApi = {
-  req: addReq,
-  res: idRes,
-  pathInfo: { path: "/add", method: "post", summary: "添加移动设备" },
-  adapter: bodyUserAdapter,
-  service: (params: FromSchema<typeof addReq>, userObj: UserObj) =>
-    adaptDeviceHttpError(() => addDevice(params, { id: userObj.id })),
-  permission: { action: "add" },
-} satisfies API;
-
-const updateReq = {
-  type: "object",
-  properties: { ...MobileDeviceUpdateVO },
-  required: [...MobileDeviceUpdateKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const updateApi = {
-  req: updateReq,
-  res: { type: "boolean" } as const,
-  pathInfo: { path: "/update", method: "post", summary: "更新移动设备" },
-  adapter: bodyUserAdapter,
-  service: (params: FromSchema<typeof updateReq>, userObj: UserObj) =>
-    adaptDeviceHttpError(() => updateDevice(params, { id: userObj.id })),
-  permission: { action: "edit" },
-} satisfies API;
-
-const getReq = {
-  type: "object",
-  properties: { ...IndexVO },
-  required: ["id"],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const getApi = {
-  req: getReq,
-  res: {
-    type: "object",
-    properties: { ...MobileDeviceVO },
-    required: [...MobileDeviceDetailKeys],
-    additionalProperties: false,
-  } as const,
-  pathInfo: { path: "/get", method: "post", summary: "获取设备详情" },
-  adapter: bodyUserContextAdapter,
-  service: (
-    params: FromSchema<typeof getReq>,
-    userObj: UserObj,
-    context: Context
-  ) =>
-    adaptDeviceHttpError(async () => {
-      const device = await getDevice(params.id);
-      void scheduleDeviceDetailAuthorizationShadow(
-        {
-          deviceId: params.id,
-          isEnabled: device.isEnabled,
-          requestId: context.get("requestId"),
-          actor: {
-            userId: userObj.userId,
-            roleIds: userObj.roleIds,
-            isSuperAdmin: userObj.isSuperAdmin,
+  add: {
+    summary: "添加移动设备",
+    handler: (params: FromSchema<typeof S.addReq>, userObj: UserObj) =>
+      adaptDeviceHttpError(() => addDevice(params, { id: userObj.id })),
+  },
+  update: {
+    summary: "更新移动设备",
+    resSchema: { type: "boolean" } as const,
+    handler: (params: FromSchema<typeof S.updateReq>, userObj: UserObj) =>
+      adaptDeviceHttpError(() => updateDevice(params, { id: userObj.id })),
+  },
+  get: {
+    adapter: bodyUserContextAdapter,
+    summary: "获取设备详情",
+    handler: (
+      params: FromSchema<typeof S.getReq>,
+      userObj: UserObj,
+      context: Context
+    ) =>
+      adaptDeviceHttpError(async () => {
+        const device = await getDevice(params.id);
+        void scheduleDeviceDetailAuthorizationShadow(
+          {
+            deviceId: params.id,
+            isEnabled: device.isEnabled,
+            requestId: context.get("requestId"),
+            actor: {
+              userId: userObj.userId,
+              roleIds: userObj.roleIds,
+              isSuperAdmin: userObj.isSuperAdmin,
+            },
           },
-        },
-        {
-          waitUntil: (promise) => context.executionCtx.waitUntil(promise),
-        }
-      );
-      return device;
-    }),
-  permission: { action: "read" },
-} satisfies API;
-const deleteApi = {
-  req: getReq,
-  res: { type: "boolean" } as const,
-  pathInfo: { path: "/delete", method: "post", summary: "删除移动设备" },
-  adapter: bodyAdapter,
-  service: (params: FromSchema<typeof getReq>) =>
-    adaptDeviceHttpError(() => deleteDevice(params.id)),
-  permission: { action: "delete" },
-} satisfies API;
+          {
+            waitUntil: (promise) => context.executionCtx.waitUntil(promise),
+          }
+        );
+        return device;
+      }),
+  },
+  delete: {
+    summary: "删除移动设备",
+    resSchema: { type: "boolean" } as const,
+    handler: (params: FromSchema<typeof S.deleteReq>) =>
+      adaptDeviceHttpError(() => deleteDevice(params.id)),
+  },
+});
 
 const updateMetadataReq = {
   type: "object",
@@ -294,7 +239,7 @@ const revealApi = {
 } satisfies API;
 
 const resetTokenApi = {
-  req: getReq,
+  req: S.getReq,
   res: {
     type: "object",
     properties: { token: { type: "string" } },
@@ -307,7 +252,7 @@ const resetTokenApi = {
     summary: "生成或重置设备上报令牌",
   },
   adapter: bodyAdapter,
-  service: (params: FromSchema<typeof getReq>) =>
+  service: (params: FromSchema<typeof S.getReq>) =>
     adaptDeviceHttpError(() => resetDeviceReportToken(params.id)),
   permission: { action: "edit" },
 } satisfies API;
@@ -478,12 +423,13 @@ const reportTaskStateApi = {
   permission: false,
 } satisfies API;
 
+// Keep key order aligned with service.spec.ts (get before delete)
 export default {
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  get: getApi,
-  delete: deleteApi,
+  list: crudApis.list,
+  add: crudApis.add,
+  update: crudApis.update,
+  get: crudApis.get,
+  delete: crudApis.delete,
   updateMetadata: updateMetadataApi,
   eventList: eventListApi,
   reveal: revealApi,

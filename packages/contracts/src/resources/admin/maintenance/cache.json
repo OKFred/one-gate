@@ -1,0 +1,65 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/maintenance/cache",
+  "permissionNamespace": "admin.maintenance.cache",
+  "permissions": "none",
+  "apiKeyName": "name",
+  "auditFields": false,
+  "api": {
+    "endpoints": {
+      "list": "/api/v1/admin/maintenance/cache/listKeys"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": false,
+    "add": false,
+    "update": false,
+    "delete": true
+  },
+  "filters": {
+    "keyword": { "enabled": false },
+    "showSortControls": false
+  },
+  "fields": [
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "缓存键名",
+        "maxLength": 500
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "cache.columns.key",
+        "table": { "show": true },
+        "card": { "role": "content", "labelKey": "cache.columns.key" },
+        "form": false
+      }
+    },
+    {
+      "name": "prefix",
+      "schema": {
+        "type": "string",
+        "description": "键名前缀过滤",
+        "maxLength": 200
+      },
+      "in": { "list": false, "detail": false, "add": false, "update": false, "listAll": false, "listFilter": true },
+      "ui": {
+        "labelKey": "cache.filter.keyPrefix",
+        "table": false,
+        "card": false,
+        "filter": {
+          "show": true,
+          "type": "text",
+          "placeholderKey": "cache.filter.keyPrefixPlaceholder",
+          "transform": "emptyToUndefined"
+        },
+        "form": false
+      }
+    }
+  ]
+}

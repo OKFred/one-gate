@@ -4,21 +4,22 @@
 
 ---
 
-## 1. 新增与独立封装 API 请求定义
+## 1. 接口调用与契约驱动 CRUD 页面规范
 
-- **前端所有 HTTP 接口调用必须保持独立解耦封装**：严禁在 React 页面组件（如 `pages/` 内的文件）中直接手写或调用内联 `axiosPlus`。
-- 所有接口请求必须统一在 `platform/packages/ui/src/api/[domain]/` 目录下按业务模块声明独立的 `.ts` 文件（例如 `admin/ai/config.ts`、`enterprise/mail/edm.ts`、`personal/mail/preference.ts`）。
-- 接口封装函数名统一按照规范命名（如 `listFn`、`listAllFn`、`getFn`、`addFn`、`updateFn`、`deleteFn`、`sendBatchFn` 等），内部采用 `axiosPlus` 适配请求，API 路径前缀必须契合后端（例如：`/api/v1/personal/profile/list`）。
-- **禁止使用 `any` 类型或 `as any` 强转**：接口请求与响应的数据类型必须直接从后端自动生成的 OpenAPI 类型文件 (`@/types/openapi.d.ts`) 或使用 `AxiosConfig<'/path', 'method'>` 泛型直接进行类型安全推导，严禁使用 `any` 绕过 TS 校验。
-- **禁止在业务组件中硬编码请求参数上下文**：发送 API 请求时（特别如 `tenantId: 1` 或特定 `userId` 等标识）严禁硬编码。这些参数必须通过全局状态、组件 Props 传入，或依赖后端 Token 隐式解析。
+- **标准与扩展 CRUD 页面优先使用顶层 JSON 契约 (`@hodor/contracts`)**：
+  - **纯声明式 CRUD（零前端 TSX）**：在 `packages/contracts/src/resources/<app>/.../<resource>.json` 中定义契约并运行 `pnpm run sync:all` 后，各前端应用 `src/routes.tsx` 会通过 `@/routes/buildContractRoutes`（`platform/packages/ui/src/routes/buildContractRoutes.tsx`）自动懒加载挂载路由，内置通过 `postCrudEndpoint`（`@/api/crud`）调用 `/list`、`/add`、`/update`、`/delete`、`/deleteWithUndo` 与详情弹窗，**无需**为标准 CRUD 编写 `pages/**/index.tsx`、`TheFilter.tsx`、`TheTable.tsx`、`TheForm.tsx`、`constant.ts` 或重复 API 封装。
+  - **带交互扩展的 CRUD（薄壳 `index.tsx` + `ContractCrudPage`）**：仅当页面需要额外抽屉/弹窗/工具栏按钮/富文本等复杂定制交互时，创建 `pages/<route>/index.tsx` 覆盖自动路由，组合 `ContractCrudPage` 与 `CrudExtensions`（`toolbarActions`、`rowActions`、`dialogs`、`customCells`、`customFormFields`、`formHeader`/`formFooter`、`afterOpen`/`beforeSubmitAsync`/`afterAdd`、`listAdapter`/`mutationAdapter`）。
+- **自定义接口调用必须保持独立解耦封装**：在非 `ContractCrudPage` 标准路径调用定制 HTTP 接口（如抽屉子面板、特殊动作、非 CRUD 业务页）时，严禁在页面或组件内直接内联调用底层请求实例；必须统一在 `platform/packages/ui/src/api/[domain]/` 下封装并导出的函数（如 `verifyFn`、`runTestFn`、`sendBatchFn`）。
+- **禁止使用 `any` 类型或 `as any` 强转**：定制接口封装与响应类型必须直接从离线生成的 OpenAPI 类型文件 (`@/types/openapi.d.ts`) 或 `AxiosConfig<'/path', 'method'>` 泛型推导。
+- **禁止在业务组件中硬编码请求参数上下文**：发送 API 请求时（如 `tenantId` 或 `userId`）严禁硬编码，必须通过状态、Props、契约 `api.fixedParams` / `contextParams` 传入或由后端 Token 解析。
 
 ---
 
 ## 2. 前端路由挂载与扁平化设计
 
-- 前端物理页面路径应当**扁平化**，直接放置于 `pages/` 根目录下，避免繁琐的二级嵌套。
-- 路由挂载在各自独立应用的 `src/routes.tsx` 中，利用 `import.meta.glob` 自动加载。
-- 页面权限标识 `PREFIX_LV1` 分别为：`admin`、`enterprise` 或 `personal`。
+- 物理页面文件放置于各 App 的 `src/pages/**/index.tsx`，由 `src/routes.tsx` 通过 `import.meta.glob` 自动加载。
+- 声明式契约路由由 `buildContractRoutes(app, physicalRoutes)` 从 `@hodor/contracts/manifest` 自动装配；若同路由下已存在物理 `pages/.../index.tsx`，**自动优先保留物理页面**以免路由冲突。
+- 各应用包名与作用域分别为：`@hodor/web-admin` (`admin`)、`@hodor/web-enterprise` (`enterprise`)、`@hodor/web-personal` (`personal`)。
 
 ---
 
@@ -77,43 +78,40 @@
 
 ---
 
-## 4. 同步 OpenAPI 接口类型
+## 4. 离线全栈同步 (`pnpm run sync:all`) 与 OpenAPI 类型
 
-若后端路由有增减，在后端启动状态下，执行以下命令同步前端类型：
+无需启动本地后端服务；每当新增或修改契约 JSON、后端路由或权限种子后，在**仓库根目录**执行一键离线同步即可完成契约构建、`BusinessKey`、`usePermission.ts`、`openapi.d.ts` 及四维契约校验：
 
 ```bash
-npx openapi-typescript http://localhost:8787/doc.json --output platform/packages/ui/src/types/openapi.d.ts
+pnpm run sync:all
 ```
+
+如需单独重新离线导出 `platform/packages/ui/src/types/openapi.d.ts`，可在仓库根目录运行：`pnpm run sync:openapi`。
 
 ---
 
-## 5. 页面权限常量自动生成 (`generate-constants.js`)
+## 5. 页面权限常量生成 (`generate-constants.js`)
 
-每个页面目录下的 `constant.ts` 均由脚本自动生成，**不要手动编辑**。
+仅保留手动引用 `./constant` 或 `../constant` 的非契约定制页面目录才需要 `constant.ts`（`ContractCrudPage` 纯 JSON 或薄壳页面应直接通过契约自动派生或从 `@/hooks/usePermission` 导入 `permissions`，**不要**再保留冗余 `constant.ts`）。
 
 **脚本路径**: `platform/scripts/generate-constants.js`
 
-**执行命令**（在 `platform/` 目录下）：
+**执行命令**（仓库根目录或 `platform/` 目录下）：
 
 ```bash
-node ./scripts/generate-constants.js
+node platform/scripts/generate-constants.js
 ```
 
 **生成规则**：
 
-- 脚本会扫描 `platform/apps/[app]/src/pages/` 下的所有子目录，对照 `packages/ui/src/hooks/usePermission.ts` 中 `permissions` 对象的实际键结构，判断该页面目录是否有对应的权限条目。
-- **有权限条目**：生成 `THIS_PERMISSION = permissions.xxx.yyy`（完整类型安全，无 `as any`）。
-- **无权限条目**（如 `mail/send`、`maintenance/openapi`）：只生成前缀常量，不生成 `THIS_PERMISSION`。
-- **排除目录**（`home`、`login`、`me`）：删除已有的 `constant.ts` 并跳过，因为这些页面与权限系统无关。
+- 脚本遍历 `platform/apps/[app]/src/pages/` 子目录时，会先检测目录及其 `components/` 下是否存在 `./constant` 或 `../constant` 的导入语句；**无引用的契约页目录与中间分组目录将被跳过**，不会重新生成孤儿 `constant.ts`。
+- 若目录实际引用了 `constant` 且 `usePermission.ts` 中存在对应键结构，则更新 `THIS_PERMISSION = permissions.xxx.yyy`；否则仅生成前缀常量。
+- **排除目录**（`home`、`login`、`me`）：删除已有的 `constant.ts` 并跳过。
 
 **何时需要重新执行**：
 
-1. 在 `usePermission.ts` 中新增或删除权限条目后。
-2. 在 `pages/` 下新增了页面子目录后。
-3. 修改了 `EXCLUDED_DIRS` 排除列表后。
-
-> **注意**：`usePermission.ts` 由 `server/scripts/sync-permissions.ts` 自动生成，不要手动编辑。因此正确的链式操作为：
-> 修改 `initPermissions.ts` → 执行 `pnpm run db:init node` → 执行 `node ./scripts/generate-constants.js`。
+1. 在 `usePermission.ts` 中新增/变更了权限条目，且存在引用 `constant.ts` 的非契约页面。
+2. 新建或改造了直接引用 `./constant` / `../constant` 的定制页面。
 
 ---
 

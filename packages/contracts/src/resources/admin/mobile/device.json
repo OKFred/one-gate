@@ -1,0 +1,371 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/mobile/device",
+  "cardMode": "none",
+  "refreshIntervalMs": 30000,
+  "api": {
+    "summaries": {
+      "list": "分页获取移动设备",
+      "get": "获取设备详情",
+      "add": "添加移动设备",
+      "update": "更新移动设备",
+      "delete": "删除移动设备"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "column.keyword",
+      "placeholderKey": "common.searchPlaceholder",
+      "transform": "emptyToUndefined"
+    },
+    "sortableFields": [
+      "id",
+      "clientId",
+      "deviceName",
+      "isEnabled",
+      "lastHeartbeatTimeUtc",
+      "batteryLevel",
+      "createTimeUtc"
+    ],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "clientId",
+      "schema": {
+        "type": "string",
+        "description": "设备标识 (唯一，对应 MQTT ClientId)",
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "mobile.device.clientId",
+        "table": { "show": true },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "required": true,
+          "defaultValue": "",
+          "disabledWhen": "edit",
+          "span": { "xs": 12, "sm": 6 }
+        }
+      }
+    },
+    {
+      "name": "isOnline",
+      "schema": {
+        "type": "boolean",
+        "description": "150 秒窗口内有效在线"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "mobile.device.onlineStatus",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.online",
+          "falseLabelKey": "status.offline",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "filled"
+        },
+        "form": false
+      }
+    },
+    {
+      "name": "deviceName",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "设备名称/别名",
+        "maxLength": 100
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "mobile.device.deviceName",
+        "table": { "show": true, "titleKey": "mobile.device.hardware" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "defaultValue": "",
+          "valueTransform": "emptyToNull",
+          "span": { "xs": 12, "sm": 6 }
+        }
+      }
+    },
+    {
+      "name": "clientVersion",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "mobile.device.clientVersions",
+        "table": { "show": true, "fallback": "-" },
+        "form": false
+      }
+    },
+    {
+      "name": "batteryLevel",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "mobile.device.battery",
+        "table": { "show": true },
+        "form": false
+      }
+    },
+    {
+      "name": "networkType",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "mobile.device.network",
+        "table": { "show": true },
+        "form": false
+      }
+    },
+    {
+      "name": "lastHeartbeatTimeUtc",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "mobile.device.lastHeartbeat",
+        "table": {
+          "show": true,
+          "renderer": "datetime",
+          "format": "YYYY-MM-DD HH:mm:ss",
+          "fallback": "-"
+        },
+        "form": false
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false, "listFilter": true },
+      "ui": {
+        "table": false,
+        "filter": false,
+        "form": { "show": true, "widget": "switch", "defaultValue": true }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "form": { "show": true, "widget": "textarea", "rows": 3, "defaultValue": null }
+      }
+    },
+    {
+      "name": "onlineStatus",
+      "schema": {
+        "type": ["string", "null"],
+        "enum": ["ONLINE", "OFFLINE", null],
+        "nullable": true
+      },
+      "in": { "list": false, "detail": false, "add": false, "update": false, "listAll": false, "listFilter": true },
+      "ui": {
+        "labelKey": "mobile.device.onlineStatus",
+        "table": false,
+        "card": false,
+        "form": false,
+        "filter": {
+          "show": true,
+          "type": "select",
+          "includeAllOption": true,
+          "transform": "emptyToUndefined",
+          "options": [
+            { "labelKey": "status.online", "value": "ONLINE" },
+            { "labelKey": "status.offline", "value": "OFFLINE" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": false
+      }
+    },
+    {
+      "name": "reportedStatus",
+      "schema": {
+        "type": ["string", "null"],
+        "enum": ["ONLINE", "OFFLINE", null],
+        "nullable": true
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "lastOnlineTimeUtc",
+      "schema": { "type": ["number", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "lastOfflineTimeUtc",
+      "schema": { "type": ["number", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "manufacturer",
+      "schema": { "type": ["string", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "brand",
+      "schema": { "type": ["string", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "model",
+      "schema": { "type": ["string", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "androidVersion",
+      "schema": { "type": ["string", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "androidSdk",
+      "schema": { "type": ["number", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "autojs6Version",
+      "schema": { "type": ["string", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "protocolVersion",
+      "schema": { "type": ["number", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "isCharging",
+      "schema": { "type": ["boolean", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "networkConnected",
+      "schema": { "type": ["boolean", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "imeiStatus",
+      "schema": { "type": ["string", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "imeiMasked",
+      "schema": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "serialStatus",
+      "schema": { "type": ["string", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "serialMasked",
+      "schema": { "type": ["string", "null"], "nullable": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "capabilities",
+      "schema": { "type": "object", "additionalProperties": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "reportedExtra",
+      "schema": { "type": "object", "additionalProperties": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "customMetadata",
+      "schema": { "type": "object", "additionalProperties": true },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    }
+  ]
+}

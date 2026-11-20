@@ -108,7 +108,7 @@ export async function runAiChat(
   }
 
   // Tier 2: System AI Configuration Fallback (OpenAI / DeepSeek / external proxy)
-  const sysConfig = (await getDefaultConfig()) as Record<string, string> | null;
+  const sysConfig = await getDefaultConfig();
   if (sysConfig && sysConfig.baseUrl && sysConfig.apiKey) {
     const { baseUrl, apiKey, model: sysModel } = sysConfig;
     const targetModel = sysModel || "gpt-3.5-turbo";

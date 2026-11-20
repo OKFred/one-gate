@@ -1,0 +1,131 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/base/log-biz",
+  "mountRoute": false,
+  "embedded": true,
+  "readonly": true,
+  "auditFields": false,
+  "permissions": "none",
+  "permissionNamespace": "admin.base.log",
+  "api": {
+    "basePath": "/api/v1/admin/base/log/biz",
+    "summaries": {
+      "list": "业务日志列表"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": false,
+    "add": false,
+    "update": false,
+    "delete": false
+  },
+  "filters": {
+    "keyword": { "enabled": false },
+    "sortableFields": ["id", "namespace", "status", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": false, "get": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "hidden" }
+      }
+    },
+    {
+      "name": "namespace",
+      "schema": { "type": "string", "description": "命名空间" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "log.namespace",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "[${status}] ${namespace}" },
+        "filter": { "show": true, "type": "text", "transform": "emptyToUndefined" }
+      }
+    },
+    {
+      "name": "status",
+      "schema": { "type": ["boolean", "null"], "nullable": true, "description": "状态 (true成功, false失败)" },
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "columns.status",
+        "table": { "show": true, "renderer": "booleanText", "fallback": "-" },
+        "card": { "role": "hidden" }
+      }
+    },
+    {
+      "name": "payloadType",
+      "schema": { "type": "string", "description": "数据格式" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "log.payloadType",
+        "table": { "show": true },
+        "card": { "role": "content", "labelKey": "log.payloadType" }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "--" },
+        "card": { "role": "subtitle", "labelKey": "columns.createTime" }
+      }
+    },
+    {
+      "name": "logValue",
+      "schema": {
+        "type": ["object", "array", "string", "number", "boolean", "null"],
+        "additionalProperties": true,
+        "description": "明细内容"
+      },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "log.content",
+        "table": { "show": true, "renderer": "jsonText", "maxWidth": 360, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "log.content" }
+      }
+    },
+    {
+      "name": "tenantId",
+      "schema": { "type": ["number", "null"], "nullable": true, "description": "租户ID" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": [],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "creatorId",
+      "schema": { "type": "number", "description": "创建人ID" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "creatorName",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "创建人名称" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    }
+  ]
+}

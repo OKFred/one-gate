@@ -1,10 +1,36 @@
+import { createRequire } from "node:module";
 import { cloudflareTest } from "@cloudflare/vitest-pool-workers";
 import { defineConfig } from "vitest/config";
 import path from "path";
 import fs from "fs";
 
+function workersCjsRequirePgProtocolPlugin() {
+  return {
+    name: "workers-cjs-require-pg-protocol",
+    enforce: "pre" as const,
+    resolveId(
+      source: string,
+      importer: string | undefined,
+      options?: { custom?: Record<string, unknown> }
+    ): string | null {
+      const nodeResolve = options?.custom?.["node-resolve"] as
+        { isRequire?: boolean } | undefined;
+      if (!nodeResolve?.isRequire || !importer || source !== "pg-protocol") {
+        return null;
+      }
+      const cleanImporter = importer
+        .split("?")[0]
+        .replace(/^\/([A-Za-z]:\/)/, "$1");
+      return createRequire(cleanImporter)
+        .resolve("pg-protocol/dist/index.js")
+        .replace(/\\/g, "/");
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
+    workersCjsRequirePgProtocolPlugin(),
     cloudflareTest({
       remoteBindings: false,
       wrangler: { configPath: "./wrangler.jsonc" },

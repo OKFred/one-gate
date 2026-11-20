@@ -1,64 +1,31 @@
+import type { MailLogPOLike } from "./model";
+import type { FromSchema } from "json-schema-to-ts";
+import type { UserObj } from "@hodor/core/types/app";
+import { adminMailLogBackendSchemas } from "@hodor/contracts/resources";
 import {
-  IndexVO,
-  MailLogVO,
-  MailLogListVO,
-  MailLogAddVO,
-  MailLogListKeys,
-  MailLogDetailKeys,
-  MailLogGetKeys,
-  MailLogAddKeys,
-  MailLogSortableKeys,
-  type MailLogPOLike,
-  type MailLogVOLike,
-  type MailLogAddVOLike,
-  type MailLogGetVOLike,
-  MailLogBaseVO,
-} from "./model";
-import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
-import {
-  listAllReqBase,
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
-import {
-  bodyAdapter,
-  bodyUserAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
-import type { API } from "@hodor/core/middleware/encapsulation";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { registry } from "../../common/registry";
 
-const listAllReq = {
-  type: "object",
-  properties: {
-    ...listAllReqBase,
-    sendStatus: MailLogVO["sendStatus"],
-    templateId: { type: "string", description: "模板ID" },
-    startTimeUtc: { type: "number", description: "开始时间（UTC毫秒）" },
-    endTimeUtc: { type: "number", description: "结束时间（UTC毫秒）" },
-    orderBy: orderByWrapper<(keyof MailLogPOLike)[]>(MailLogSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
+const S = adminMailLogBackendSchemas;
 
-const listAllRes = {
-  type: "array",
-  items: {
-    type: "object",
-    properties: {
-      ...MailLogVO,
-    },
-    required: [
-      ...MailLogListKeys,
-    ] as const satisfies RequiredKeys<MailLogVOLike>[],
-  },
-} as const satisfies JSONSchema;
+interface BizLogSourceItem {
+  id: number;
+  logValue: unknown;
+  remark?: string | null;
+  creatorId: number;
+  creatorName?: string | null;
+  createTimeUtc: number;
+}
 
-function mapBizLogToMailLog(item: any): MailLogPOLike {
-  const val = item.logValue || {};
+function mapBizLogToMailLog(item: BizLogSourceItem): MailLogPOLike {
+  const val = (
+    typeof item.logValue === "object" && item.logValue !== null
+      ? item.logValue
+      : {}
+  ) as Partial<MailLogPOLike>;
   return {
     id: item.id,
     mailTo: val.mailTo ?? "",
@@ -66,7 +33,7 @@ function mapBizLogToMailLog(item: any): MailLogPOLike {
     title: val.title ?? "",
     templateId: val.templateId ?? null,
     templateParams: val.templateParams ?? null,
-    sendStatus: val.sendStatus ?? false,
+    sendStatus: Boolean(val.sendStatus),
     exceptionCode: val.exceptionCode ?? null,
     exceptionDetails: val.exceptionDetails ?? null,
     remark: item.remark ?? null,
@@ -76,9 +43,26 @@ function mapBizLogToMailLog(item: any): MailLogPOLike {
   };
 }
 
+function sortMailLogsByField(
+  rows: MailLogPOLike[],
+  orderBy: string,
+  descend: boolean
+) {
+  rows.sort((a, b) => {
+    if (orderBy === "mailTo" || orderBy === "mailFrom") {
+      return descend
+        ? b[orderBy].localeCompare(a[orderBy])
+        : a[orderBy].localeCompare(b[orderBy]);
+    }
+    const aNum = Number(a[orderBy as keyof MailLogPOLike] ?? 0);
+    const bNum = Number(b[orderBy as keyof MailLogPOLike] ?? 0);
+    return descend ? bNum - aNum : aNum - bNum;
+  });
+}
+
 async function onListAll(
-  params: FromSchema<typeof listAllReq>
-): Promise<FromSchema<typeof listAllRes>> {
+  params: FromSchema<typeof S.listAllReq>
+): Promise<FromSchema<typeof S.listAllRes>> {
   const {
     orderBy = "id",
     descend = true,
@@ -108,58 +92,15 @@ async function onListAll(
   const mappedList = list.map(mapBizLogToMailLog);
 
   if (orderBy && orderBy !== "id" && orderBy !== "createTimeUtc") {
-    mappedList.sort((a, b) => {
-      const aVal = a[orderBy] as any;
-      const bVal = b[orderBy] as any;
-      if (typeof aVal === "string" && typeof bVal === "string") {
-        return descend ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
-      }
-      return descend ? bVal - aVal : aVal - bVal;
-    });
+    sortMailLogsByField(mappedList, orderBy, descend);
   }
 
-  return mappedList as any;
+  return mappedList;
 }
 
-const listAllApi = {
-  req: listAllReq,
-  res: listAllRes,
-  pathInfo: {
-    path: "/list_all",
-    method: "post",
-    summary: "获取邮件日志全量列表",
-  } as const,
-  adapter: bodyAdapter,
-  service: onListAll,
-  permission: { action: "read" },
-} satisfies API;
-
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    sendStatus: MailLogVO["sendStatus"],
-    templateId: { type: "string", description: "模板ID" },
-    startTimeUtc: { type: "number", description: "开始时间（UTC毫秒）" },
-    endTimeUtc: { type: "number", description: "结束时间（UTC毫秒）" },
-    orderBy: orderByWrapper<(keyof MailLogPOLike)[]>(MailLogSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<MailLogVOLike>[]>(
-    {
-      ...MailLogVO,
-    },
-    [...MailLogListKeys]
-  ),
-} as const satisfies JSONSchema;
-
 async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
   const {
     orderBy = "id",
     descend = true,
@@ -191,58 +132,17 @@ async function onList(
   const mappedList = list.map(mapBizLogToMailLog);
 
   if (orderBy && orderBy !== "id" && orderBy !== "createTimeUtc") {
-    mappedList.sort((a, b) => {
-      const aVal = a[orderBy] as any;
-      const bVal = b[orderBy] as any;
-      if (typeof aVal === "string" && typeof bVal === "string") {
-        return descend ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
-      }
-      return descend ? bVal - aVal : aVal - bVal;
-    });
+    sortMailLogsByField(mappedList, orderBy, descend);
   }
 
-  return {
-    total,
-    totalPage: Math.ceil(total / finalPageSize),
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list: mappedList as any,
-  };
+  return buildPagedListResult(mappedList, total, pageNo, finalPageSize);
 }
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取邮件日志列表",
-  } as const,
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
-
-const addReq = {
-  type: "object",
-  properties: {
-    ...MailLogAddVO,
-  },
-  required: [
-    ...MailLogAddKeys,
-  ] as const satisfies RequiredKeys<MailLogAddVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const addRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onAdd(
-  obj: FromSchema<typeof addReq>,
+  obj: FromSchema<typeof S.addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
-  const creatorId = userObj.id || (userObj as any).userId;
+): Promise<number> {
+  const creatorId = userObj.id || userObj.userId;
   const username = userObj.username;
   const { remark, ...logValue } = obj;
 
@@ -252,80 +152,48 @@ async function onAdd(
     namespace: "mail",
     status: !obj.exceptionCode && Boolean(obj.sendStatus),
     payloadType: "json",
-    logValue: logValue,
-    remark: remark,
+    logValue,
+    remark,
     creatorId,
     creatorName,
   });
 
-  return insertedId || null;
+  if (!insertedId) {
+    throw new Error("添加邮件日志失败");
+  }
+  return insertedId;
 }
 
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加邮件日志",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
-
-const getReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...MailLogGetKeys,
-  ] as const satisfies RequiredKeys<MailLogGetVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const getRes = {
-  type: "object",
-  properties: {
-    ...MailLogVO,
-  },
-  required: [
-    ...MailLogDetailKeys,
-  ] as const satisfies RequiredKeys<MailLogVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 async function onGet(
-  obj: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes> | null> {
+  obj: FromSchema<typeof S.getReq>
+): Promise<FromSchema<typeof S.getRes>> {
   const { id } = obj;
   const row = await registry.base.log.biz.detail(id);
   preventEmpty(row);
 
   if (row.namespace !== "mail") {
-    return null;
+    throw new Error("邮件日志不存在");
   }
 
-  return mapBizLogToMailLog(row) as any;
+  return mapBizLogToMailLog(row);
 }
 
-const getApi = {
-  req: getReq,
-  res: getRes,
-  pathInfo: {
-    path: "/get",
-    method: "post",
+export default createCrudApis(S, {
+  listAll: {
+    path: "/list_all",
+    summary: "获取邮件日志全量列表",
+    handler: onListAll,
+  },
+  list: {
+    summary: "获取邮件日志列表",
+    handler: onList,
+  },
+  add: {
+    summary: "添加邮件日志",
+    handler: onAdd,
+  },
+  get: {
     summary: "获取邮件日志",
-  } as const,
-  adapter: bodyAdapter,
-  service: onGet,
-  permission: { action: "read" },
-} satisfies API;
-
-export default {
-  listAll: listAllApi,
-  list: listApi,
-  add: addApi,
-  get: getApi,
-};
+    handler: onGet,
+  },
+});
