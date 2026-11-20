@@ -1,31 +1,12 @@
 import { getTranslation } from "@hodor/core/utils/i18n/shared";
-import {
-  IndexVO,
-  CronVO,
-  CronListVO,
-  CronAddVO,
-  CronUpdateVO,
-  CronListKeys,
-  CronDetailKeys,
-  CronGetKeys,
-  CronDeleteKeys,
-  CronAddKeys,
-  CronUpdateKeys,
-  CronSortableKeys,
-  type CronPOLike,
-  type CronVOLike,
-  type CronAddVOLike,
-  type CronUpdateVOLike,
-  type CronDeleteVOLike,
-  type CronGetVOLike,
-} from "./model";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
+import type { UserObj } from "@hodor/core/types/app";
+import { adminMaintenanceCronBackendSchemas } from "@hodor/contracts/resources";
 import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
+import { listReqBase } from "@hodor/core/middleware/encapsulation/common.schema";
 import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import {
@@ -36,31 +17,12 @@ import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { CronExpressionParser } from "cron-parser";
 import * as cronRepository from "./repository";
 
-//----------------- 1. 获取任务列表 ----------------//
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    status: { type: "boolean", description: "状态" },
-    orderBy: orderByWrapper<(keyof CronPOLike)[]>(CronSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<CronPOLike>[]>(
-    {
-      ...CronListVO,
-    },
-    [...CronListKeys]
-  ),
-} as const satisfies JSONSchema;
+const S = adminMaintenanceCronBackendSchemas;
 
 async function onList(
-  params: FromSchema<typeof listReq>,
-  userObj?: UserObj
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>,
+  _userObj?: UserObj
+): Promise<FromSchema<typeof S.listRes>> {
   const {
     orderBy = "id",
     descend = true,
@@ -75,65 +37,31 @@ async function onList(
   const { total, list } = await cronRepository.findPage({
     pageNo,
     pageSize: finalPageSize,
-    orderBy: orderBy as keyof CronPOLike,
+    orderBy,
     descend,
     keyword,
     status,
   });
 
-  const totalPage = Math.ceil(total / finalPageSize);
-  return {
-    total,
-    totalPage,
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list,
-  };
+  return buildPagedListResult(list, total, pageNo, finalPageSize);
 }
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取定时任务列表",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
-
-//----------------- 2. 新增任务 ----------------//
-const addReq = {
-  type: "object",
-  properties: {
-    ...CronAddVO,
-  } satisfies Partial<Record<keyof CronAddVOLike, JSONSchema>>,
-  required: [...CronAddKeys] as const satisfies RequiredKeys<CronAddVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const addRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onAdd(
-  params: FromSchema<typeof addReq>,
+  params: FromSchema<typeof S.addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
+): Promise<number | null> {
   const { userId: creatorId } = userObj;
   const { jobKey, name, cronExpression, status = true, parameters } = params;
 
-  // 验证 Cron 表达式是否合法，并计算初始下次运行时间
   let nextRunTimeUtc: number | null = null;
   if (status === true) {
     try {
       const interval = CronExpressionParser.parse(cronExpression);
       nextRunTimeUtc = interval.next().toDate().getTime();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
       throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-        message: `无效的 Cron 表达式: ${err.message}`,
+        message: `无效的 Cron 表达式: ${msg}`,
       });
     }
   }
@@ -150,47 +78,16 @@ async function onAdd(
   });
 }
 
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加定时任务",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
-
-//----------------- 3. 更新任务 ----------------//
-const updateReq = {
-  type: "object",
-  properties: {
-    ...CronUpdateVO,
-  },
-  required: [
-    ...CronUpdateKeys,
-  ] as const satisfies RequiredKeys<CronUpdateVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const updateRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof updateRes> | null> {
+): Promise<number> {
   const { userId: updaterId } = userObj;
   const { id, jobKey, name, cronExpression, status, parameters } = params;
 
-  // 前置校验任务是否存在
   const row = await cronRepository.findById(id);
   preventEmpty(row);
 
-  // 如果更新了 cron 表达式或者状态，需要重新计算下次运行时间
   let nextRunTimeUtc = row.nextRunTimeUtc;
   const targetCron =
     cronExpression !== undefined ? cronExpression : row.cronExpression;
@@ -200,9 +97,10 @@ async function onUpdate(
     try {
       const interval = CronExpressionParser.parse(targetCron);
       nextRunTimeUtc = interval.next().toDate().getTime();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
       throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-        message: `无效的 Cron 表达式: ${err.message}`,
+        message: `无效的 Cron 表达式: ${msg}`,
       });
     }
   } else {
@@ -225,105 +123,30 @@ async function onUpdate(
   return updateRow.id;
 }
 
-const updateApi = {
-  req: updateReq,
-  res: updateRes,
-  pathInfo: {
-    path: "/update",
-    method: "post",
-    summary: "更新定时任务",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
-
-//----------------- 4. 删除任务 ----------------//
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...CronDeleteKeys,
-  ] as const satisfies RequiredKeys<CronDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onDelete(
-  params: FromSchema<typeof deleteReq>,
-  userObj: UserObj
-): Promise<FromSchema<typeof deleteRes> | null> {
+  params: FromSchema<typeof S.deleteReq>,
+  _userObj: UserObj
+): Promise<number> {
   const { id } = params;
 
   const row = await cronRepository.findById(id);
   preventEmpty(row);
 
-  // 执行级联删除
   const deleteRow = await cronRepository.onDelete(id);
   preventEmpty(deleteRow);
 
   return deleteRow.id;
 }
 
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除定时任务",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
-
-//----------------- 5. 获取任务详情 ----------------//
-const getReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [...CronGetKeys] as const satisfies RequiredKeys<CronGetVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const getRes = {
-  type: "object",
-  properties: {
-    ...CronVO,
-  },
-  required: [...CronDetailKeys] as const satisfies RequiredKeys<CronVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 async function onGet(
-  params: FromSchema<typeof getReq>,
-  userObj?: UserObj
-): Promise<FromSchema<typeof getRes> | null> {
+  params: FromSchema<typeof S.getReq>,
+  _userObj?: UserObj
+): Promise<FromSchema<typeof S.getRes>> {
   const { id } = params;
   const row = await cronRepository.findById(id);
   preventEmpty(row);
   return row;
 }
-
-const getApi = {
-  req: getReq,
-  res: getRes,
-  pathInfo: {
-    path: "/get",
-    method: "post",
-    summary: "获取定时任务信息",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onGet,
-  permission: { action: "read" },
-} satisfies API;
 
 //----------------- 6. 获取任务运行日志 ----------------//
 const listLogsReq = {
@@ -375,7 +198,7 @@ const listLogsRes = {
 
 async function onListLogs(
   params: FromSchema<typeof listLogsReq>,
-  userObj?: UserObj
+  _userObj?: UserObj
 ): Promise<FromSchema<typeof listLogsRes>> {
   const { jobId, pageNo = 1, pageSize = 10 } = params;
   const maxPageSize = 1000;
@@ -387,14 +210,7 @@ async function onListLogs(
     pageSize: finalPageSize,
   });
 
-  const totalPage = Math.ceil(total / finalPageSize);
-  return {
-    total,
-    totalPage,
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list,
-  };
+  return buildPagedListResult(list, total, pageNo, finalPageSize);
 }
 
 const listLogsApi = {
@@ -444,7 +260,6 @@ async function onParse(
   try {
     const interval = CronExpressionParser.parse(cronExpression);
 
-    // 取未来 5 次的执行时间
     const nextDates: Date[] = [];
     for (let i = 0; i < 5; i++) {
       nextDates.push(interval.next().toDate());
@@ -455,7 +270,6 @@ async function onParse(
       return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
     });
 
-    // 计算频率提示
     const lang = userObj?.langCode || "zh-CN";
     let frequency = await getTranslation(lang, "cron.frequency.custom");
 
@@ -502,10 +316,12 @@ async function onParse(
       frequency,
       nextTimes,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       valid: false,
-      error: err.message || "无效的 Cron 表达式",
+      error:
+        (err instanceof Error ? err.message : String(err)) ||
+        "无效的 Cron 表达式",
       frequency: "无法解析频率",
       nextTimes: [],
     };
@@ -525,13 +341,26 @@ const parseApi = {
   permission: false,
 } satisfies API;
 
-//----------------- 统一导出 ----------------//
-export default {
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  delete: deleteApi,
-  get: getApi,
-  listLogs: listLogsApi,
-  parse: parseApi,
-};
+export default createCrudApis(S, {
+  list: {
+    adapter: bodyUserAdapter,
+    summary: "获取定时任务列表",
+    handler: onList,
+  },
+  add: { summary: "添加定时任务", handler: onAdd },
+  update: { summary: "更新定时任务", handler: onUpdate },
+  delete: {
+    adapter: bodyUserAdapter,
+    summary: "删除定时任务",
+    handler: onDelete,
+  },
+  get: {
+    adapter: bodyUserAdapter,
+    summary: "获取定时任务信息",
+    handler: onGet,
+  },
+  extra: {
+    listLogs: listLogsApi,
+    parse: parseApi,
+  },
+});

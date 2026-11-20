@@ -1,31 +1,13 @@
 import { registry } from "../../common/registry.js";
 import { can } from "@hodor/core/middleware/auth/permission";
-import {
-  IndexVO,
-  SchemaFormVO,
-  SchemaFormListVO,
-  SchemaFormAddVO,
-  SchemaFormUpdateVO,
-  SchemaFormListKeys,
-  SchemaFormDetailKeys,
-  SchemaFormDeleteKeys,
-  SchemaFormAddKeys,
-  SchemaFormUpdateKeys,
-  SchemaFormSortableKeys,
-  SchemaFormGetVO,
-  type SchemaFormPOLike,
-  type SchemaFormVOLike,
-  type SchemaFormAddVOLike,
-  type SchemaFormUpdateVOLike,
-  type SchemaFormDeleteVOLike,
-} from "./model";
+import { SchemaFormVO, SchemaFormDetailKeys, SchemaFormGetVO } from "./model";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
+import type { UserObj } from "@hodor/core/types/app";
+import { adminDataSchemaFormBackendSchemas } from "@hodor/contracts/resources";
 import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import {
   bodyAdapter,
   bodyUserAdapter,
@@ -39,29 +21,11 @@ import {
 } from "@hodor/core/utils/schemaRegistry";
 import { mergeSchemaSources } from "./schema-source";
 
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    isEnabled: SchemaFormVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof SchemaFormPOLike)[]>(SchemaFormSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<SchemaFormPOLike>[]>(
-    {
-      ...SchemaFormListVO,
-    },
-    [...SchemaFormListKeys]
-  ),
-} as const satisfies JSONSchema;
+const S = adminDataSchemaFormBackendSchemas;
 
 async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
@@ -74,97 +38,43 @@ async function onList(
     pageSize: finalPageSize,
   });
 
-  const totalPage = Math.ceil(total / finalPageSize);
-  return {
+  return buildPagedListResult(
+    list.map((row) => ({
+      ...row,
+      source: row.source as "system" | "user",
+    })),
     total,
-    totalPage,
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list,
-  };
+    pageNo,
+    finalPageSize
+  );
 }
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取动态表单列表",
-  } as const,
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
-
-const addReq = {
-  type: "object",
-  properties: {
-    ...SchemaFormAddVO,
-  } satisfies Partial<Record<keyof SchemaFormAddVOLike, JSONSchema>>,
-  required: [
-    ...SchemaFormAddKeys,
-  ] as const satisfies RequiredKeys<SchemaFormAddVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const addRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onAdd(
-  params: FromSchema<typeof addReq>,
+  params: FromSchema<typeof S.addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
+): Promise<number> {
   const { userId: creatorId } = userObj;
   const creatorName = await registry.system.getUserNameById(creatorId);
 
-  const updateData = {
+  const insertData = {
     ...params,
+    uiSchemaData: params.uiSchemaData ?? null,
+    remark: params.remark ?? null,
     source: params.source ?? "user",
     creatorId,
     creatorName,
   };
-  const insertedId = await schemaFormRepository.onInsert(updateData);
+  const insertedId = await schemaFormRepository.onInsert(insertData);
   return insertedId;
 }
 
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加动态表单",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
-
-const updateReq = {
-  type: "object",
-  properties: {
-    ...SchemaFormUpdateVO,
-  },
-  required: [
-    ...SchemaFormUpdateKeys,
-  ] as const satisfies RequiredKeys<SchemaFormUpdateVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const updateRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof updateRes> | null> {
+): Promise<number> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
 
-  // 获取当前记录
   const currentForm = await schemaFormRepository.findById(id);
   preventEmpty(currentForm);
   const updaterName = await registry.system.getUserNameById(updaterId);
@@ -179,56 +89,13 @@ async function onUpdate(
   return updatedId;
 }
 
-const updateApi = {
-  req: updateReq,
-  res: updateRes,
-  pathInfo: {
-    path: "/update",
-    method: "post",
-    summary: "更新动态表单",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
-
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...SchemaFormDeleteKeys,
-  ] as const satisfies RequiredKeys<SchemaFormDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onDelete(
-  params: FromSchema<typeof deleteReq>
-): Promise<FromSchema<typeof deleteRes> | null> {
+  params: FromSchema<typeof S.deleteReq>
+): Promise<number> {
   const { id } = params;
-  if (id === undefined) return null;
-
   const deletedId = await schemaFormRepository.onDelete(id);
   return deletedId;
 }
-
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除动态表单",
-  } as const,
-  adapter: bodyAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
 
 const getReq = {
   type: "object",
@@ -244,9 +111,7 @@ const getRes = {
   properties: {
     ...SchemaFormVO,
   },
-  required: [
-    ...SchemaFormDetailKeys,
-  ] as const satisfies RequiredKeys<SchemaFormVOLike>[],
+  required: [...SchemaFormDetailKeys] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -261,7 +126,10 @@ async function onGet(
     row = await schemaFormRepository.findByCode(code);
   }
   preventEmpty(row);
-  return row as unknown as FromSchema<typeof getRes>;
+  return {
+    ...row,
+    source: row.source as "system" | "user",
+  };
 }
 
 const getApi = {
@@ -370,7 +238,6 @@ async function onBatchGet(
 
   const currentVersion = getVersionHash();
 
-  // 版本号一致，返回 notModified
   if (clientVersion && clientVersion === currentVersion) {
     return {
       schemas: {},
@@ -379,7 +246,6 @@ async function onBatchGet(
     };
   }
 
-  // 鉴权检查：如果是系统资源前缀，校验是否有模块的 read 权限
   const isSystem = /^(admin|enterprise)(\.|$)/.test(prefix);
   if (isSystem) {
     const hasPerm = await can(userObj, "read", prefix);
@@ -392,14 +258,12 @@ async function onBatchGet(
     }
   }
 
-  // 运行时 Registry 保证系统 Schema 随代码发布即可用；D1 同名数据保持热修复优先级。
   const registeredSchemas = getSchemasByPrefix(prefix);
   const rows = await schemaFormRepository.findByPrefix(prefix);
   const mergedSchemas = mergeSchemaSources(registeredSchemas, rows);
 
   const schemas: Record<string, string> = {};
   for (const [code, schemaData] of mergedSchemas) {
-    // 权限校验过滤：只返回用户拥有权限的 schema
     if (
       isSystem &&
       !hasPermissionForSchema(code, userObj.permissions, userObj.isSuperAdmin)
@@ -429,11 +293,13 @@ const batchGetApi = {
   permission: false as const,
 } satisfies API;
 
-export default {
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  delete: deleteApi,
-  get: getApi,
-  batch_get: batchGetApi,
-};
+export default createCrudApis(S, {
+  list: { summary: "获取动态表单列表", handler: onList },
+  add: { summary: "添加动态表单", handler: onAdd },
+  update: { summary: "更新动态表单", handler: onUpdate },
+  delete: { summary: "删除动态表单", handler: onDelete },
+  extra: {
+    get: getApi,
+    batch_get: batchGetApi,
+  },
+});

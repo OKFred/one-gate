@@ -1,0 +1,128 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/mobile/app",
+  "cardMode": "none",
+  "api": {
+    "summaries": {
+      "list": "分页获取移动应用",
+      "get": "获取应用详情",
+      "add": "添加移动应用",
+      "update": "更新移动应用",
+      "delete": "删除移动应用"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "column.keyword",
+      "placeholderKey": "common.searchPlaceholder",
+      "transform": "emptyToUndefined"
+    },
+    "sortableFields": ["id", "packageName", "name", "isEnabled", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "应用名称",
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "mobile.app.appName",
+        "table": { "show": true },
+        "form": { "show": true, "widget": "text", "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "packageName",
+      "schema": {
+        "type": "string",
+        "description": "包名 (唯一, 如 org.autojs.autojs6)",
+        "maxLength": 255
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "mobile.app.packageName",
+        "table": { "show": true },
+        "form": { "show": true, "widget": "text", "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "iconUrl",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "图标 (支持 Base64 与普通 URL 链接)"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "table": false,
+        "form": false
+      }
+    },
+    {
+      "name": "description",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "描述",
+        "maxLength": 500
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "table": false,
+        "form": false
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false, "listFilter": true },
+      "ui": {
+        "table": false,
+        "filter": false,
+        "form": { "show": true, "widget": "switch", "defaultValue": true }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "ui": {
+        "table": { "show": true, "renderer": "datetime", "format": "YYYY-MM-DD HH:mm:ss" },
+        "form": false
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": [],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "form": { "show": true, "widget": "textarea", "rows": 3, "defaultValue": null }
+      }
+    }
+  ]
+}

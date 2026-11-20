@@ -1,0 +1,220 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/data/schema_form",
+  "permissions": "none",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取动态表单列表",
+      "get": "获取动态表单信息",
+      "add": "添加动态表单",
+      "update": "更新动态表单",
+      "delete": "删除动态表单"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "name", "code", "isEnabled", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": false
+      }
+    },
+    {
+      "name": "code",
+      "schema": {
+        "type": "string",
+        "description": "表单唯一标识",
+        "examples": ["survey_01"],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "schemaForm.fields.code",
+        "table": { "show": true },
+        "card": { "role": "subtitle", "labelKey": "schemaForm.fields.code" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 6,
+          "required": true,
+          "disabledWhen": "edit",
+          "placeholderKey": "schemaForm.fields.codePlaceholder",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "表单名称",
+        "examples": ["用户调查问卷"],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "schemaForm.fields.name",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${name}" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 6,
+          "required": true,
+          "placeholderKey": "schemaForm.fields.namePlaceholder",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "schemaData",
+      "schema": {
+        "type": "string",
+        "description": "JSON Schema 字符串"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "schemaForm.fields.schemaData",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 10,
+          "required": true,
+          "placeholder": "{\"type\": \"object\", \"properties\": { ... }}",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "uiSchemaData",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "UI Schema 字符串"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "schemaForm.fields.uiSchemaData",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 4,
+          "placeholder": "{\"ui:order\": [\"field1\", \"field2\"]}",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 2,
+          "placeholderKey": "schemaForm.fields.remarkPlaceholder",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false, "listFilter": true },
+      "ui": {
+        "labelKey": "status.enabled",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "error",
+          "variant": "outlined"
+        },
+        "card": {
+          "role": "tag",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "error"
+        },
+        "filter": false,
+        "form": { "show": true, "widget": "switch", "defaultValue": true }
+      }
+    },
+    {
+      "name": "source",
+      "schema": {
+        "type": "string",
+        "description": "来源类型",
+        "enum": ["system", "user"]
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "creatorName",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "创建人姓名"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "updaterName",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "更新人姓名"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    }
+  ]
+}

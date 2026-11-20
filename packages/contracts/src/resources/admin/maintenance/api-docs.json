@@ -1,0 +1,189 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/maintenance/api-docs",
+  "permissionNamespace": "admin.maintenance.api_docs",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取 API 文档列表",
+      "add": "上传/添加 API 文档",
+      "update": "更新 API 文档",
+      "delete": "删除 API 文档",
+      "get": "获取 API 文档详情"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "apiDocs.filter.keywordPlaceholder"
+    },
+    "sortableFields": ["id", "name", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": false
+      }
+    },
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "文档名称",
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiDocs.field.name",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${name}" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 5,
+          "required": true,
+          "placeholderKey": "form.pleaseEnter",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "version",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "文档版本",
+        "maxLength": 50
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiDocs.field.version",
+        "table": { "show": true, "fallback": "1.0.0" },
+        "card": { "role": "subtitle", "labelKey": "apiDocs.field.version" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 3,
+          "required": true,
+          "placeholder": "e.g. 1.0.0",
+          "defaultValue": "1.0.0"
+        }
+      }
+    },
+    {
+      "name": "docType",
+      "schema": {
+        "type": "string",
+        "description": "文档类型",
+        "enum": ["swagger2.0", "openapi3.0", "openapi3.1"]
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiDocs.field.docType",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "outlined",
+          "options": [
+            { "value": "swagger2.0", "label": "Swagger 2.0", "color": "primary" },
+            { "value": "openapi3.0", "label": "OpenAPI 3.0", "color": "secondary" },
+            { "value": "openapi3.1", "label": "OpenAPI 3.1", "color": "info" }
+          ]
+        },
+        "card": { "role": "tag", "variant": "outlined" },
+        "form": {
+          "show": true,
+          "widget": "select",
+          "span": 4,
+          "required": true,
+          "defaultValue": "openapi3.0",
+          "options": [
+            { "value": "swagger2.0", "label": "Swagger 2.0" },
+            { "value": "openapi3.0", "label": "OpenAPI 3.0" },
+            { "value": "openapi3.1", "label": "OpenAPI 3.1" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "description",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "文档描述",
+        "maxLength": 500
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiDocs.field.description",
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "apiDocs.field.description", "fallback": "" },
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 2,
+          "placeholderKey": "form.pleaseEnter",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "content",
+      "schema": {
+        "type": "string",
+        "description": "文档内容 (JSON 字符串)"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "apiDocs.field.content",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "code",
+          "theme": "dark",
+          "rows": 10,
+          "required": true,
+          "placeholderKey": "apiDocs.form.contentPlaceholder",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": false
+      }
+    }
+  ]
+}

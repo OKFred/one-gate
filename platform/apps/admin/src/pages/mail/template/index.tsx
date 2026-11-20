@@ -1,63 +1,129 @@
-import { THIS_PERMISSION } from './constant';
-import { useState } from 'react';
-import { SchemaCrudPage } from '@/components/Crud';
-import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
-import { tableConfig, type TemplateRes, type TableExtraContext } from './components/TheTable';
-import { formConfig } from './components/TheForm';
+import { Suspense, lazy, useState } from 'react';
+import { Box, Chip, CircularProgress, Tooltip, Typography } from '@mui/material';
+import { Visibility as VisibilityIcon } from '@mui/icons-material';
+import dayjs from 'dayjs';
+import { adminMailTemplateContract } from '@hodor/contracts/resources';
+import { ContractCrudPage, type CrudExtensions } from '@/components/Crud/contract';
+import type { ListMailTemplateRes } from '@/api/admin/mail/type';
 import ThePreview from './components/ThePreview';
-import * as MailTemplateAPI from '@/api/admin/mail/template';
-import type { ListMailTemplateReq } from '@/api/admin/mail/type';
-import type { SchemaCrudConfig } from '@/components/Crud';
+
+const JoditEditor = lazy(() => import('@/components/JoditEditor/index'));
+
+type TemplateRecord = NonNullable<ListMailTemplateRes['list']>[number] & Record<string, unknown>;
+
+function truncateText(text?: string | null, maxLength = 50): string {
+  if (!text) return '-';
+  return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+}
+
+function stripHtml(html?: string | null): string {
+  if (!html) return '-';
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || '';
+  } catch {
+    return html;
+  }
+}
 
 export default function MailTemplatePage() {
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewData, setPreviewData] = useState<TemplateRes | null>(null);
+  const [previewData, setPreviewData] = useState<TemplateRecord | null>(null);
 
-  const openPreview = (row: TemplateRes) => {
-    setPreviewData(row);
-    setPreviewOpen(true);
-  };
-
-  const extraContext: TableExtraContext = {
-    openPreview,
-  };
-
-  const config: SchemaCrudConfig<TemplateRes, FilterState, ListMailTemplateReq, TableExtraContext> =
-    {
-      apiKeyName: 'id',
-      permissions: {
-        add: [THIS_PERMISSION.add],
-        edit: [THIS_PERMISSION.edit],
-        delete: [THIS_PERMISSION.delete],
+  const extensions: CrudExtensions<TemplateRecord> = {
+    customCells: {
+      title: (row) => (
+        <Tooltip title={row.title || ''}>
+          <span>{truncateText(row.title, 30)}</span>
+        </Tooltip>
+      ),
+      name: (row) => (
+        <Tooltip title={row.name || ''}>
+          <span>{truncateText(row.name, 20)}</span>
+        </Tooltip>
+      ),
+      content: (row) => truncateText(stripHtml(row.content), 40),
+    },
+    customCardFields: (translate) => [
+      { type: 'title', render: (row) => row.title },
+      {
+        type: 'subtitle',
+        label: `ID: ${translate('template.table.name')}`,
+        render: (row) => `${row.id} | ${row.name}`,
       },
-      api: {
-        list: MailTemplateAPI.listFn,
-        add: MailTemplateAPI.addFn,
-        update: MailTemplateAPI.updateFn,
-        delete: MailTemplateAPI.deleteFn,
+      {
+        type: 'content',
+        label: translate('dialog.title.preview'),
+        render: (row) => truncateText(stripHtml(row.content), 100),
       },
-      filter: {
-        defaultFilters,
-        fields: filterConfig.fields,
-        transformRequest: (filters) =>
-          ({
-            keyword: filters.keyword || undefined,
-            orderBy: filters.orderBy,
-            descend: filters.descend,
-          }) as ListMailTemplateReq,
+      {
+        type: 'content',
+        label: translate('columns.createTime'),
+        render: (row) =>
+          row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '-',
       },
-      table: {
-        columns: tableConfig.columns,
-        cardFields: tableConfig.cardFields,
-        actions: tableConfig.actions,
+      {
+        type: 'content',
+        label: translate('column.remark'),
+        render: (row) => row.remark || '-',
       },
-      form: formConfig,
-    };
-
-  return (
-    <>
-      <SchemaCrudPage config={config} extraContext={extraContext} />
+      {
+        type: 'tags',
+        render: (row) => (
+          <>
+            {row.langCode && <Chip label={row.langCode} color="info" size="small" />}
+            {row.category && <Chip label={row.category} color="secondary" size="small" />}
+          </>
+        ),
+      },
+    ],
+    rowActions: () => [
+      {
+        key: 'preview',
+        color: 'info',
+        icon: <VisibilityIcon />,
+        onClick: (row) => {
+          setPreviewData(row);
+          setPreviewOpen(true);
+        },
+      },
+    ],
+    customFormFields: {
+      content: (ctx) => (
+        <Box>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 500 }}>
+            {ctx.t('template.table.contentLabel')}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {ctx.t('template.table.contentHelp')}
+          </Typography>
+          <Suspense
+            fallback={
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress />
+              </Box>
+            }
+          >
+            <JoditEditor
+              value={typeof ctx.form.content === 'string' ? ctx.form.content : ''}
+              onChange={(html) => ctx.setForm((prev) => ({ ...prev, content: html }))}
+              placeholder={ctx.t('form.pleaseEnter')}
+              height={ctx.isMobile ? 300 : 450}
+            />
+          </Suspense>
+        </Box>
+      ),
+    },
+    beforeSubmitAsync: (form, isEdit) => ({
+      ...form,
+      langCode: form.langCode || (isEdit ? undefined : ''),
+      category: form.category || '',
+      remark: form.remark ?? null,
+    }),
+    dialogs: () => (
       <ThePreview open={previewOpen} onClose={() => setPreviewOpen(false)} template={previewData} />
-    </>
-  );
+    ),
+  };
+
+  return <ContractCrudPage contract={adminMailTemplateContract} extensions={extensions} />;
 }

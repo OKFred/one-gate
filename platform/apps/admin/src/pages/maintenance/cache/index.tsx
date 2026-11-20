@@ -1,98 +1,53 @@
-import { THIS_PERMISSION } from './constant';
-import { useState, useMemo } from 'react';
-import { SchemaCrudPage } from '@/components/Crud';
+import { useState } from 'react';
 import { Visibility as ViewIcon } from '@mui/icons-material';
+import { adminMaintenanceCacheContract } from '@hodor/contracts/resources';
+import { ContractCrudPage, type CrudExtensions } from '@/components/Crud/contract';
+import { permissions } from '@/hooks/usePermission';
 import * as CacheAPI from '@/api/admin/maintenance/cache';
 import type { ListKeysRes } from '@/api/admin/maintenance/type';
-import type { SchemaCrudConfig } from '@/components/Crud';
 import TheDetail from './components/TheDetail';
 
-type CacheRow = NonNullable<ListKeysRes['keys']>[number];
-
-export interface CacheContext {
-  onPreview: (row: CacheRow) => void;
-}
+type CacheRow = NonNullable<ListKeysRes['keys']>[number] & Record<string, unknown>;
 
 export default function CacheManagementPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewRow, setPreviewRow] = useState<CacheRow | null>(null);
 
-  const extraContext = useMemo<CacheContext>(
-    () => ({
-      onPreview: (row) => {
-        setPreviewRow(row);
-        setPreviewOpen(true);
-      },
-    }),
-    [],
-  );
-
-  const config: SchemaCrudConfig<CacheRow, { prefix: string }, { prefix?: string }, CacheContext> =
-    {
-      apiKeyName: 'name',
-      permissions: {},
-      api: {
-        list: async (args) => {
-          const prefix = args.data?.prefix || undefined;
-          const res = await CacheAPI.listKeysFn({ data: { prefix, limit: 1000 } });
-          const keysList = res.data?.data?.keys || [];
-          return {
-            data: {
-              data: {
-                list: keysList,
-                total: keysList.length,
-              },
-            },
-          } as unknown as ReturnType<
-            NonNullable<
-              SchemaCrudConfig<CacheRow, { prefix: string }, { prefix?: string }>['api']['list']
-            >
-          >;
+  const extensions: CrudExtensions<CacheRow> = {
+    listAdapter: async (args) => {
+      const prefix =
+        typeof args.data?.prefix === 'string' && args.data.prefix ? args.data.prefix : undefined;
+      const res = await CacheAPI.listKeysFn({
+        data: { prefix, limit: 1000 },
+        errorPresentation: args.errorPresentation,
+      });
+      const keysList = (res.data?.data?.keys ?? []) as CacheRow[];
+      return {
+        data: {
+          ok: true,
+          data: {
+            list: keysList,
+            total: keysList.length,
+          },
         },
-        delete: (args) => {
-          return CacheAPI.deleteFn({ data: { key: String(args.data.id) } });
+      };
+    },
+    mutationAdapter: {
+      delete: (args) => CacheAPI.deleteFn({ data: { key: String(args.data.id) } }),
+    },
+    rowActions: () => [
+      {
+        key: 'view',
+        color: 'info',
+        icon: <ViewIcon />,
+        permissionCodes: [permissions.admin.maintenance.cache.view],
+        onClick: (row) => {
+          setPreviewRow(row);
+          setPreviewOpen(true);
         },
       },
-      filter: {
-        defaultFilters: { prefix: '' },
-        fields: (t) => [
-          {
-            name: 'prefix',
-            label: t('cache.filter.keyPrefix'),
-            type: 'text',
-            placeholder: t('cache.filter.keyPrefixPlaceholder'),
-            sx: { width: '100%' },
-          },
-        ],
-        transformRequest: (filters) => ({
-          prefix: filters.prefix || undefined,
-        }),
-      },
-      table: {
-        columns: (t) => [{ title: t('cache.columns.key'), render: (row) => row.name }],
-        cardFields: (t) => [{ label: t('cache.columns.key'), render: (row) => row.name }],
-        actions: (_, context) => [
-          {
-            key: 'view',
-            color: 'info',
-            icon: <ViewIcon />,
-            permissionCodes: [THIS_PERMISSION.view],
-            onClick: (row) => {
-              context?.onPreview(row);
-            },
-          },
-        ],
-      },
-      form: {
-        schema: { type: 'object' },
-        defaultForm: {},
-      },
-    };
-
-  return (
-    <>
-      <SchemaCrudPage config={config} extraContext={extraContext} />
-
+    ],
+    dialogs: () => (
       <TheDetail
         open={previewOpen}
         onClose={() => {
@@ -101,6 +56,8 @@ export default function CacheManagementPage() {
         }}
         cacheKey={previewRow?.name || ''}
       />
-    </>
-  );
+    ),
+  };
+
+  return <ContractCrudPage contract={adminMaintenanceCacheContract} extensions={extensions} />;
 }

@@ -27,12 +27,14 @@ import { showConfirm, showSnackbar } from '@/components/Notification';
 import { ResponsiveButton } from '@/components/Responsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
-import { THIS_PERMISSION } from '../constant';
+import { permissions } from '@/hooks/usePermission';
 import {
   parseDeviceOpsArtifactFrame,
   sha256Hex,
   type DeviceOpsArtifactHeader,
 } from './device-ops-artifact';
+
+const THIS_PERMISSION = permissions.admin.mobile.device;
 
 const AUDIO_STREAMS = [
   'media',

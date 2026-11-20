@@ -40,11 +40,13 @@ import { showConfirm, showSnackbar } from '@/components/Notification';
 import { ResponsiveButton } from '@/components/Responsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
-import { THIS_PERMISSION } from '../constant';
+import { permissions } from '@/hooks/usePermission';
 import { ClientDeploymentPanel } from './ClientDeploymentPanel';
 import { DeviceOpsPanel } from './DeviceOpsPanel';
 import { NetworkRoutingPanel } from './NetworkRoutingPanel';
 import { DeviceTaskPanel } from './DeviceTaskPanel';
+
+const THIS_PERMISSION = permissions.admin.mobile.device;
 
 interface DeviceStatusDrawerProps {
   open: boolean;
@@ -123,6 +125,7 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
       setDetail(next);
       setMetadataRows(metadataToRows(next.customMetadata));
     } catch {
+      // 全局拦截器统一展示错误
     } finally {
       setLoading(false);
     }
@@ -143,7 +146,9 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
         ignoreAbort: true,
       });
       setEvents(response.data.data.list);
-    } catch {}
+    } catch {
+      // 全局拦截器统一展示错误
+    }
   }, [deviceId, endTime, eventType, startTime]);
 
   useEffect(() => {
@@ -184,7 +189,9 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
       await DeviceAPI.updateMetadataFn({ data: { id: deviceId, customMetadata } });
       showSnackbar({ message: t('mobile.device.metadataSaved'), type: 'success' });
       await loadDetail();
-    } catch {}
+    } catch {
+      // 全局拦截器统一展示错误
+    }
   };
 
   const reveal = async (id: number, target: 'identifiers' | 'customMetadata' | 'event') => {
@@ -192,7 +199,9 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
       const response = await DeviceAPI.revealSensitiveFn({ data: { id, target } });
       setRevealTitle(t(`mobile.device.reveal.${target}`));
       setRevealed(response.data.data);
-    } catch {}
+    } catch {
+      // 全局拦截器统一展示错误
+    }
   };
 
   const resetToken = async () => {
@@ -207,7 +216,9 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
     try {
       const response = await DeviceAPI.resetReportTokenFn({ data: { id: deviceId } });
       setToken(response.data.data.token);
-    } catch {}
+    } catch {
+      // 全局拦截器统一展示错误
+    }
   };
 
   const copyToken = async () => {

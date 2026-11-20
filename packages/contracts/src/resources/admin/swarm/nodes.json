@@ -1,0 +1,188 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/swarm/nodes",
+  "readonly": true,
+  "apiKeyName": "id",
+  "auditFields": false,
+  "showIdColumn": false,
+  "permissions": "none",
+  "cardMode": "custom",
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": false,
+    "add": false,
+    "update": false,
+    "delete": false
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "swarm.docker.searchLabel",
+      "placeholderKey": "swarm.docker.searchPlaceholder",
+      "transform": "emptyToUndefined"
+    },
+    "showSortControls": false
+  },
+  "fields": [
+    {
+      "name": "id",
+      "schema": { "type": "string", "description": "节点 ID" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.id",
+        "table": false,
+        "card": false,
+        "form": false
+      }
+    },
+    {
+      "name": "hostname",
+      "schema": { "type": "string", "description": "主机名称" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.hostname",
+        "table": { "show": true },
+        "form": false
+      }
+    },
+    {
+      "name": "role",
+      "schema": { "type": "string", "enum": ["manager", "worker"], "description": "角色" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.role",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "outlined",
+          "options": [
+            { "value": "manager", "labelKey": "swarm.nodes.manager", "color": "primary" },
+            { "value": "worker", "labelKey": "swarm.nodes.worker", "color": "default" }
+          ]
+        },
+        "form": false
+      }
+    },
+    {
+      "name": "status",
+      "schema": { "type": "string", "enum": ["ready", "down", "disconnected"], "description": "状态" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.status",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "outlined",
+          "options": [
+            { "value": "ready", "labelKey": "swarm.nodes.ready", "color": "success" },
+            { "value": "down", "labelKey": "swarm.nodes.down", "color": "error" },
+            { "value": "disconnected", "labelKey": "swarm.nodes.disconnected", "color": "warning" }
+          ]
+        },
+        "form": false
+      }
+    },
+    {
+      "name": "availability",
+      "schema": { "type": "string", "enum": ["active", "drain", "pause"], "description": "调度可用性" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.availability",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "outlined",
+          "options": [
+            { "value": "active", "labelKey": "swarm.nodes.active", "color": "info" },
+            { "value": "drain", "labelKey": "swarm.nodes.drain", "color": "secondary" },
+            { "value": "pause", "labelKey": "swarm.nodes.pause", "color": "default" }
+          ]
+        },
+        "form": false
+      }
+    },
+    {
+      "name": "ip",
+      "schema": { "type": "string", "description": "节点 IP" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.ip",
+        "table": { "show": true, "fallback": "-" },
+        "form": false
+      }
+    },
+    {
+      "name": "allocatedCpus",
+      "schema": { "type": "number", "description": "已分配 CPU (核数)" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.allocatedCpus",
+        "table": { "show": true },
+        "form": false
+      }
+    },
+    {
+      "name": "allocatedMemory",
+      "schema": { "type": "number", "description": "已分配内存 (字节)" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.allocatedMemory",
+        "table": { "show": true },
+        "form": false
+      }
+    },
+    {
+      "name": "runningTaskCount",
+      "schema": { "type": "number", "description": "在该节点运行中的 Task 数量" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.taskCount",
+        "table": { "show": true },
+        "form": false
+      }
+    },
+    {
+      "name": "engineVersion",
+      "schema": { "type": "string", "description": "Docker 引擎版本" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "swarm.nodes.engineVersion",
+        "table": { "show": true, "fallback": "-" },
+        "form": false
+      }
+    },
+    {
+      "name": "nanoCpus",
+      "schema": { "type": "number", "description": "CPU 核心数" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "memoryBytes",
+      "schema": { "type": "number", "description": "总物理内存" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "rawJson",
+      "schema": { "type": "string", "description": "原始 JSON 数据" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": { "table": false, "card": false, "form": false }
+    }
+  ]
+}
