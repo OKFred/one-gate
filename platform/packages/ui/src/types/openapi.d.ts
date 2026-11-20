@@ -33760,11 +33760,6 @@ export interface components {
             /** @description 是否降序 */
             descend?: boolean;
             /**
-             * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
-             * @enum {number}
-             */
-            status?: 0 | 1 | 2 | 3;
-            /**
              * @description 员工ID
              * @example 1
              */
@@ -33774,6 +33769,11 @@ export interface components {
              * @example 2024-04-18
              */
             date?: string;
+            /**
+             * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
+             * @enum {number}
+             */
+            status?: 0 | 1 | 2 | 3;
             /** @enum {string} */
             orderBy?: "id" | "employeeId" | "date" | "status" | "createTimeUtc";
         };
@@ -33810,21 +33810,8 @@ export interface components {
                  * @enum {number}
                  */
                 status: 0 | 1 | 2 | 3;
-                /** @description 备注说明 */
+                /** @description 备注 */
                 remark?: ((string | null) | null) | null;
-                /** @description 员工对象 */
-                employeeObj?: (({
-                    /**
-                     * @description 员工ID
-                     * @example 1
-                     */
-                    value: number;
-                    /**
-                     * @description 员工名称
-                     * @example 张三
-                     */
-                    label: string;
-                } | null) | null) | null;
                 /** @description 创建人ID */
                 creatorId?: number;
                 /**
@@ -33861,11 +33848,6 @@ export interface components {
              */
             pageSize: number;
             /**
-             * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
-             * @enum {number}
-             */
-            status?: 0 | 1 | 2 | 3;
-            /**
              * @description 员工ID
              * @example 1
              */
@@ -33875,6 +33857,11 @@ export interface components {
              * @example 2024-04-18
              */
             date?: string;
+            /**
+             * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
+             * @enum {number}
+             */
+            status?: 0 | 1 | 2 | 3;
             /** @enum {string} */
             orderBy?: "id" | "employeeId" | "date" | "status" | "createTimeUtc";
         };
@@ -33895,11 +33882,19 @@ export interface components {
                      * @example 1
                      */
                     id: number;
-                    /**
-                     * @description 员工ID
-                     * @example 1
-                     */
-                    employeeId?: number;
+                    /** @description 员工对象 */
+                    employeeObj: (({
+                        /**
+                         * @description 员工ID
+                         * @example 1
+                         */
+                        value: number;
+                        /**
+                         * @description 员工名称
+                         * @example 张三
+                         */
+                        label: string;
+                    } | null) | null) | null;
                     /**
                      * @description 考勤日期
                      * @example 2024-04-18
@@ -33920,21 +33915,8 @@ export interface components {
                      * @enum {number}
                      */
                     status: 0 | 1 | 2 | 3;
-                    /** @description 备注说明 */
+                    /** @description 备注 */
                     remark?: ((string | null) | null) | null;
-                    /** @description 员工对象 */
-                    employeeObj: (({
-                        /**
-                         * @description 员工ID
-                         * @example 1
-                         */
-                        value: number;
-                        /**
-                         * @description 员工名称
-                         * @example 张三
-                         */
-                        label: string;
-                    } | null) | null) | null;
                     /** @description 创建人ID */
                     creatorId: number;
                     /**
@@ -33954,11 +33936,6 @@ export interface components {
             message: string;
         };
         "organization.attendance.add.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id?: number;
             /**
              * @description 员工ID
              * @example 1
@@ -33984,38 +33961,15 @@ export interface components {
              * @enum {number}
              */
             status: 0 | 1 | 2 | 3;
-            /** @description 备注说明 */
+            /** @description 备注 */
             remark?: ((string | null) | null) | null;
-            /** @description 员工对象 */
-            employeeObj?: (({
-                /**
-                 * @description 员工ID
-                 * @example 1
-                 */
-                value: number;
-                /**
-                 * @description 员工名称
-                 * @example 张三
-                 */
-                label: string;
-            } | null) | null) | null;
-            /** @description 创建人ID */
-            creatorId?: number;
-            /**
-             * @description 创建时间
-             * @example 1672531199000
-             */
-            createTimeUtc?: number;
-            /** @description 更新人ID */
-            updaterId?: ((number | null) | null) | null;
-            /**
-             * @description 更新时间
-             * @example 1672531199000
-             */
-            updateTimeUtc?: ((number | null) | null) | null;
         };
         "organization.attendance.add.res": {
             ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
             data: number;
             message: string;
         };
@@ -34050,38 +34004,15 @@ export interface components {
              * @enum {number}
              */
             status?: 0 | 1 | 2 | 3;
-            /** @description 备注说明 */
+            /** @description 备注 */
             remark?: ((string | null) | null) | null;
-            /** @description 员工对象 */
-            employeeObj?: (({
-                /**
-                 * @description 员工ID
-                 * @example 1
-                 */
-                value: number;
-                /**
-                 * @description 员工名称
-                 * @example 张三
-                 */
-                label: string;
-            } | null) | null) | null;
-            /** @description 创建人ID */
-            creatorId?: number;
-            /**
-             * @description 创建时间
-             * @example 1672531199000
-             */
-            createTimeUtc?: number;
-            /** @description 更新人ID */
-            updaterId?: ((number | null) | null) | null;
-            /**
-             * @description 更新时间
-             * @example 1672531199000
-             */
-            updateTimeUtc?: ((number | null) | null) | null;
         };
         "organization.attendance.update.res": {
             ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
             data: number;
             message: string;
         };
@@ -34094,6 +34025,10 @@ export interface components {
         };
         "organization.attendance.delete.res": {
             ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
             data: number;
             message: string;
         };
@@ -34112,11 +34047,19 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /**
-                 * @description 员工ID
-                 * @example 1
-                 */
-                employeeId: number;
+                /** @description 员工对象 */
+                employeeObj: (({
+                    /**
+                     * @description 员工ID
+                     * @example 1
+                     */
+                    value: number;
+                    /**
+                     * @description 员工名称
+                     * @example 张三
+                     */
+                    label: string;
+                } | null) | null) | null;
                 /**
                  * @description 考勤日期
                  * @example 2024-04-18
@@ -34137,35 +34080,22 @@ export interface components {
                  * @enum {number}
                  */
                 status: 0 | 1 | 2 | 3;
-                /** @description 备注说明 */
+                /** @description 备注 */
                 remark?: ((string | null) | null) | null;
-                /** @description 员工对象 */
-                employeeObj?: (({
-                    /**
-                     * @description 员工ID
-                     * @example 1
-                     */
-                    value: number;
-                    /**
-                     * @description 员工名称
-                     * @example 张三
-                     */
-                    label: string;
-                } | null) | null) | null;
                 /** @description 创建人ID */
-                creatorId?: number;
+                creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
-                createTimeUtc?: number;
+                createTimeUtc: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };

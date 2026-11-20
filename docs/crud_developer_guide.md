@@ -1,256 +1,185 @@
-# OKFred 前端低代码/高配置化 CRUD 构建指南
+# One-Gate 全栈 JSON 契约驱动 CRUD 开发指南
 
-本指南详细介绍了基于 **JSON Schema** 驱动的通用 CRUD 页面设计规范，用于指导开发人员在最少代码量下，快速搭建支持国际化、响应式、列表搜索、分页、弹窗编辑/新增及 AJV 规则校验的标准化 CRUD 模块。
+本指南介绍基于顶层共享契约包 **`@hodor/contracts`**（`packages/contracts/`）的全栈 CRUD 开发方式：用**单份声明式 JSON 契约**同时驱动后端 Hono/OpenAPI 校验模型与前端 React/MUI 响应式界面（含离线 AJV 表单校验、PC 表格、移动端卡片、筛选、软删除撤销、行动作、详情弹窗与路由自动挂载）。
 
 ---
 
 ## 🏗️ 整体架构体系
 
-我们的 CRUD 架构基于**单点配置驱动模型（Configuration-Driven UI）**。一个标准的 CRUD 页面仅包含一个主入口 `index.tsx` 和一系列强类型的配置。核心渲染与状态机制由底座组件 `SchemaCrudPage` 自动接管，不需要手写琐碎的 UI 状态。
-
 ```mermaid
-graph TD
-    A[Business Page index.tsx] -->|SchemaCrudConfig| B(SchemaCrudPage)
-    B -->|Rendering| C[Filter Component]
-    B -->|Rendering| D[ResponsiveList Component]
-    B -->|Rendering| E[FormDialog Component]
-    B -->|Rendering| F[DeleteConfirmDialog Component]
-    E -->|AJV Validation Context| G[SchemaForm / DynamicForm]
+flowchart LR
+    C["packages/contracts/src/resources/<app>/.../<resource>.json"] -->|generate & tsc| G["@hodor/contracts/resources & manifest"]
+    G -->|compileBackendSchemas + createCrudApis| B["server/packages/<app>/.../service.ts"]
+    G -->|buildContractRoutes（无物理 index.tsx）| R["纯 JSON 自动懒加载路由"]
+    G -->|ContractCrudPage + CrudExtensions（有物理 index.tsx）| F["薄壳扩展页面 index.tsx"]
+    R --> Core["SchemaCrudPage + ContractFormRenderer + ContractDetailDialog"]
+    F --> Core
 ```
 
-### 📁 目录及组件说明
+### 核心职责分层
 
-所有的底层通用代码均封装在 `src/components/Crud` 下，目录结构如下：
-
-- **`index.ts`**：公共类型与底座的统一导出入口。
-- **`types.ts`**：定义了 `SchemaCrudConfig` 及各种核心类型。
-- **`SchemaCrudPage.tsx`**：主调度中心组件，负责统一加载列表、分页控制、搜索防抖和增删改的核心事务。
-- **`components/Filter.tsx`**：高精内聚的筛选栏（包含文字检索、下拉列表、折叠展开等）。
-- **`components/FormDialog.tsx`**：弹出框表单（内置 AJV Validation 校验框架与响应式布局逻辑）。
-- **`components/DeleteConfirmDialog.tsx`**：二次删除安全确认框。
+- **顶层共享契约 (`packages/contracts/`)**：
+  - `schema/crud-resource.schema.json`：元 Schema 约束契约合法性。
+  - `src/resources/<app>/.../<resource>.json`：唯一真源（Single Source of Truth）。按**字段为中心（Field-Centric）**声明数据类型、必填阶段（`requiredOn`）、前后端作用域成员（`in`: `list`/`detail`/`add`/`update`/`get`/`listAll`/`listFilter`）以及 UI 投影（`ui.table`/`ui.card`/`ui.filter`/`ui.form`/`ui.detail`）。
+  - `src/defaults.ts`：约定优于配置推导 `app`、`route`、`basePath`、`permissionNamespace`、内置 preset（`id`/`isEnabled`/`remark`/`createTimeUtc`/`updateTimeUtc`）及标准审计字段注入。
+  - `src/backend.ts`：导出 `compileBackendSchemas`，编译后端 `listReq`/`listRes`/`listAllReq`/`listAllRes`/`getReq`/`getRes`/`addReq`/`updateReq`/`deleteReq`/`deleteWithUndoReq`/`deleteWithUndoRes`/`idRes`。
+  - `src/frontend.ts`：导出 `compileFrontendValidationSchema`、`projectTableColumns`、`projectCardFields`、`projectFilterConfig`、`projectFormConfig`。
+  - `scripts/generate.ts` & `scripts/validate.ts`：离线编译生成 `src/generated/` 并一次性校验元 Schema、后端权限种子、OpenAPI 路径与 `zh-CN`/`en-US` 双语词条完整度。
+- **后端装配层 (`server/packages/core/src/middleware/encapsulation/crud.ts`)**：
+  - `createCrudApis(schemas, options)`：根据 `*BackendSchemas` 自动生成 `list`、`listAll`、`add`、`update`、`delete`、`deleteWithUndo`、`get` 等 `API` 定义，支持自定义 `adapter`、`resSchema` 及 `extra` 扩展端点。
+  - `buildPagedListResult(list, total, pageNo, pageSize)`：统一分页返回包装与上限归一。
+- **前端渲染层 (`platform/packages/ui/src/`)**：
+  - `routes/buildContractRoutes.tsx`：结合 `@hodor/contracts/manifest` 自动挂载所有 `mountRoute: true` 的契约页面；当对应目录下存在物理 `pages/.../index.tsx` 时自动让位。
+  - `components/Crud/contract/ContractCrudPage.tsx`：统一接管列表请求（`postCrudEndpoint`）、离线 AJV 表单校验、响应式表格/卡片切换、`softDelete` 乐观锁撤销及自定义 `extensions`。
+  - `components/Crud/contract/ContractFormRenderer.tsx` & `ContractDetailDialog.tsx`：内置 `text`/`email`/`number`/`textarea`/`password`/`code`/`switch`/`checkbox`/`select`/`multiSelect`/`treeFlatMultiSelect`/`tagInput`/`date`/`time`/`datetime`/`dynamicSubForm`/`divider` 组件及配置化详情对话框。
 
 ---
 
-## 🛠️ 如何快速构建一个新 CRUD 模块
+## 🛠️ 场景一：5 分钟新增纯 JSON CRUD 页面（0 行前端 TSX）
 
-要增加一个新的 CRUD 页面（例如以**国际化地区（Region）**页面为例），您只需要新建一个目录并创建以下 4 个小文件：
+以新建管理端配置资源 `admin/rpa/config` 为例：
 
-### 1. 筛选条件配置 `components/TheFilter.tsx`
+### 1. 编写单份契约 JSON
 
-定义表格上方的过滤器配置与类型：
+新建 `packages/contracts/src/resources/admin/rpa/config.json`：
+
+```json
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/rpa/config",
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel",
+      "transform": "emptyToUndefined"
+    },
+    "sortableFields": ["id", "name", "isEnabled", "createTimeUtc"],
+    "showSortControls": false
+  },
+  "fields": [
+    {
+      "name": "name",
+      "schema": { "type": "string", "maxLength": 100 },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "ui": {
+        "labelKey": "rpa.config.name",
+        "table": { "show": true },
+        "card": { "role": "title" },
+        "form": { "show": true, "widget": "text", "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled"
+    },
+    {
+      "name": "remark",
+      "preset": "remark"
+    }
+  ]
+}
+```
+
+> **约定自动推导规则**：仅填写 `"resource": "admin/rpa/config"` 时，引擎自动推导出 `app = "admin"`、`route = "rpa/config"`、`basePath = "/api/v1/admin/rpa/config"`、`permissionNamespace = "admin.rpa.config"`，并自动前置 `id` 列与 4 个审计字段（可通过 `auditFields: false`、`showIdColumn: false`、`api.endpoints` 或 `permissions` 显式覆盖）。
+
+### 2. 后端接入 `createCrudApis`
+
+首先运行 `pnpm --filter @hodor/contracts build` 生成 `@hodor/contracts/resources` 导出，随后在 `server/packages/admin/src/rpa/config/service.ts` 装配接口（零手写 `req`/`res` JSON Schema）：
 
 ```typescript
-import type { FilterFieldConfig } from "@/components/Crud";
+import type { FromSchema } from "json-schema-to-ts";
+import { adminRpaConfigBackendSchemas } from "@hodor/contracts/resources";
+import {
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
+import type { UserObj } from "@hodor/core/types/app";
 
-// 1. 定义筛选器的状态类型
-export interface FilterState {
-  keyword?: string;
-  enabled?: boolean;
+const S = adminRpaConfigBackendSchemas;
+
+async function onList(params: FromSchema<typeof S.listReq>): Promise<FromSchema<typeof S.listRes>> {
+  const { total, list } = await repo.findPage(params);
+  return buildPagedListResult(list, total, params.pageNo ?? 1, params.pageSize ?? 10);
 }
 
-// 2. 导出 JSON-like 筛选器配置
-export const filterConfig = {
-  defaultFilters: {
-    keyword: "",
-    enabled: undefined,
-  } as FilterState,
-
-  // 基于国际化 t 函数和 extraContext 的动态字段定义
-  fields: (t: any): FilterFieldConfig<FilterState>[] => [
-    {
-      name: "keyword",
-      type: "text",
-      label: t("filter.keyword"),
-      placeholder: t("filter.keywordLabel"),
-    },
-    {
-      name: "enabled",
-      type: "select",
-      label: t("region.fields.status"),
-      options: [
-        { label: t("region.status.all"), value: undefined },
-        { label: t("region.status.enabled"), value: true },
-        { label: t("region.status.disabled"), value: false },
-      ],
-    },
-  ],
-};
-```
-
-### 2. 表格与卡片字段 `components/TheTable.tsx`
-
-定义 PC 端表格列、移动端卡片式展示（Card List）和自定义扩展行操作按钮：
-
-```tsx
-import type {
-  TableColumnConfig,
-  CardFieldConfig,
-  CrudHelpers,
-} from "@/components/Crud";
-import type { RegionRes } from "@/api/i18n/type";
-import { ToggleButton } from "@/components/Button"; // 假设有行内开关
-
-export { type RegionRes };
-
-export const tableConfig = {
-  // 1. 定义 PC 表格列
-  columns: (t: any, extraContext: any): TableColumnConfig<RegionRes>[] => [
-    { title: t("region.fields.code"), dataIndex: "code" },
-    { title: t("region.fields.name"), dataIndex: "name" },
-    {
-      title: t("region.fields.status"),
-      render: (row, helpers) => (
-        <ToggleButton
-          checked={row.enabled}
-          onChange={() => handleToggle(row, helpers)}
-        />
-      ),
-    },
-  ],
-
-  // 2. 定义移动端卡片列表展示项
-  cardFields: (t: any): CardFieldConfig<RegionRes>[] => [
-    { label: t("region.fields.code"), dataIndex: "code" },
-    { label: t("region.fields.name"), dataIndex: "name" },
-  ],
-
-  // 3. 灵活扩展其他行内操作按钮（例如自定义详情、审核等）
-  actions: (t: any): any[] => [
-    {
-      key: "custom-view",
-      icon: <InfoIcon />,
-      permissionCodes: ["custom:view"],
-      onClick: (row: RegionRes, helpers: CrudHelpers<RegionRes>) => {
-        console.log("查看详情", row);
-      },
-    },
-  ],
-};
-```
-
-### 3. 表单校验与 Schema 定义 `components/TheForm.tsx`
-
-配置 AJV 校验协议及表单的表层组件设计：
-
-```tsx
-import { JSONSchemaType } from "ajv";
-
-export interface FormState {
-  code: string;
-  name: string;
+async function onAdd(params: FromSchema<typeof S.addReq>, userObj: UserObj): Promise<number | null> {
+  return await repo.onInsert({ ...params, creatorId: userObj.userId });
 }
 
-// 1. 严格的 AJV JSON Schema 声明，错误提示信息高度定制化
-export const formSchema: JSONSchemaType<FormState> = {
-  type: "object",
-  properties: {
-    code: { type: "string", minLength: 2, errorMessage: "编码不能少于2个字符" },
-    name: { type: "string", minLength: 1, errorMessage: "名称为必填项" },
-  },
-  required: ["code", "name"],
-  errorMessage: {
-    required: {
-      code: "编码为必填项",
-      name: "名称为必填项",
-    },
-  },
-};
-
-// 2. 导出表单的主体配置
-export const formConfig = {
-  schema: formSchema,
-  defaultForm: {
-    code: "",
-    name: "",
-  } as FormState,
-
-  // 3. 渲染表单内部字段，可接收外部 context 比如关联数据源列表
-  renderForm: (
-    form: Partial<FormState>,
-    setForm: React.Dispatch<React.SetStateAction<Partial<FormState>>>,
-    isMobile: boolean,
-    t: any,
-    extraContext?: any,
-  ) => {
-    return (
-      <Stack spacing={2}>
-        <TextField
-          label={t("region.fields.code")}
-          value={form.code || ""}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, code: e.target.value }))
-          }
-          fullWidth
-        />
-        {/* 可以直接在此消费 extraContext 动态渲染关联选择器 */}
-      </Stack>
-    );
-  },
-};
+export default createCrudApis(S, {
+  list: onList,
+  add: onAdd,
+  update: onUpdate,
+  delete: onDelete,
+  get: onGet,
+});
 ```
 
-### 4. 组装主入口 `index.tsx` (零手写 Hooks)
+### 3. 一键全栈离线同步与校验
 
-极简声明，React Compiler 会在编译期接管全局状态防抖与缓存，无需添加任何 `useMemo` 与 `useCallback` 包裹：
+无需创建任何前端 `pages/` 目录、路由条目或 `api/*.ts` 包装，在**仓库根目录**执行：
 
-```tsx
-import { useState, useEffect } from "react";
-import { SchemaCrudPage, type SchemaCrudConfig } from "@/components/Crud";
-import { filterConfig, type FilterState } from "./components/TheFilter";
-import { tableConfig, type RegionRes } from "./components/TheTable";
-import { formConfig } from "./components/TheForm";
-import * as RegionAPI from "@/api/i18n/region";
-import { admin_i18n } from "@/hooks/usePermission";
-
-export default function RegionPage() {
-  const [languages, setLanguages] = useState([]);
-
-  // 加载页面独立所需的级联/上下文数据源
-  useEffect(() => {
-    fetchLanguages().then(setLanguages);
-  }, []);
-
-  // 声明极其直观干净 of CRUD 行为契约
-  const config: SchemaCrudConfig<RegionRes, FilterState, any, any> = {
-    titleKey: "region.title",
-    apiKeyName: "id", // 主键字段名，默认为 'id'
-    permissions: {
-      add: [admin_i18n.region.add],
-      edit: [admin_i18n.region.edit],
-      delete: [admin_i18n.region.delete],
-    },
-    api: {
-      list: RegionAPI.listFn,
-      add: RegionAPI.addFn,
-      update: RegionAPI.updateFn,
-      delete: RegionAPI.deleteFn,
-    },
-    filter: filterConfig,
-    table: tableConfig,
-    form: formConfig,
-  };
-
-  return <SchemaCrudPage config={config} extraContext={{ languages }} />;
-}
+```bash
+pnpm run sync:all
 ```
+
+该命令串联执行：`contracts:generate` → `contracts:build` → `sync:business` → `sync:permissions` → `sync:openapi` → `contracts:check`（同步校验全部契约的元 Schema、后端权限种子、`openapi.d.ts` 路径及 `zh-CN`/`en-US` 双语文案）。执行通过后即可在 `/admin/rpa/config` 直接访问完整页面。
 
 ---
 
-## ⚡ 核心低代码运行逻辑
+## 🧩 场景二：声明内置行动作、详情弹窗与软删除撤销
 
-1. **高内聚的 `QueryState` 大对象状态集**：
-   在底座内部，查询入参被完全内聚为一个单一的响应式状态大对象，避免了传统开发中 `page`, `pageSize`, `filters` 零散杂乱的问题：
-   ```typescript
-   export interface QueryState<TFilters> {
-     page: number;
-     pageSize: number;
-     filters: TFilters;
-   }
-   ```
-   这种高内聚设计不仅使组件体内的状态派发与更新更加集中规范，且大大缩减了数据拉取方法的参数个数（仅需 2 个参数，极大提升了测试性）。
-2. **零心智负担缓存机制**：
-   在 **React 19** 与 **React Compiler** 时代下，**切勿使用** `useMemo` 或 `useCallback` 去手动包裹配置或回调！React Compiler 能够精确识别纯函数、依赖引用，并在打包期自动生成高效的二进制缓存。我们的底座内没有任何禁用的 Eslint `react-hooks/exhaustive-deps` 忽略规则，这使得 React Compiler 可以 100% 优化整张页面，拒绝 Bailout。
-3. **校验自动化**：
-   底座通过 `useValidator` 加载 JSON Schema 并提供给 `useFormError`。当客户端或服务端校验返回错误时，校验上下文会自动把后端返回的字段错误精确绑定到表单具体的 Input 输入框上，实现秒级高亮。
-4. **响应式自适应**：
-   在 Mobile 端，底座会自动调用 `ResponsiveList` 切换至优雅的卡片流布局，并在打开表单时采用全屏抽屉式的 Dialog 呈现，在 Web 端则平滑回退至表格排版。
+许多中复杂度页面仍然**不需要**编写任何前端 TSX，仅在契约 JSON 内即可声明：
+
+- **只读与嵌入式抽屉列表**：设置 `"readonly": true`；若页面仅作为 Drawer 内部子表（不生成独立路由），设置 `"embedded": true` 或 `"mountRoute": false`，由父抽屉通过 `<ContractCrudPage contract={...} embedded contextParams={{ appId }} />` 挂载。
+- **表格内置行动作 (`actions`) & 详情弹窗 (`detailDialog`)**：
+  - `type: "api"`：直接调用后端 `POST` 端点（支持 `confirmMessageKey` 二次确认、`payloadMap` 模板映射如 `{"id": "${id}"}`、`successCheck`、`refreshAfter`）。
+  - `type: "detail"`：弹出 `ContractDetailDialog`，配合 `detailDialog.fetchUrl` 与 `sections`/`items` 声明式渲染 JSON/代码块、状态 Tag、告警条与时间戳。
+- **软删除短时撤销 (`softDelete`)**：在契约根部声明 `softDelete: { resourceType, displayNameField, confirmMessageKey }`，后端提供 `deleteWithUndo` handler 后，`ContractCrudPage` 自动接入乐观锁并发校验与 Toast 撤销通知闭环。
+- **远程下拉 (`optionsSource`) 与动态子表单 (`dynamicSubForm`)**：通过字段 `ui.form.optionsSource`（支持平面或 `parentIdField`/`childrenField` 树形扁平化）和 `ui.form.dynamicSubForm` 驱动，无需手写组件。
+
+---
+
+## 🎨 场景三：需要深度交互时的薄壳扩展槽 (`CrudExtensions`)
+
+当页面必须嵌入富文本编辑器、独立抽屉、图表或 CSV 导入/导出弹窗时，在对应路由创建仅一个 `platform/apps/<app>/src/pages/<route>/index.tsx`（**禁止**再拆回 `TheFilter.tsx` / `TheTable.tsx` / `TheForm.tsx` / 孤儿 `constant.ts`），传入 `ContractCrudPage` 与 `extensions`：
+
+```tsx
+import { adminMobileAppContract } from '@hodor/contracts/resources';
+import { ContractCrudPage, type CrudExtensions } from '@/components/Crud/contract';
+
+export default function AppPage() {
+  const extensions: CrudExtensions<AppRow> = {
+    // 1. 顶部工具栏按钮（如导入/导出）
+    toolbarActions: (helpers, translate) => <Button onClick={() => ...}>...</Button>,
+    // 2. 自定义单元格 / 自定义列 / 移动端卡片
+    customCells: { name: (row) => <CustomCell row={row} /> },
+    // 3. 自定义表单头部/底部或局部字段接管（如富文本、多行动态键值对、时间选择）
+    customFormFields: { content: (ctx) => <RichEditor ... /> },
+    // 4. 打开弹窗前或提交前的异步/同步数据塑形
+    afterOpen: (form, isEdit, row) => ({ ... }),
+    beforeSubmitAsync: async (form, isEdit) => ({ ... }),
+    // 5. 行操作按钮与挂载外部 Dialog/Drawer
+    rowActions: (translate, helpers) => [{ key: 'versions', ... }],
+    dialogs: (helpers) => <CustomDrawer ... />,
+    // 6. 非标准接口结构适配器（如 KV 列表或 Docker Swarm 代理）
+    listAdapter: async (args) => ({ data: { ok: true, data: { list, total } } }),
+    mutationAdapter: { add, update, delete },
+  };
+
+  return <ContractCrudPage contract={adminMobileAppContract} extensions={extensions} />;
+}
+```
+
+> **React Compiler 注意事项**：若 `customFormFields` 或 `formHeader` 内需要使用 Hooks（如 `useFormErrorContext`、`useState`、`useRef`），请将该字段渲染提取为独立命名的 React 函数组件（例如 `CronJobKeyField`、`ApiDocsUploadHeader`），切勿直接在回调内调用 Hooks。
+
+---
+
+## ⚡ 运行时与校验最佳实践
+
+1. **客户端校验完全离线运行**：`ContractCrudPage` 通过 `compileFrontendValidationSchema(contract, 'add' | 'update')` 在构建期直接获得标准 Draft JSON Schema，不再依赖运行时请求服务端 D1 同步校验模型。
+2. **契约字段必填与展示分离**：使用 `in` 控制字段是否进入某类接口体，`requiredOn` 控制后端 JSON Schema 的 `required` 数组（其中 `'get'` 控制 `listAllRes` 单项必填；`'list'` 控制分页响应单项必填；`'detail'` 控制 `/get` 响应必填；`'add'` / `'update'` 控制写入校验）。
+3. **文本截断与代码块规范**：表格截断统一使用 `"renderer": "text", "truncate": 50`（可选 `"tooltip": true` / `"stripHtml": true`）；表单多行代码统一使用 `"widget": "code", "theme": "dark"`；卡片标签统一使用 `"labelKey"` 声明国际化键值。
+4. **严格类型与异常处理**：契约与扩展代码严禁出现 `any` / `as any`；前端请求异常由 `@/api/config` 全局拦截器统一处理，扩展 `catch` 块保留简短注释即可，禁止调用 `console.error` 或重复弹窗。

@@ -1,0 +1,279 @@
+{
+  "$schema": "../../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "enterprise/organization/attendance",
+  "api": {
+    "summaries": {
+      "listAll": "获取所有考勤记录（不分页）",
+      "list": "获取考勤记录列表",
+      "add": "添加考勤记录",
+      "update": "更新考勤记录",
+      "delete": "删除考勤记录",
+      "get": "获取考勤记录详情"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": true,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel",
+      "transform": "emptyToUndefined"
+    },
+    "sortableFields": ["id", "employeeId", "date", "status", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "employeeId",
+      "schema": {
+        "type": "number",
+        "description": "员工ID",
+        "examples": [1],
+        "minimum": 1
+      },
+      "requiredOn": ["add", "get"],
+      "in": { "list": false, "detail": false, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "organization.attendance.employee",
+        "table": false,
+        "card": false,
+        "filter": false,
+        "form": {
+          "show": true,
+          "widget": "select",
+          "required": true,
+          "span": 12,
+          "defaultValue": "",
+          "optionsSource": {
+            "url": "/api/v1/admin/system/user/listAll",
+            "labelField": "username",
+            "valueField": "id"
+          }
+        }
+      }
+    },
+    {
+      "name": "employeeObj",
+      "schema": {
+        "type": ["object", "null"],
+        "nullable": true,
+        "description": "员工对象",
+        "properties": {
+          "value": { "type": "number", "description": "员工ID", "examples": [1] },
+          "label": { "type": "string", "description": "员工名称", "examples": ["张三"] }
+        },
+        "required": ["value", "label"],
+        "additionalProperties": false
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "organization.attendance.employee",
+        "table": { "show": true, "dataPath": "employeeObj.label", "fallback": "-" },
+        "card": { "role": "title" },
+        "form": false
+      }
+    },
+    {
+      "name": "date",
+      "schema": {
+        "type": "string",
+        "description": "考勤日期",
+        "examples": ["2024-04-18"],
+        "maxLength": 10
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "organization.attendance.date",
+        "table": { "show": true },
+        "card": { "role": "subtitle", "labelKey": "organization.attendance.date" },
+        "filter": false,
+        "form": {
+          "show": true,
+          "widget": "date",
+          "required": true,
+          "span": 12
+        }
+      }
+    },
+    {
+      "name": "checkInTime",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "签到时间",
+        "examples": [1672531200000]
+      },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "organization.attendance.checkInTime",
+        "table": { "show": true, "renderer": "datetime", "format": "HH:mm:ss", "fallback": "-" },
+        "card": { "role": "content", "labelKey": "organization.attendance.checkInTime" },
+        "form": { "show": true, "span": 6, "defaultValue": null }
+      }
+    },
+    {
+      "name": "checkOutTime",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "签退时间",
+        "examples": [1672560000000]
+      },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "organization.attendance.checkOutTime",
+        "table": { "show": true, "renderer": "datetime", "format": "HH:mm:ss", "fallback": "-" },
+        "card": { "role": "content", "labelKey": "organization.attendance.checkOutTime" },
+        "form": { "show": true, "span": 6, "defaultValue": null }
+      }
+    },
+    {
+      "name": "status",
+      "schema": {
+        "type": "number",
+        "description": "考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)",
+        "enum": [0, 1, 2, 3]
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "organization.attendance.status",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "outlined",
+          "options": [
+            { "value": 0, "labelKey": "organization.attendance.status.normal", "color": "success" },
+            { "value": 1, "labelKey": "organization.attendance.status.late", "color": "warning" },
+            { "value": 2, "labelKey": "organization.attendance.status.earlyLeave", "color": "info" },
+            { "value": 3, "labelKey": "organization.attendance.status.absent", "color": "error" }
+          ]
+        },
+        "card": { "role": "tag" },
+        "filter": false,
+        "form": {
+          "show": true,
+          "widget": "select",
+          "required": true,
+          "defaultValue": 0,
+          "span": 12,
+          "options": [
+            { "value": 0, "labelKey": "organization.attendance.status.normal" },
+            { "value": 1, "labelKey": "organization.attendance.status.late" },
+            { "value": 2, "labelKey": "organization.attendance.status.earlyLeave" },
+            { "value": 3, "labelKey": "organization.attendance.status.absent" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "textarea", "rows": 3, "maxLength": 500, "span": 12 }
+      }
+    },
+    {
+      "name": "creatorId",
+      "schema": { "type": "number", "description": "创建人ID" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false, "filter": false, "form": false }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "updaterId",
+      "schema": { "type": ["number", "null"], "nullable": true, "description": "更新人ID" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false, "filter": false, "form": false }
+    },
+    {
+      "name": "updateTimeUtc",
+      "preset": "updateTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false, "form": false }
+    }
+  ],
+  "actions": [
+    {
+      "key": "details",
+      "type": "detail",
+      "icon": "Visibility",
+      "color": "info"
+    }
+  ],
+  "detailDialog": {
+    "maxWidth": "xs",
+    "titleKey": "organization.attendance.detailTitle",
+    "sections": [
+      {
+        "items": [
+          {
+            "field": "employeeObj.label",
+            "labelKey": "organization.attendance.employee",
+            "fallback": "-"
+          },
+          {
+            "field": "date",
+            "labelKey": "organization.attendance.date"
+          },
+          {
+            "field": "checkInTime",
+            "labelKey": "organization.attendance.checkInTime",
+            "renderer": "datetime",
+            "format": "HH:mm:ss",
+            "fallback": "-"
+          },
+          {
+            "field": "checkOutTime",
+            "labelKey": "organization.attendance.checkOutTime",
+            "renderer": "datetime",
+            "format": "HH:mm:ss",
+            "fallback": "-"
+          },
+          {
+            "field": "status",
+            "labelKey": "organization.attendance.status",
+            "renderer": "enumChip",
+            "options": {
+              "0": { "value": 0, "labelKey": "organization.attendance.status.normal", "color": "success" },
+              "1": { "value": 1, "labelKey": "organization.attendance.status.late", "color": "warning" },
+              "2": { "value": 2, "labelKey": "organization.attendance.status.earlyLeave", "color": "info" },
+              "3": { "value": 3, "labelKey": "organization.attendance.status.absent", "color": "error" }
+            }
+          },
+          {
+            "field": "remark",
+            "labelKey": "column.remark",
+            "fallback": "-"
+          }
+        ]
+      }
+    ]
+  }
+}

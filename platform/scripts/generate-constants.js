@@ -219,6 +219,22 @@ function extractTopLevelKeysWithValues(block) {
 
 const validPermPaths = parseValidPermPaths(USE_PERMISSION_PATH);
 
+function dirReferencesConstant(dirPath) {
+  const candidates = [dirPath, path.join(dirPath, 'components')];
+  for (const folder of candidates) {
+    if (!fs.existsSync(folder)) continue;
+    for (const entry of fs.readdirSync(folder, { withFileTypes: true })) {
+      if (!entry.isFile()) continue;
+      if (!/\.(ts|tsx)$/.test(entry.name) || entry.name === 'constant.ts') continue;
+      const source = fs.readFileSync(path.join(folder, entry.name), 'utf8');
+      if (/from\s+['"]\.\.?\/constant['"]/.test(source)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 function generateConstantFile(dirPath, targetDir) {
   const rel = path.relative(targetDir, dirPath);
   if (!rel) return;
@@ -235,13 +251,17 @@ function generateConstantFile(dirPath, targetDir) {
     cleanParts.shift();
   }
 
-  // Intermediate directory with no remaining keys → delete and skip
+  // Intermediate directory with no remaining keys or dirs without ./constant references → delete and skip
   if (cleanParts.length === 0) {
     const constantPath = path.join(dirPath, 'constant.ts');
     if (fs.existsSync(constantPath)) {
       fs.unlinkSync(constantPath);
       console.log(`[Deleted Excluded] ${constantPath}`);
     }
+    return;
+  }
+
+  if (!dirReferencesConstant(dirPath)) {
     return;
   }
 
