@@ -1,6 +1,7 @@
 import { Drawer, Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import AppVersionPage from '../../app-version/index';
+import { adminMobileAppVersionContract } from '@hodor/contracts/resources';
+import { ContractCrudPage } from '@/components/Crud';
 
 interface AppVersionDrawerProps {
   open: boolean;
@@ -33,7 +34,13 @@ export default function AppVersionDrawer({ open, onClose, appId, appName }: AppV
         </IconButton>
       </Box>
       <Box sx={{ p: 2, height: 'calc(100vh - 65px)', overflowY: 'auto' }}>
-        {appId ? <AppVersionPage appId={appId} /> : null}
+        {appId ? (
+          <ContractCrudPage
+            contract={adminMobileAppVersionContract}
+            embedded
+            contextParams={{ appId }}
+          />
+        ) : null}
       </Box>
     </Drawer>
   );

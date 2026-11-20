@@ -98,7 +98,7 @@ export function ContractCrudPage<
     });
 
   const addFn =
-    meta.operations.add && meta.endpoints.add
+    !contract.readonly && meta.operations.add && meta.endpoints.add
       ? (extensions?.mutationAdapter?.add ??
         ((args: { data: Record<string, unknown> }) =>
           postCrudEndpoint(meta.endpoints.add!, {
@@ -107,7 +107,7 @@ export function ContractCrudPage<
       : undefined;
 
   const updateFn =
-    meta.operations.update && meta.endpoints.update
+    !contract.readonly && meta.operations.update && meta.endpoints.update
       ? (extensions?.mutationAdapter?.update ??
         ((args: { data: Record<string, unknown> }) =>
           postCrudEndpoint(meta.endpoints.update!, {
@@ -116,7 +116,7 @@ export function ContractCrudPage<
       : undefined;
 
   const deleteFn =
-    meta.operations.delete && meta.endpoints.delete
+    !contract.readonly && meta.operations.delete && meta.endpoints.delete
       ? (extensions?.mutationAdapter?.delete ??
         ((args: { data: { id: number | string } }) => {
           const payload = idKey === 'id' ? { id: args.data.id } : { [idKey]: args.data.id };
@@ -145,54 +145,56 @@ export function ContractCrudPage<
     Record<string, unknown>,
     Record<string, unknown>,
     number | string
-  >['softDelete'] = contract.softDelete
-    ? (() => {
-        const sd = contract.softDelete;
-        const deletePath =
-          sd.deletePath ?? meta.endpoints.deleteWithUndo ?? `${meta.basePath}/deleteWithUndo`;
-        const getPath = sd.getPath ?? meta.endpoints.get ?? `${meta.basePath}/get`;
-        const expectedTimeField = sd.expectedUpdateTimeField ?? 'updateTimeUtc';
-        const recyclePerms = sd.recycleBinPermissions ?? [];
-        const verifyReadPerms = sd.verifyReadPermissions ?? meta.permissions.read;
+  >['softDelete'] =
+    !contract.readonly && contract.softDelete
+      ? (() => {
+          const sd = contract.softDelete;
+          const deletePath =
+            sd.deletePath ?? meta.endpoints.deleteWithUndo ?? `${meta.basePath}/deleteWithUndo`;
+          const getPath = sd.getPath ?? meta.endpoints.get ?? `${meta.basePath}/get`;
+          const expectedTimeField = sd.expectedUpdateTimeField ?? 'updateTimeUtc';
+          const recyclePerms = sd.recycleBinPermissions ?? [];
+          const verifyReadPerms = sd.verifyReadPermissions ?? meta.permissions.read;
 
-        return {
-          resourceType: sd.resourceType,
-          displayName: (row) => String(getValueByPath(row, sd.displayNameField) ?? ''),
-          expectedUpdateTimeUtc: (row) =>
-            (getValueByPath(row, expectedTimeField) as number | null | undefined) ?? null,
-          confirmationContent: (_row, translate) => translate(sd.confirmMessageKey),
-          delete: ({ data, errorPresentation }) =>
-            postCrudEndpoint(deletePath, {
-              data: data as unknown as Record<string, unknown>,
-              errorPresentation,
-            }),
-          canOpenRecycleBin: () =>
-            recyclePerms.length === 0 || permissionRef.current.hasAllPermissions([...recyclePerms]),
-          verifyCurrent: getPath
-            ? async (row) => {
-                if (
-                  verifyReadPerms.length > 0 &&
-                  !permissionRef.current.hasAllPermissions([...verifyReadPerms])
-                ) {
-                  return null;
+          return {
+            resourceType: sd.resourceType,
+            displayName: (row) => String(getValueByPath(row, sd.displayNameField) ?? ''),
+            expectedUpdateTimeUtc: (row) =>
+              (getValueByPath(row, expectedTimeField) as number | null | undefined) ?? null,
+            confirmationContent: (_row, translate) => translate(sd.confirmMessageKey),
+            delete: ({ data, errorPresentation }) =>
+              postCrudEndpoint(deletePath, {
+                data: data as unknown as Record<string, unknown>,
+                errorPresentation,
+              }),
+            canOpenRecycleBin: () =>
+              recyclePerms.length === 0 ||
+              permissionRef.current.hasAllPermissions([...recyclePerms]),
+            verifyCurrent: getPath
+              ? async (row) => {
+                  if (
+                    verifyReadPerms.length > 0 &&
+                    !permissionRef.current.hasAllPermissions([...verifyReadPerms])
+                  ) {
+                    return null;
+                  }
+                  try {
+                    const idVal = row[idKey as keyof TRecord];
+                    const res = await postCrudEndpoint<Record<string, unknown>>(getPath, {
+                      data: { [idKey]: idVal },
+                      errorPresentation: 'local',
+                    });
+                    return res.data?.ok === true && res.data.data?.[idKey] === idVal ? true : null;
+                  } catch {
+                    return null;
+                  }
                 }
-                try {
-                  const idVal = row[idKey as keyof TRecord];
-                  const res = await postCrudEndpoint<Record<string, unknown>>(getPath, {
-                    data: { [idKey]: idVal },
-                    errorPresentation: 'local',
-                  });
-                  return res.data?.ok === true && res.data.data?.[idKey] === idVal ? true : null;
-                } catch {
-                  return null;
-                }
-              }
-            : undefined,
-          retryableErrorCodes: sd.retryableErrorCodes,
-          stateChangedErrorCodes: sd.stateChangedErrorCodes,
-        };
-      })()
-    : undefined;
+              : undefined,
+            retryableErrorCodes: sd.retryableErrorCodes,
+            stateChangedErrorCodes: sd.stateChangedErrorCodes,
+          };
+        })()
+      : undefined;
 
   const handleApiAction = async (
     act: CrudActionSpec,

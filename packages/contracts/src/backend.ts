@@ -125,9 +125,9 @@ export function compileBackendSchemas(contract: CrudResourceContract): CompiledB
   const listReq: JsonSchemaProperty = {
     type: 'object',
     properties: {
-      orderBy: orderBySchema,
       ...LIST_REQ_BASE,
       ...listFilterProps,
+      orderBy: orderBySchema,
     },
     required: [],
     additionalProperties: false,

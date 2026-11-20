@@ -245,9 +245,12 @@ export function renderCellValue(
     }
     case 'stackedText':
     case 'mediaStackedText': {
+      const primaryRaw = getValueByPath(row, ui.primaryField ?? path);
       const primary = ui.primaryTemplate
         ? interpolateTemplate(ui.primaryTemplate, row)
-        : String(getValueByPath(row, ui.primaryField ?? path) ?? fallback);
+        : primaryRaw !== null && primaryRaw !== undefined && primaryRaw !== ''
+          ? String(primaryRaw)
+          : fallback;
       const secondary = ui.secondaryTemplate
         ? interpolateTemplate(ui.secondaryTemplate, row)
         : ui.secondaryField

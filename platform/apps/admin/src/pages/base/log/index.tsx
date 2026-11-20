@@ -1,10 +1,12 @@
 import { Suspense, useState } from 'react';
 import { Tabs, Tab, Box } from '@mui/material';
-// Log Components
-import SysLogTable from './components/SysLogTable';
-import AuditLogTable from './components/AuditLogTable';
-import BizLogTable from './components/BizLogTable';
-import HttpLogTable from './components/HttpLogTable';
+import {
+  adminBaseLogAuditContract,
+  adminBaseLogBizContract,
+  adminBaseLogHttpContract,
+  adminBaseLogSysContract,
+} from '@hodor/contracts/resources';
+import { ContractCrudPage } from '@/components/Crud';
 import GlobalTimeline from './components/GlobalTimeline';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -61,24 +63,16 @@ export default function BaseLogPage() {
       </Box>
       <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
         <CustomTabPanel value={value} index={0}>
-          <Suspense fallback={<div>{t('common.loading')}</div>}>
-            <SysLogTable />
-          </Suspense>
+          <ContractCrudPage contract={adminBaseLogSysContract} embedded />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          <Suspense fallback={<div>{t('common.loading')}</div>}>
-            <AuditLogTable />
-          </Suspense>
+          <ContractCrudPage contract={adminBaseLogAuditContract} embedded />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          <Suspense fallback={<div>{t('common.loading')}</div>}>
-            <BizLogTable />
-          </Suspense>
+          <ContractCrudPage contract={adminBaseLogBizContract} embedded />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={3}>
-          <Suspense fallback={<div>{t('common.loading')}</div>}>
-            <HttpLogTable />
-          </Suspense>
+          <ContractCrudPage contract={adminBaseLogHttpContract} embedded />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={4}>
           <Suspense fallback={<div>{t('common.loading')}</div>}>

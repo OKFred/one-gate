@@ -1,0 +1,185 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/mobile/app-version",
+  "permissionNamespace": "admin.mobile.app_version",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取应用版本列表",
+      "add": "登记新版本",
+      "update": "更新应用版本",
+      "get": "获取版本详情",
+      "delete": "删除应用版本"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "column.keyword",
+      "placeholderKey": "common.searchPlaceholder"
+    },
+    "sortableFields": ["id", "appId", "versionName", "versionCode", "isForced", "isEnabled", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "appId",
+      "schema": {
+        "type": "integer",
+        "description": "关联 mobile_app.id (无数据库外键)"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listFilter": true },
+      "ui": {
+        "table": false,
+        "card": false,
+        "filter": false,
+        "form": { "show": false }
+      }
+    },
+    {
+      "name": "versionCode",
+      "schema": {
+        "type": "integer",
+        "description": "版本号 (整型)"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "mobile.appVersion.versionCode",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "mobile.appVersion.versionCode" },
+        "form": { "show": true, "widget": "number", "span": 6, "required": true }
+      }
+    },
+    {
+      "name": "versionName",
+      "schema": {
+        "type": "string",
+        "description": "版本名 (如 1.0.0)",
+        "maxLength": 50
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "mobile.appVersion.versionName",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "title", "template": "${versionName}" },
+        "form": { "show": true, "widget": "text", "span": 6, "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "apkUrl",
+      "schema": {
+        "type": "string",
+        "description": "安装包地址",
+        "maxLength": 1000
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "mobile.appVersion.apkUrl",
+        "table": {
+          "show": true,
+          "renderer": "linkButton",
+          "labelKey": "mobile.appVersion.download",
+          "fallback": "-"
+        },
+        "card": false,
+        "form": { "show": true, "widget": "text", "span": 12, "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "releaseNotes",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "更新说明"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "mobile.appVersion.releaseNotes",
+        "table": false,
+        "card": { "role": "content", "labelKey": "mobile.appVersion.releaseNotes", "fallback": "-" },
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 3,
+          "valueTransform": "emptyToNull"
+        }
+      }
+    },
+    {
+      "name": "isForced",
+      "schema": {
+        "type": "boolean",
+        "description": "是否强制更新"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "labelKey": "mobile.appVersion.isForced",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "switch", "span": 6, "defaultValue": false }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listFilter": true },
+      "ui": {
+        "labelKey": "status.enabled",
+        "table": false,
+        "card": { "role": "tag" },
+        "filter": false,
+        "form": { "show": true, "widget": "switch", "span": 6, "defaultValue": true }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": { "role": "content", "labelKey": "columns.createTime" }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "in": { "list": true, "detail": true, "add": true, "update": true },
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "column.remark", "fallback": "-" },
+        "form": { "rows": 3, "valueTransform": "emptyToNull" }
+      }
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/base/log-audit",
+  "mountRoute": false,
+  "embedded": true,
+  "readonly": true,
+  "auditFields": false,
+  "permissions": "none",
+  "permissionNamespace": "admin.base.log",
+  "api": {
+    "basePath": "/api/v1/admin/base/log/audit",
+    "summaries": {
+      "list": "审计日志列表"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": false,
+    "add": false,
+    "update": false,
+    "delete": false
+  },
+  "filters": {
+    "keyword": { "enabled": false },
+    "sortableFields": ["id", "namespace", "action", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": false, "get": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "hidden" }
+      }
+    },
+    {
+      "name": "namespace",
+      "schema": { "type": "string", "description": "命名空间" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "log.namespace",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "[${action}] ${namespace}" },
+        "filter": { "show": true, "type": "text", "transform": "emptyToUndefined" }
+      }
+    },
+    {
+      "name": "action",
+      "schema": { "type": "string", "description": "操作动作" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "table.actions",
+        "table": { "show": true },
+        "card": { "role": "hidden" }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "--" },
+        "card": { "role": "subtitle", "labelKey": "columns.createTime" }
+      }
+    },
+    {
+      "name": "creatorName",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "创建人名称" },
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "column.creatorName",
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "column.creatorName", "fallback": "System" }
+      }
+    },
+    {
+      "name": "beforeData",
+      "schema": {
+        "type": ["object", "array", "string", "number", "boolean", "null"],
+        "nullable": true,
+        "additionalProperties": true,
+        "description": "变更前数据"
+      },
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "log.beforeData",
+        "table": { "show": true, "renderer": "jsonText", "maxWidth": 260, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "log.beforeData" }
+      }
+    },
+    {
+      "name": "afterData",
+      "schema": {
+        "type": ["object", "array", "string", "number", "boolean", "null"],
+        "nullable": true,
+        "additionalProperties": true,
+        "description": "变更后数据"
+      },
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "log.afterData",
+        "table": { "show": true, "renderer": "jsonText", "maxWidth": 260, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "log.afterData" }
+      }
+    },
+    {
+      "name": "targetId",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "目标ID" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "payloadType",
+      "schema": { "type": "string", "description": "数据格式" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "tenantId",
+      "schema": { "type": ["number", "null"], "nullable": true, "description": "租户ID" },
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": [],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "creatorId",
+      "schema": { "type": "number", "description": "创建人ID" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    }
+  ]
+}

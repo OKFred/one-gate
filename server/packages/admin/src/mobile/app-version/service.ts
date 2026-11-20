@@ -1,88 +1,78 @@
-import type { FromSchema, JSONSchema } from "json-schema-to-ts";
+import type { FromSchema } from "json-schema-to-ts";
 import type { UserObj } from "@hodor/core/types/app";
+import { adminMobileAppVersionBackendSchemas } from "@hodor/contracts/resources";
 import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
-import {
-  bodyAdapter,
-  bodyUserAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
-import type { API } from "@hodor/core/middleware/encapsulation";
-import {
-  IndexVO,
-  MobileAppVersionVO,
-  MobileAppVersionAddVO,
-  MobileAppVersionUpdateVO,
-  MobileAppVersionAddKeys,
-  MobileAppVersionUpdateKeys,
-  MobileAppVersionDetailKeys,
-  MobileAppVersionListKeys,
-  MobileAppVersionSortableKeys,
-} from "./model";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
+import type { MobileAppVersionPOLike } from "./model";
 import { mobileAppVersionRepo } from "./repository";
 
-// 列表 (分页)
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    appId: { type: "integer" },
-    isEnabled: MobileAppVersionVO["isEnabled"],
-    orderBy: orderByWrapper<(typeof MobileAppVersionSortableKeys)[number][]>([
-      ...MobileAppVersionSortableKeys,
-    ]),
-  },
-  additionalProperties: false,
-} as const satisfies JSONSchema;
+const S = adminMobileAppVersionBackendSchemas;
 
-const listRes = {
-  ...listResponseWrapper(MobileAppVersionVO, [...MobileAppVersionListKeys]),
-} as const satisfies JSONSchema;
+const SORTABLE_FIELDS: ReadonlySet<keyof MobileAppVersionPOLike> = new Set([
+  "id",
+  "appId",
+  "versionName",
+  "versionCode",
+  "isForced",
+  "isEnabled",
+  "createTimeUtc",
+]);
 
-async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
-  const res = await mobileAppVersionRepo.list({
-    appId: params.appId,
-    keyword: (params as { keyword?: string }).keyword,
-    isEnabled: params.isEnabled,
-    orderBy: params.orderBy as any,
-    descend: params.descend,
-    pageNo: params.pageNo,
-    pageSize: params.pageSize,
-  });
-
+function mapAppVersionRow(row: MobileAppVersionPOLike) {
   return {
-    ...res,
-    list: res.list as unknown as FromSchema<typeof listRes>["list"],
+    id: row.id,
+    appId: row.appId,
+    versionCode: row.versionCode,
+    versionName: row.versionName,
+    apkUrl: row.apkUrl,
+    releaseNotes: row.releaseNotes ?? null,
+    isForced: row.isForced,
+    isEnabled: row.isEnabled,
+    createTimeUtc: row.createTimeUtc,
+    remark: row.remark ?? null,
+    creatorId: row.creatorId,
+    updaterId: row.updaterId ?? null,
+    updateTimeUtc: row.updateTimeUtc ?? null,
   };
 }
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: { path: "/list", method: "post", summary: "获取应用版本列表" },
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
+// 列表 (分页)
+async function onList(
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
+  const pageNo = params.pageNo ?? 1;
+  const pageSize = params.pageSize ?? 10;
+  const orderBy =
+    params.orderBy &&
+    SORTABLE_FIELDS.has(params.orderBy as keyof MobileAppVersionPOLike)
+      ? (params.orderBy as keyof MobileAppVersionPOLike)
+      : undefined;
+
+  const res = await mobileAppVersionRepo.list({
+    appId: params.appId,
+    keyword: params.keyword,
+    isEnabled: params.isEnabled,
+    orderBy,
+    descend: params.descend,
+    pageNo,
+    pageSize,
+  });
+
+  return buildPagedListResult(
+    res.list.map(mapAppVersionRow),
+    res.total,
+    pageNo,
+    pageSize
+  );
+}
 
 // 新增
-const addReq = {
-  type: "object",
-  properties: { ...MobileAppVersionAddVO },
-  required: [...MobileAppVersionAddKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const addRes = { ...IndexVO["id"] } as const satisfies JSONSchema;
-
 async function onAdd(
-  obj: FromSchema<typeof addReq>,
+  obj: FromSchema<typeof S.addReq>,
   userObj: UserObj
-): Promise<number | null> {
+): Promise<number> {
   const existing = await mobileAppVersionRepo.getByAppIdAndVersionCode(
     obj.appId,
     obj.versionCode
@@ -100,87 +90,37 @@ async function onAdd(
   });
 }
 
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: { path: "/add", method: "post", summary: "登记新版本" },
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
-
 // 更新
-const updateReq = {
-  type: "object",
-  properties: { ...MobileAppVersionUpdateVO },
-  required: [...MobileAppVersionUpdateKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 async function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
-): Promise<void> {
+): Promise<number> {
   await mobileAppVersionRepo.update({
     ...params,
     updaterId: userObj.id,
   });
+  return params.id;
 }
-
-const updateApi = {
-  req: updateReq,
-  res: addRes,
-  pathInfo: { path: "/update", method: "post", summary: "更新应用版本" },
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
 
 // 获取详情
-const getReq = {
-  type: "object",
-  properties: { ...IndexVO },
-  required: ["id"],
-} as const satisfies JSONSchema;
-
-async function onGet(params: FromSchema<typeof getReq>) {
-  const row = await mobileAppVersionRepo.getById(params.id as number);
+async function onGet(
+  params: FromSchema<typeof S.getReq>
+): Promise<FromSchema<typeof S.getRes>> {
+  const row = await mobileAppVersionRepo.getById(params.id);
   if (!row) throw new Error("Version not found");
-  return row;
+  return mapAppVersionRow(row);
 }
-
-const getApi = {
-  req: getReq,
-  res: {
-    type: "object",
-    properties: { ...MobileAppVersionVO },
-    required: [...MobileAppVersionDetailKeys],
-  } as const,
-  pathInfo: { path: "/get", method: "post", summary: "获取版本详情" },
-  adapter: bodyAdapter,
-  service: onGet,
-  permission: { action: "read" },
-} satisfies API;
 
 // 删除
-async function onDelete(obj: FromSchema<typeof getReq>) {
-  await mobileAppVersionRepo.delete(obj.id as number);
-  return true;
+async function onDelete(obj: FromSchema<typeof S.deleteReq>): Promise<number> {
+  await mobileAppVersionRepo.delete(obj.id);
+  return obj.id;
 }
 
-const deleteApi = {
-  req: getReq,
-  res: { type: "boolean" } as const,
-  pathInfo: { path: "/delete", method: "post", summary: "删除应用版本" },
-  adapter: bodyAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
-
-export default {
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  get: getApi,
-  delete: deleteApi,
-};
+export default createCrudApis(S, {
+  list: { summary: "获取应用版本列表", handler: onList },
+  add: { summary: "登记新版本", handler: onAdd },
+  update: { summary: "更新应用版本", handler: onUpdate },
+  get: { summary: "获取版本详情", handler: onGet },
+  delete: { summary: "删除应用版本", handler: onDelete },
+});
