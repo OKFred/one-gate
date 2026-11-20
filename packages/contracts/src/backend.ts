@@ -233,14 +233,21 @@ export function compileBackendSchemas(contract: CrudResourceContract): CompiledB
       }
     : undefined;
 
+  const softDeleteIdProp: JsonSchemaProperty =
+    idProp.type === 'number' || idProp.type === 'integer'
+      ? { type: 'integer', minimum: 1, maximum: Number.MAX_SAFE_INTEGER }
+      : idProp;
+
   const deleteWithUndoReq: JsonSchemaProperty | undefined = meta.operations.deleteWithUndo
     ? {
         type: 'object',
         properties: {
-          [meta.apiKeyName]: idProp,
+          [meta.apiKeyName]: softDeleteIdProp,
           expectedUpdateTimeUtc: {
-            type: ['number', 'null'],
+            type: ['integer', 'null'],
             nullable: true,
+            minimum: 0,
+            maximum: Number.MAX_SAFE_INTEGER,
             description: '乐观锁更新时间',
           },
         },
@@ -253,11 +260,13 @@ export function compileBackendSchemas(contract: CrudResourceContract): CompiledB
     ? {
         type: 'object',
         properties: {
-          resourceType: { type: 'string' },
-          id: idProp,
-          expectedDeletedTimeUtc: { type: 'number' },
-          undoExpiresTimeUtc: { type: 'number' },
-          serverTimeUtc: { type: 'number' },
+          resourceType: contract.softDelete?.resourceType
+            ? { type: 'string', const: contract.softDelete.resourceType }
+            : { type: 'string' },
+          id: softDeleteIdProp,
+          expectedDeletedTimeUtc: { type: 'integer', minimum: 0 },
+          undoExpiresTimeUtc: { type: 'integer', minimum: 0 },
+          serverTimeUtc: { type: 'integer', minimum: 0 },
         },
         required: [
           'resourceType',

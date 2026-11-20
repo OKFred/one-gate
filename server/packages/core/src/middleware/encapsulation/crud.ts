@@ -30,9 +30,13 @@ export type CrudOpConfig<THandler extends CrudServiceFn = CrudServiceFn> =
       readonly resSchema?: JSONSchema;
     };
 
-export type TypedCrudApi<THandler extends CrudServiceFn = CrudServiceFn> = {
-  readonly req: JSONSchema;
-  readonly res: JSONSchema;
+export type TypedCrudApi<
+  THandler extends CrudServiceFn = CrudServiceFn,
+  TReq extends JSONSchema = JSONSchema,
+  TRes extends JSONSchema = JSONSchema,
+> = {
+  readonly req: TReq;
+  readonly res: TRes;
   readonly pathInfo: {
     readonly path: string;
     readonly method: "post";
@@ -65,20 +69,70 @@ type ExtractHandler<T> = T extends {
     ? T
     : CrudServiceFn;
 
-type CrudApisBase<TOptions extends CrudApisOptions> = {
+type OpReqSchema<
+  TSchemas extends CompiledBackendSchemaSet,
+  K extends CrudOpKey,
+> = K extends "list"
+  ? TSchemas["listReq"]
+  : K extends "listAll"
+    ? NonNullable<TSchemas["listAllReq"]>
+    : K extends "get"
+      ? TSchemas["getReq"]
+      : K extends "add"
+        ? NonNullable<TSchemas["addReq"]>
+        : K extends "update"
+          ? NonNullable<TSchemas["updateReq"]>
+          : K extends "delete"
+            ? NonNullable<TSchemas["deleteReq"]>
+            : K extends "deleteWithUndo"
+              ? NonNullable<TSchemas["deleteWithUndoReq"]>
+              : JSONSchema;
+
+type DefaultOpResSchema<
+  TSchemas extends CompiledBackendSchemaSet,
+  K extends CrudOpKey,
+> = K extends "list"
+  ? TSchemas["listRes"]
+  : K extends "listAll"
+    ? NonNullable<TSchemas["listAllRes"]>
+    : K extends "get"
+      ? TSchemas["getRes"]
+      : K extends "deleteWithUndo"
+        ? NonNullable<TSchemas["deleteWithUndoRes"]>
+        : TSchemas["idRes"];
+
+type ExtractResSchema<
+  TSchemas extends CompiledBackendSchemaSet,
+  K extends CrudOpKey,
+  TOp,
+> = TOp extends { readonly resSchema: infer R extends JSONSchema }
+  ? R
+  : DefaultOpResSchema<TSchemas, K>;
+
+type CrudApisBase<
+  TSchemas extends CompiledBackendSchemaSet,
+  TOptions extends CrudApisOptions,
+> = {
   [
     K in keyof TOptions & CrudOpKey as NonNullable<
       TOptions[K]
     > extends CrudOpConfig
       ? K
       : never
-  ]-?: TypedCrudApi<ExtractHandler<NonNullable<TOptions[K]>>>;
+  ]-?: TypedCrudApi<
+    ExtractHandler<NonNullable<TOptions[K]>>,
+    OpReqSchema<TSchemas, K>,
+    ExtractResSchema<TSchemas, K, NonNullable<TOptions[K]>>
+  >;
 };
 
-export type CreateCrudApisResult<TOptions extends CrudApisOptions> =
+export type CreateCrudApisResult<
+  TSchemas extends CompiledBackendSchemaSet,
+  TOptions extends CrudApisOptions,
+> =
   TOptions["extra"] extends Record<string, API>
-    ? CrudApisBase<TOptions> & TOptions["extra"]
-    : CrudApisBase<TOptions>;
+    ? CrudApisBase<TSchemas, TOptions> & TOptions["extra"]
+    : CrudApisBase<TSchemas, TOptions>;
 
 function buildApiEntry(
   op: CrudOpConfig,
@@ -111,9 +165,12 @@ function buildApiEntry(
  * 根据顶层共享契约编译出的 JSON Schema 集自动装配标准 CRUD encapsulation API 字典。
  */
 export function createCrudApis<
-  TSchemas extends CompiledBackendSchemaSet,
+  const TSchemas extends CompiledBackendSchemaSet,
   const TOptions extends CrudApisOptions,
->(schemas: TSchemas, options: TOptions): CreateCrudApisResult<TOptions> {
+>(
+  schemas: TSchemas,
+  options: TOptions
+): CreateCrudApisResult<TSchemas, TOptions> {
   const apis: Record<string, API> = {};
 
   if (options.listAll && schemas.listAllReq && schemas.listAllRes) {
@@ -203,7 +260,7 @@ export function createCrudApis<
     }
   }
 
-  return apis as CreateCrudApisResult<TOptions>;
+  return apis as CreateCrudApisResult<TSchemas, TOptions>;
 }
 
 /** 分页参数归一化与分页响应包装辅助函数 */

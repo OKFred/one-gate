@@ -1,0 +1,250 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/system/role",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取角色列表",
+      "listAll": "获取所有角色（不分页）",
+      "get": "获取角色",
+      "add": "添加角色",
+      "update": "更新角色",
+      "delete": "删除角色",
+      "deleteWithUndo": "删除角色并返回短时撤销收据"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": true,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true,
+    "deleteWithUndo": true
+  },
+  "softDelete": {
+    "resourceType": "role",
+    "displayNameField": "name",
+    "expectedUpdateTimeField": "updateTimeUtc",
+    "confirmMessageKey": "role.dialog.softDeleteConfirm",
+    "deletePath": "/api/v1/admin/system/role/deleteWithUndo",
+    "getPath": "/api/v1/admin/system/role/get",
+    "recycleBinPermissions": [
+      "admin.maintenance.recycle_bin:read",
+      "admin.maintenance.recycle_bin:restore",
+      "admin.system.role:read",
+      "admin.system.role:edit"
+    ],
+    "verifyReadPermissions": ["admin.system.role:read"],
+    "retryableErrorCodes": [
+      "errorHandler.role.nameConflict",
+      "errorHandler.role.departmentsUnavailable"
+    ],
+    "stateChangedErrorCodes": [
+      "errorHandler.role.staleDeletion",
+      "errorHandler.role.notDeleted",
+      "errorHandler.role.stateConflict"
+    ]
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "name", "isEnabled", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": true },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "角色名称",
+        "examples": ["管理员"],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "role.table.roleName",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${name}" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "required": true,
+          "placeholderKey": "form.pleaseEnter",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "dataScope",
+      "schema": {
+        "type": "string",
+        "enum": ["all", "dept_and_below", "custom", "self_only"],
+        "description": "数据访问范围",
+        "default": "self_only"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "role.table.dataScope",
+        "table": {
+          "show": true,
+          "renderer": "enumText",
+          "options": [
+            { "value": "all", "labelKey": "role.dataScope.all" },
+            { "value": "dept_and_below", "labelKey": "role.dataScope.dept_and_below" },
+            { "value": "custom", "labelKey": "role.dataScope.custom" },
+            { "value": "self_only", "labelKey": "role.dataScope.self_only" }
+          ]
+        },
+        "card": { "role": "content", "labelKey": "role.table.dataScope" },
+        "form": {
+          "show": true,
+          "widget": "select",
+          "defaultValue": "self_only",
+          "disabledWhen": { "field": "id", "equals": 1 },
+          "options": [
+            { "value": "all", "labelKey": "role.dataScope.all" },
+            { "value": "dept_and_below", "labelKey": "role.dataScope.dept_and_below" },
+            { "value": "custom", "labelKey": "role.dataScope.custom" },
+            { "value": "self_only", "labelKey": "role.dataScope.self_only" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "customDeptIds",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效）"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "role.dataScope.customDeptIds",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "treeFlatMultiSelect",
+          "visibleWhen": { "field": "dataScope", "equals": "custom" },
+          "optionsSource": {
+            "url": "/api/v1/admin/system/department/listAll",
+            "labelField": "name",
+            "valueField": "id",
+            "parentIdField": "parentId",
+            "childrenField": "children"
+          },
+          "valueTransform": "jsonStringArray",
+          "jsonStringArrayOptions": {
+            "nullWhenEmpty": false,
+            "nullUnless": { "field": "dataScope", "equals": "custom" }
+          },
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "permissionCount",
+      "schema": {
+        "type": "integer",
+        "description": "权限数量"
+      },
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "status.enabled",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "error",
+          "variant": "outlined"
+        },
+        "card": {
+          "role": "tag",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "error"
+        },
+        "filter": false,
+        "form": {
+          "show": true,
+          "widget": "switch",
+          "defaultValue": true,
+          "disabledWhen": { "field": "id", "equals": 1 }
+        }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "--" },
+        "card": false
+      }
+    },
+    {
+      "name": "updateTimeUtc",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "更新时间"
+      },
+      "requiredOn": ["list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false, "form": false }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 3,
+          "maxLength": 500,
+          "showCharCount": true,
+          "placeholderKey": "form.pleaseEnter",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    }
+  ]
+}

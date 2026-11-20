@@ -1,67 +1,28 @@
 import crypto from "crypto";
-import {
-  IndexVO,
-  ApiTokenVO,
-  ApiTokenListVO,
-  ApiTokenAddVO,
-  ApiTokenUpdateVO,
-  ApiTokenListKeys,
-  ApiTokenDetailKeys,
-  ApiTokenGetKeys,
-  ApiTokenDeleteKeys,
-  ApiTokenAddKeys,
-  ApiTokenUpdateKeys,
-  ApiTokenSortableKeys,
-  type ApiTokenPOLike,
-  type ApiTokenVOLike,
-  type ApiTokenAddVOLike,
-  type ApiTokenUpdateVOLike,
-  type ApiTokenDeleteVOLike,
-  type ApiTokenGetVOLike,
-} from "./model";
+import { IndexVO } from "./model";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
+import type { UserObj } from "@hodor/core/types/app";
+import { adminSystemApiTokenBackendSchemas } from "@hodor/contracts/resources";
 import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
-import {
-  bodyAdapter,
-  bodyUserAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
+import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { apiTokenRepository } from "./repository";
 
-// ==================== list ====================
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    status: ApiTokenVO["status"],
-    orderBy: orderByWrapper<(keyof ApiTokenPOLike)[]>(ApiTokenSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<ApiTokenVOLike>[]>(
-    {
-      ...ApiTokenListVO,
-    },
-    [...ApiTokenListKeys]
-  ),
-} as const satisfies JSONSchema;
+const S = adminSystemApiTokenBackendSchemas;
 
+// ==================== list ====================
 /**
  * 分页查询 API 令牌列表
  * @param params 分页与筛选参数
  * @returns 分页列表结果
  */
 async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
@@ -74,90 +35,36 @@ async function onList(
     pageSize: finalPageSize,
   });
 
-  const totalPage = Math.ceil(total / finalPageSize);
-  return {
-    total,
-    totalPage,
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list: list.map((row) => ({
+  return buildPagedListResult(
+    list.map((row) => ({
       ...row,
       status: row.status as "active" | "revoked",
     })),
-  };
+    total,
+    pageNo,
+    finalPageSize
+  );
 }
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取 API 令牌列表",
-  } as const,
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
 
 // ==================== get ====================
-const getReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...ApiTokenGetKeys,
-  ] as const satisfies RequiredKeys<ApiTokenGetVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const getRes = {
-  type: "object",
-  properties: {
-    ...ApiTokenVO,
-  },
-  required: [
-    ...ApiTokenDetailKeys,
-  ] as const satisfies RequiredKeys<ApiTokenVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 /**
  * 获取单个 API 令牌详情
  * @param obj 包含令牌 ID 的请求对象
  * @returns 令牌详情
  */
 async function onGet(
-  obj: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes> | null> {
+  obj: FromSchema<typeof S.getReq>
+): Promise<FromSchema<typeof S.getRes>> {
   const { id } = obj;
   const row = await apiTokenRepository.findById(id);
   preventEmpty(row);
-  return row as FromSchema<typeof getRes>;
+  return {
+    ...row,
+    status: row.status as "active" | "revoked",
+  };
 }
-const getApi = {
-  req: getReq,
-  res: getRes,
-  pathInfo: {
-    path: "/get",
-    method: "post",
-    summary: "获取 API 令牌详情",
-  } as const,
-  adapter: bodyAdapter,
-  service: onGet,
-  permission: { action: "read" },
-} satisfies API;
 
 // ==================== add ====================
-const addReq = {
-  type: "object",
-  properties: {
-    ...ApiTokenAddVO,
-  } satisfies Partial<Record<keyof ApiTokenAddVOLike, JSONSchema>>,
-  required: [
-    ...ApiTokenAddKeys,
-  ] as const satisfies RequiredKeys<ApiTokenAddVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
 const addRes = {
   type: "object",
   properties: {
@@ -179,7 +86,7 @@ const addRes = {
  * @returns 令牌 ID 和一次性展示的完整令牌值
  */
 async function onAdd(
-  obj: FromSchema<typeof addReq>,
+  obj: FromSchema<typeof S.addReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes>> {
   const { userId: creatorId } = userObj;
@@ -207,34 +114,8 @@ async function onAdd(
 
   return { id: insertedId, rawToken };
 }
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "创建 API 令牌",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
 
 // ==================== update ====================
-const updateReq = {
-  type: "object",
-  properties: {
-    ...ApiTokenUpdateVO,
-  },
-  required: [
-    ...ApiTokenUpdateKeys,
-  ] as const satisfies RequiredKeys<ApiTokenUpdateVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const updateRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 /**
  * 更新 API 令牌（名称、权限、IP白名单、TTL、备注）
  * @param params 更新请求参数
@@ -242,9 +123,9 @@ const updateRes = {
  * @returns 更新的记录 ID
  */
 async function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof updateRes> | null> {
+): Promise<number> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
 
@@ -254,59 +135,21 @@ async function onUpdate(
   });
   return updatedId;
 }
-const updateApi = {
-  req: updateReq,
-  res: updateRes,
-  pathInfo: {
-    path: "/update",
-    method: "post",
-    summary: "更新 API 令牌",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
 
 // ==================== delete ====================
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...ApiTokenDeleteKeys,
-  ] as const satisfies RequiredKeys<ApiTokenDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 /**
  * 删除 API 令牌
  * @param obj 包含令牌 ID 的请求对象
  * @returns 删除的记录 ID
  */
 async function onDelete(
-  obj: FromSchema<typeof deleteReq>,
-  userObj: UserObj
-): Promise<FromSchema<typeof deleteRes> | null> {
+  obj: FromSchema<typeof S.deleteReq>,
+  _userObj: UserObj
+): Promise<number> {
   const { id } = obj;
   const deletedId = await apiTokenRepository.onDelete(id);
   return deletedId;
 }
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除 API 令牌",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
 
 // ==================== revoke ====================
 const revokeReq = {
@@ -314,9 +157,7 @@ const revokeReq = {
   properties: {
     ...IndexVO,
   },
-  required: [
-    ...ApiTokenGetKeys,
-  ] as const satisfies RequiredKeys<ApiTokenGetVOLike>[],
+  required: ["id"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const revokeRes = {
@@ -354,11 +195,15 @@ const revokeApi = {
   permission: { action: "edit" },
 } satisfies API;
 
-export default {
-  list: listApi,
-  get: getApi,
-  add: addApi,
-  update: updateApi,
-  delete: deleteApi,
-  revoke: revokeApi,
-};
+export default createCrudApis(S, {
+  list: { summary: "获取 API 令牌列表", handler: onList },
+  get: { summary: "获取 API 令牌详情", handler: onGet },
+  add: { resSchema: addRes, summary: "创建 API 令牌", handler: onAdd },
+  update: { summary: "更新 API 令牌", handler: onUpdate },
+  delete: {
+    adapter: bodyUserAdapter,
+    summary: "删除 API 令牌",
+    handler: onDelete,
+  },
+  extra: { revoke: revokeApi },
+});

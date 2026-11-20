@@ -1,0 +1,255 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/i18n/region",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取国家地区列表",
+      "listAll": "获取所有国家地区（不分页）",
+      "get": "获取国家地区详情",
+      "add": "添加国家地区",
+      "update": "更新国家地区",
+      "delete": "删除国家地区"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": true,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": [
+      "id",
+      "labels",
+      "alpha2Code",
+      "alpha3Code",
+      "numeric",
+      "iso3166Independent",
+      "isEnabled",
+      "businessLanguages",
+      "createTimeUtc"
+    ],
+    "showSortControls": true,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": false
+    },
+    "sortFieldLabelKeys": {
+      "id": "columns.id",
+      "alpha2Code": "region.table.alpha2Code",
+      "alpha3Code": "region.table.alpha3Code",
+      "numeric": "region.table.numeric",
+      "createTimeUtc": "columns.createTime"
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": true },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "labels",
+      "schema": {
+        "type": ["object", "null"],
+        "nullable": true,
+        "description": "语言对象",
+        "properties": {
+          "zh-CN": { "type": "string", "description": "中文（中国）", "maxLength": 100 },
+          "en-US": { "type": "string", "description": "英语（美国）", "maxLength": 150 }
+        },
+        "propertyNames": { "type": "string", "maxLength": 10, "pattern": "^[a-z]{2}-[A-Z]{2}$" },
+        "additionalProperties": true
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "region.table.alpha2Code",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "text", "defaultValue": {} }
+      }
+    },
+    {
+      "name": "alpha2Code",
+      "schema": {
+        "type": "string",
+        "description": "ISO 3166-1 alpha-2",
+        "pattern": "^[A-Z]{2}$",
+        "maxLength": 2
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "region.table.alpha2Code",
+        "table": { "show": true, "renderer": "enumChip", "color": "primary", "variant": "outlined" },
+        "card": { "role": "title", "template": "${alpha2Code}" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 4,
+          "required": true,
+          "placeholder": "CN",
+          "valueTransform": "uppercase",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "alpha3Code",
+      "schema": {
+        "type": "string",
+        "description": "ISO 3166-1 alpha-3",
+        "pattern": "^[A-Z]{3}$",
+        "maxLength": 3
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "region.table.alpha3Code",
+        "table": { "show": true, "renderer": "enumChip", "color": "secondary", "variant": "outlined" },
+        "card": { "role": "content", "labelKey": "region.table.alpha3Code" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "span": 4,
+          "required": true,
+          "placeholder": "CHN",
+          "valueTransform": "uppercase",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "numeric",
+      "schema": {
+        "type": "integer",
+        "description": "ISO 3166-1 numeric",
+        "examples": [156],
+        "maximum": 99999
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "region.table.numeric",
+        "table": { "show": true },
+        "card": { "role": "content", "labelKey": "region.table.numeric" },
+        "form": {
+          "show": true,
+          "widget": "number",
+          "span": 4,
+          "required": true,
+          "min": 0,
+          "placeholder": "156",
+          "defaultValue": 0
+        }
+      }
+    },
+    {
+      "name": "iso3166Independent",
+      "schema": {
+        "type": "boolean",
+        "description": "是否ISO3166独立主权国家"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "region.table.iso3166Independent",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "column.yes",
+          "falseLabelKey": "column.no",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "card": false,
+        "form": { "show": true, "widget": "checkbox", "span": 6, "defaultValue": true }
+      }
+    },
+    {
+      "name": "businessLanguages",
+      "schema": {
+        "type": ["array", "null"],
+        "nullable": true,
+        "description": "语言代码列表",
+        "items": { "type": "string", "maxLength": 10, "examples": ["zh-CN", "en-US"] },
+        "uniqueItems": true
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "region.table.businessLanguages",
+        "table": { "show": true },
+        "card": false,
+        "form": { "show": true, "widget": "text", "defaultValue": null }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "filter.enabledStatus",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "card": { "role": "tag" },
+        "filter": { "show": true, "type": "select", "labelKey": "status.enabled", "includeAllOption": true },
+        "form": { "show": true, "widget": "switch", "labelKey": "status.enabled", "span": 6, "defaultValue": true }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": false
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 2,
+          "maxLength": 500,
+          "showCharCount": true,
+          "placeholderKey": "form.pleaseEnter",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    }
+  ]
+}

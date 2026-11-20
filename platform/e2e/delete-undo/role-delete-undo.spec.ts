@@ -237,6 +237,8 @@ test('role conflicts remain visible and the retry deadline never renews', async 
   await page.clock.fastForward(10_000);
   await toast(page).getByRole('button', { name: 'Undo deletion', exact: true }).click();
   await toast(page).getByRole('button', { name: 'Retry', exact: true }).click();
+  await expect.poll(() => fixture.undoRequests).toHaveLength(2);
+  await expect(toast(page).getByRole('button', { name: 'Retry', exact: true })).toBeEnabled();
   expect(fixture.undoRequests[0]).toEqual(fixture.undoRequests[1]);
   await page.clock.fastForward(6000);
   await expect(toast(page)).toContainText(/departments.*unavailable/i);
@@ -545,6 +547,7 @@ test('a CRUD resource without softDelete retains its original confirmation and n
     .click();
   await expect(page.getByRole('dialog')).not.toContainText('30 days');
   await page.getByRole('dialog').getByRole('button', { name: 'Delete', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(row(page, 'ordinary-crud-record')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Undo deletion', exact: true })).toHaveCount(0);
   expect(requests).toEqual([{ id: 88 }]);

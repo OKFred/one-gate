@@ -9546,64 +9546,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/system/api-token/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取 API 令牌详情 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.system.api_token.get.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.system.api_token.get.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/admin/system/api-token/add": {
         parameters: {
             query?: never;
@@ -9750,6 +9692,64 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.system.api_token.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/api-token/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取 API 令牌详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.api_token.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.api_token.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -22540,12 +22540,12 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新人ID */
-                    updaterId?: ((number | null) | null) | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc?: ((number | null) | null) | null;
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -22685,23 +22685,19 @@ export interface components {
                  */
                 createTimeUtc: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
         "admin.i18n.region.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
-            /**
-             * @description 是否启用
-             * @example true
-             * @example false
-             */
+            /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
@@ -22736,11 +22732,7 @@ export interface components {
                 iso3166Independent?: boolean;
                 /** @description 语言代码列表 */
                 businessLanguages?: ((string[] | null) | null) | null;
-                /**
-                 * @description 是否启用
-                 * @example true
-                 * @example false
-                 */
+                /** @description 是否启用 */
                 isEnabled?: boolean;
             }[];
             message: string;
@@ -22763,11 +22755,7 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /**
-             * @description 是否启用
-             * @example true
-             * @example false
-             */
+            /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
@@ -22789,15 +22777,6 @@ export interface components {
                      * @example 1
                      */
                     id: number;
-                    /** @description ISO 3166-1 alpha-2 */
-                    alpha2Code: string;
-                    /** @description ISO 3166-1 alpha-3 */
-                    alpha3Code: string;
-                    /**
-                     * @description ISO 3166-1 numeric
-                     * @example 156
-                     */
-                    numeric: number;
                     /** @description 语言对象 */
                     labels: ((({
                         /** @description 中文（中国） */
@@ -22807,25 +22786,30 @@ export interface components {
                     } & {
                         [key: string]: unknown;
                     }) | null) | null) | null;
+                    /** @description ISO 3166-1 alpha-2 */
+                    alpha2Code: string;
+                    /** @description ISO 3166-1 alpha-3 */
+                    alpha3Code: string;
+                    /**
+                     * @description ISO 3166-1 numeric
+                     * @example 156
+                     */
+                    numeric: number;
                     /** @description 是否ISO3166独立主权国家 */
                     iso3166Independent: boolean;
                     /** @description 语言代码列表 */
                     businessLanguages: ((string[] | null) | null) | null;
-                    /**
-                     * @description 是否启用
-                     * @example true
-                     * @example false
-                     */
+                    /** @description 是否启用 */
                     isEnabled: boolean;
-                    /** @description 备注 */
-                    remark: ((string | null) | null) | null;
-                    /** @description 创建人ID */
-                    creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
+                    /** @description 备注 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
                     /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
@@ -22838,15 +22822,6 @@ export interface components {
             message: string;
         };
         "admin.i18n.region.add.req": {
-            /** @description ISO 3166-1 alpha-2 */
-            alpha2Code: string;
-            /** @description ISO 3166-1 alpha-3 */
-            alpha3Code: string;
-            /**
-             * @description ISO 3166-1 numeric
-             * @example 156
-             */
-            numeric: number;
             /** @description 语言对象 */
             labels: ((({
                 /** @description 中文（中国） */
@@ -22856,15 +22831,20 @@ export interface components {
             } & {
                 [key: string]: unknown;
             }) | null) | null) | null;
+            /** @description ISO 3166-1 alpha-2 */
+            alpha2Code: string;
+            /** @description ISO 3166-1 alpha-3 */
+            alpha3Code: string;
+            /**
+             * @description ISO 3166-1 numeric
+             * @example 156
+             */
+            numeric: number;
             /** @description 是否ISO3166独立主权国家 */
             iso3166Independent: boolean;
             /** @description 语言代码列表 */
             businessLanguages: ((string[] | null) | null) | null;
-            /**
-             * @description 是否启用
-             * @example true
-             * @example false
-             */
+            /** @description 是否启用 */
             isEnabled: boolean;
             /** @description 备注 */
             remark: ((string | null) | null) | null;
@@ -22884,15 +22864,6 @@ export interface components {
              * @example 1
              */
             id: number;
-            /** @description ISO 3166-1 alpha-2 */
-            alpha2Code?: string;
-            /** @description ISO 3166-1 alpha-3 */
-            alpha3Code?: string;
-            /**
-             * @description ISO 3166-1 numeric
-             * @example 156
-             */
-            numeric?: number;
             /** @description 语言对象 */
             labels?: ((({
                 /** @description 中文（中国） */
@@ -22902,15 +22873,20 @@ export interface components {
             } & {
                 [key: string]: unknown;
             }) | null) | null) | null;
+            /** @description ISO 3166-1 alpha-2 */
+            alpha2Code?: string;
+            /** @description ISO 3166-1 alpha-3 */
+            alpha3Code?: string;
+            /**
+             * @description ISO 3166-1 numeric
+             * @example 156
+             */
+            numeric?: number;
             /** @description 是否ISO3166独立主权国家 */
             iso3166Independent?: boolean;
             /** @description 语言代码列表 */
             businessLanguages?: ((string[] | null) | null) | null;
-            /**
-             * @description 是否启用
-             * @example true
-             * @example false
-             */
+            /** @description 是否启用 */
             isEnabled?: boolean;
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
@@ -22955,15 +22931,6 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /** @description ISO 3166-1 alpha-2 */
-                alpha2Code: string;
-                /** @description ISO 3166-1 alpha-3 */
-                alpha3Code: string;
-                /**
-                 * @description ISO 3166-1 numeric
-                 * @example 156
-                 */
-                numeric: number;
                 /** @description 语言对象 */
                 labels: ((({
                     /** @description 中文（中国） */
@@ -22973,25 +22940,30 @@ export interface components {
                 } & {
                     [key: string]: unknown;
                 }) | null) | null) | null;
+                /** @description ISO 3166-1 alpha-2 */
+                alpha2Code: string;
+                /** @description ISO 3166-1 alpha-3 */
+                alpha3Code: string;
+                /**
+                 * @description ISO 3166-1 numeric
+                 * @example 156
+                 */
+                numeric: number;
                 /** @description 是否ISO3166独立主权国家 */
                 iso3166Independent: boolean;
                 /** @description 语言代码列表 */
                 businessLanguages: ((string[] | null) | null) | null;
-                /**
-                 * @description 是否启用
-                 * @example true
-                 * @example false
-                 */
+                /** @description 是否启用 */
                 isEnabled: boolean;
-                /** @description 备注 */
-                remark: ((string | null) | null) | null;
-                /** @description 创建人ID */
-                creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
                 /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
@@ -23024,11 +22996,7 @@ export interface components {
              * @example zh-CN
              */
             langCode?: string;
-            /**
-             * @description 是否启用
-             * @example true
-             * @example false
-             */
+            /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
@@ -23071,11 +23039,7 @@ export interface components {
                  * @example Welcome to our application
                  */
                 tValue?: string;
-                /**
-                 * @description 是否启用
-                 * @example true
-                 * @example false
-                 */
+                /** @description 是否启用 */
                 isEnabled?: boolean;
             }[];
             message: string;
@@ -23117,11 +23081,7 @@ export interface components {
              * @example zh-CN
              */
             langCode?: string;
-            /**
-             * @description 是否启用
-             * @example true
-             * @example false
-             */
+            /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
@@ -23144,6 +23104,25 @@ export interface components {
                      */
                     id: number;
                     /**
+                     * @description 应用
+                     * @example frontend
+                     * @example backend
+                     * @example common
+                     */
+                    application: string;
+                    /**
+                     * @description 业务
+                     * @example email
+                     * @example order
+                     */
+                    business: string;
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
+                    langCode: string;
+                    /**
                      * @description 翻译键
                      * @example welcome.message
                      * @example businessType.i18n
@@ -23159,43 +23138,17 @@ export interface components {
                      * @example abc123...
                      */
                     valueHash: string;
-                    /**
-                     * @description 语言代码
-                     * @example en-US
-                     * @example zh-CN
-                     */
-                    langCode: string;
-                    /**
-                     * @description 应用
-                     * @example frontend
-                     * @example backend
-                     * @example common
-                     */
-                    application: string;
-                    /**
-                     * @description 业务
-                     * @example email
-                     * @example order
-                     */
-                    business: string;
-                    /**
-                     * @description 备注说明
-                     * @example 欢迎消息的翻译
-                     */
-                    remark: ((string | null) | null) | null;
-                    /**
-                     * @description 是否启用
-                     * @example true
-                     * @example false
-                     */
+                    /** @description 是否启用 */
                     isEnabled: boolean;
-                    /** @description 创建人ID */
-                    creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
+                    /** @description 备注 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
                     /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
@@ -23208,6 +23161,25 @@ export interface components {
             message: string;
         };
         "admin.i18n.translation.add.req": {
+            /**
+             * @description 应用
+             * @example frontend
+             * @example backend
+             * @example common
+             */
+            application: string;
+            /**
+             * @description 业务
+             * @example email
+             * @example order
+             */
+            business: string;
+            /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode: string;
             /**
              * @description 翻译键
              * @example welcome.message
@@ -23224,36 +23196,10 @@ export interface components {
              * @example abc123...
              */
             valueHash: string;
-            /**
-             * @description 语言代码
-             * @example en-US
-             * @example zh-CN
-             */
-            langCode: string;
-            /**
-             * @description 应用
-             * @example frontend
-             * @example backend
-             * @example common
-             */
-            application: string;
-            /**
-             * @description 业务
-             * @example email
-             * @example order
-             */
-            business: string;
-            /**
-             * @description 备注说明
-             * @example 欢迎消息的翻译
-             */
-            remark: ((string | null) | null) | null;
-            /**
-             * @description 是否启用
-             * @example true
-             * @example false
-             */
+            /** @description 是否启用 */
             isEnabled: boolean;
+            /** @description 备注 */
+            remark: ((string | null) | null) | null;
         };
         "admin.i18n.translation.add.res": {
             ok: boolean;
@@ -23271,6 +23217,25 @@ export interface components {
              */
             id: number;
             /**
+             * @description 应用
+             * @example frontend
+             * @example backend
+             * @example common
+             */
+            application?: string;
+            /**
+             * @description 业务
+             * @example email
+             * @example order
+             */
+            business?: string;
+            /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode?: string;
+            /**
              * @description 翻译键
              * @example welcome.message
              * @example businessType.i18n
@@ -23286,36 +23251,10 @@ export interface components {
              * @example abc123...
              */
             valueHash?: string;
-            /**
-             * @description 语言代码
-             * @example en-US
-             * @example zh-CN
-             */
-            langCode?: string;
-            /**
-             * @description 应用
-             * @example frontend
-             * @example backend
-             * @example common
-             */
-            application?: string;
-            /**
-             * @description 业务
-             * @example email
-             * @example order
-             */
-            business?: string;
-            /**
-             * @description 备注说明
-             * @example 欢迎消息的翻译
-             */
-            remark?: ((string | null) | null) | null;
-            /**
-             * @description 是否启用
-             * @example true
-             * @example false
-             */
+            /** @description 是否启用 */
             isEnabled?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
         };
         "admin.i18n.translation.update.res": {
             ok: boolean;
@@ -23358,6 +23297,25 @@ export interface components {
                  */
                 id: number;
                 /**
+                 * @description 应用
+                 * @example frontend
+                 * @example backend
+                 * @example common
+                 */
+                application: string;
+                /**
+                 * @description 业务
+                 * @example email
+                 * @example order
+                 */
+                business: string;
+                /**
+                 * @description 语言代码
+                 * @example en-US
+                 * @example zh-CN
+                 */
+                langCode: string;
+                /**
                  * @description 翻译键
                  * @example welcome.message
                  * @example businessType.i18n
@@ -23373,43 +23331,17 @@ export interface components {
                  * @example abc123...
                  */
                 valueHash: string;
-                /**
-                 * @description 语言代码
-                 * @example en-US
-                 * @example zh-CN
-                 */
-                langCode: string;
-                /**
-                 * @description 应用
-                 * @example frontend
-                 * @example backend
-                 * @example common
-                 */
-                application: string;
-                /**
-                 * @description 业务
-                 * @example email
-                 * @example order
-                 */
-                business: string;
-                /**
-                 * @description 备注说明
-                 * @example 欢迎消息的翻译
-                 */
-                remark: ((string | null) | null) | null;
-                /**
-                 * @description 是否启用
-                 * @example true
-                 * @example false
-                 */
+                /** @description 是否启用 */
                 isEnabled: boolean;
-                /** @description 创建人ID */
-                creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
                 /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
@@ -23637,12 +23569,12 @@ export interface components {
                     /** @description 创建人ID */
                     creatorId: number;
                     /** @description 更新人ID */
-                    updaterId?: ((number | null) | null) | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc?: ((number | null) | null) | null;
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -23836,12 +23768,12 @@ export interface components {
                 /** @description 创建人ID */
                 creatorId: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -26448,12 +26380,12 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新人ID */
-                    updaterId?: ((number | null) | null) | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc?: ((number | null) | null) | null;
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -26608,12 +26540,12 @@ export interface components {
                  */
                 createTimeUtc: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -27042,17 +26974,17 @@ export interface components {
                     resource: ((string | null) | null) | null;
                     /** @description 业务标识 */
                     business: ((string | null) | null) | null;
-                    /** @description 备注说明 */
-                    remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
-                    /** @description 创建人ID */
-                    creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
+                    /** @description 备注 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
                     /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
@@ -28023,6 +27955,12 @@ export interface components {
                  */
                 id: number;
                 /**
+                 * @description 权限代码，唯一标识
+                 * @example user:read
+                 * @example file:write:own
+                 */
+                code: string;
+                /**
                  * @description 权限名称
                  * @example 查看用户
                  * @example 编辑文件
@@ -28041,16 +27979,10 @@ export interface components {
                 resource?: ((string | null) | null) | null;
                 /** @description 业务标识 */
                 business?: ((string | null) | null) | null;
-                /** @description 备注说明 */
-                remark?: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
-                /**
-                 * @description 权限代码，唯一标识
-                 * @example user:read
-                 * @example file:write:own
-                 */
-                code: string;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
             }[];
             message: string;
         };
@@ -28136,17 +28068,17 @@ export interface components {
                     resource: ((string | null) | null) | null;
                     /** @description 业务标识 */
                     business: ((string | null) | null) | null;
-                    /** @description 备注说明 */
-                    remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
-                    /** @description 创建人ID */
-                    creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
+                    /** @description 备注 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
                     /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
@@ -28184,10 +28116,10 @@ export interface components {
             resource: ((string | null) | null) | null;
             /** @description 业务标识 */
             business: ((string | null) | null) | null;
-            /** @description 备注说明 */
-            remark: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
+            /** @description 备注 */
+            remark: ((string | null) | null) | null;
         };
         "admin.system.permission.add.res": {
             ok: boolean;
@@ -28229,10 +28161,10 @@ export interface components {
             resource?: ((string | null) | null) | null;
             /** @description 业务标识 */
             business?: ((string | null) | null) | null;
-            /** @description 备注说明 */
-            remark?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
         };
         "admin.system.permission.update.res": {
             ok: boolean;
@@ -28299,17 +28231,17 @@ export interface components {
                 resource: ((string | null) | null) | null;
                 /** @description 业务标识 */
                 business: ((string | null) | null) | null;
-                /** @description 备注说明 */
-                remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
-                /** @description 创建人ID */
-                creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
                 /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
@@ -28336,30 +28268,27 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /** @description 备注说明 */
-                remark?: ((string | null) | null) | null;
-                /** @description 是否启用 */
-                isEnabled?: boolean;
-                /** @description 权限数量 */
-                permissionCount?: number;
-                /**
-                 * @description 数据访问范围
-                 * @default self_only
-                 * @enum {string}
-                 */
-                dataScope: "all" | "dept_and_below" | "self_only" | "custom";
-                /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
-                customDeptIds?: ((string | null) | null) | null;
                 /**
                  * @description 角色名称
                  * @example 管理员
                  */
                 name: string;
                 /**
-                 * @description 更新时间
-                 * @example 1672531199000
+                 * @description 数据访问范围
+                 * @default self_only
+                 * @enum {string}
                  */
+                dataScope: "all" | "dept_and_below" | "custom" | "self_only";
+                /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
+                customDeptIds?: ((string | null) | null) | null;
+                /** @description 权限数量 */
+                permissionCount?: number;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
+                /** @description 更新时间 */
                 updateTimeUtc: ((number | null) | null) | null;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
             }[];
             message: string;
         };
@@ -28408,34 +28337,31 @@ export interface components {
                      * @example 管理员
                      */
                     name: string;
-                    /** @description 备注说明 */
-                    remark: ((string | null) | null) | null;
-                    /** @description 是否启用 */
-                    isEnabled: boolean;
-                    /** @description 权限数量 */
-                    permissionCount?: number;
                     /**
                      * @description 数据访问范围
                      * @default self_only
                      * @enum {string}
                      */
-                    dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+                    dataScope: "all" | "dept_and_below" | "custom" | "self_only";
                     /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
                     customDeptIds: ((string | null) | null) | null;
-                    /** @description 创建人ID */
-                    creatorId: number;
+                    /** @description 权限数量 */
+                    permissionCount?: number;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
+                    /** @description 更新时间 */
+                    updateTimeUtc: ((number | null) | null) | null;
+                    /** @description 备注 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
                     /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -28446,18 +28372,18 @@ export interface components {
              * @example 管理员
              */
             name: string;
-            /** @description 备注说明 */
-            remark: ((string | null) | null) | null;
-            /** @description 是否启用 */
-            isEnabled: boolean;
             /**
              * @description 数据访问范围
              * @default self_only
              * @enum {string}
              */
-            dataScope: "all" | "dept_and_below" | "self_only" | "custom";
-            /** @description 自定义部门ID列表（JSON序列化） */
+            dataScope: "all" | "dept_and_below" | "custom" | "self_only";
+            /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
             customDeptIds: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 备注 */
+            remark: ((string | null) | null) | null;
         };
         "admin.system.role.add.res": {
             ok: boolean;
@@ -28479,19 +28405,18 @@ export interface components {
              * @example 管理员
              */
             name?: string;
-            /** @description 备注说明 */
-            remark?: ((string | null) | null) | null;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-            /** @description 权限数量 */
-            permissionCount?: number;
             /**
              * @description 数据访问范围
+             * @default self_only
              * @enum {string}
              */
-            dataScope?: "all" | "dept_and_below" | "self_only" | "custom";
-            /** @description 自定义部门ID列表（JSON序列化） */
+            dataScope: "all" | "dept_and_below" | "custom" | "self_only";
+            /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
             customDeptIds?: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
         };
         "admin.system.role.update.res": {
             ok: boolean;
@@ -28520,7 +28445,8 @@ export interface components {
         };
         "admin.system.role.deletewithundo.req": {
             id: number;
-            expectedUpdateTimeUtc: number | null;
+            /** @description 乐观锁更新时间 */
+            expectedUpdateTimeUtc: ((number | null) | null) | null;
         };
         "admin.system.role.deletewithundo.res": {
             ok: boolean;
@@ -28554,34 +28480,31 @@ export interface components {
                  * @example 管理员
                  */
                 name: string;
-                /** @description 备注说明 */
-                remark: ((string | null) | null) | null;
-                /** @description 是否启用 */
-                isEnabled: boolean;
-                /** @description 权限数量 */
-                permissionCount?: number;
                 /**
                  * @description 数据访问范围
                  * @default self_only
                  * @enum {string}
                  */
-                dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+                dataScope: "all" | "dept_and_below" | "custom" | "self_only";
                 /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
                 customDeptIds: ((string | null) | null) | null;
-                /** @description 创建人ID */
-                creatorId: number;
+                /** @description 权限数量 */
+                permissionCount?: number;
+                /** @description 是否启用 */
+                isEnabled: boolean;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
+                /** @description 更新时间 */
+                updateTimeUtc: ((number | null) | null) | null;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
                 /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -28836,17 +28759,17 @@ export interface components {
                 resource: ((string | null) | null) | null;
                 /** @description 业务标识 */
                 business: ((string | null) | null) | null;
-                /** @description 备注说明 */
-                remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
-                /** @description 创建人ID */
-                creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
                 /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
@@ -28879,27 +28802,27 @@ export interface components {
                  */
                 username: string;
                 /**
-                 * @description 语言代码
-                 * @example en-US
-                 * @example zh-CN
-                 */
-                langCode?: string;
-                /** @description 是否启用 */
-                isEnabled?: boolean;
-                /** @description 备注说明 */
-                remark?: ((string | null) | null) | null;
-                /**
-                 * @description 国家地区ID
-                 * @example 1
-                 */
-                regionId?: ((number | null) | null) | null;
-                /**
                  * @description 部门ID
                  * @example 1
                  */
                 departmentId?: ((number | null) | null) | null;
                 /** @description 角色ID数组 */
                 roleIdArr?: number[];
+                /**
+                 * @description 语言代码
+                 * @example en-US
+                 * @example zh-CN
+                 */
+                langCode?: string;
+                /**
+                 * @description 国家地区ID
+                 * @example 1
+                 */
+                regionId?: ((number | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
             }[];
             message: string;
         };
@@ -28949,34 +28872,34 @@ export interface components {
                      */
                     username: string;
                     /**
-                     * @description 语言代码
-                     * @example en-US
-                     * @example zh-CN
-                     */
-                    langCode: string;
-                    /** @description 是否启用 */
-                    isEnabled: boolean;
-                    /** @description 备注说明 */
-                    remark?: ((string | null) | null) | null;
-                    /**
-                     * @description 国家地区ID
-                     * @example 1
-                     */
-                    regionId: ((number | null) | null) | null;
-                    /**
                      * @description 部门ID
                      * @example 1
                      */
                     departmentId: ((number | null) | null) | null;
                     /** @description 角色ID数组 */
                     roleIdArr: number[];
-                    /** @description 创建人ID */
-                    creatorId: number;
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
+                    langCode: string;
+                    /**
+                     * @description 国家地区ID
+                     * @example 1
+                     */
+                    regionId: ((number | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
                     /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
@@ -28999,29 +28922,6 @@ export interface components {
              * @example QWRtaW5AM==
              */
             password: string;
-            /**
-             * @description 语言代码
-             * @example en-US
-             * @example zh-CN
-             */
-            langCode: string;
-            /** @description 是否启用 */
-            isEnabled: boolean;
-            /** @description 备注说明 */
-            remark: ((string | null) | null) | null;
-            /** @description 国家地区对象 */
-            regionObj: (({
-                /**
-                 * @description 国家地区ID
-                 * @example 1
-                 */
-                value: number;
-                /**
-                 * @description 国家地区二位编码
-                 * @example CN
-                 */
-                label: string;
-            } | null) | null) | null;
             /** @description 部门对象 */
             departmentObj: (({
                 /**
@@ -29048,6 +28948,29 @@ export interface components {
                  */
                 label: string;
             }[];
+            /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode: string;
+            /** @description 国家地区对象 */
+            regionObj: (({
+                /**
+                 * @description 国家地区ID
+                 * @example 1
+                 */
+                value: number;
+                /**
+                 * @description 国家地区二位编码
+                 * @example CN
+                 */
+                label: string;
+            } | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 备注 */
+            remark: ((string | null) | null) | null;
         };
         "admin.system.user.add.res": {
             ok: boolean;
@@ -29069,29 +28992,6 @@ export interface components {
              * @example user
              */
             username?: string;
-            /**
-             * @description 语言代码
-             * @example en-US
-             * @example zh-CN
-             */
-            langCode?: string;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-            /** @description 备注说明 */
-            remark?: ((string | null) | null) | null;
-            /** @description 国家地区对象 */
-            regionObj?: (({
-                /**
-                 * @description 国家地区ID
-                 * @example 1
-                 */
-                value: number;
-                /**
-                 * @description 国家地区二位编码
-                 * @example CN
-                 */
-                label: string;
-            } | null) | null) | null;
             /** @description 部门对象 */
             departmentObj?: (({
                 /**
@@ -29118,6 +29018,29 @@ export interface components {
                  */
                 label: string;
             }[];
+            /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode?: string;
+            /** @description 国家地区对象 */
+            regionObj?: (({
+                /**
+                 * @description 国家地区ID
+                 * @example 1
+                 */
+                value: number;
+                /**
+                 * @description 国家地区二位编码
+                 * @example CN
+                 */
+                label: string;
+            } | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
         };
         "admin.system.user.update.res": {
             ok: boolean;
@@ -29164,29 +29087,6 @@ export interface components {
                  * @example user
                  */
                 username: string;
-                /**
-                 * @description 语言代码
-                 * @example en-US
-                 * @example zh-CN
-                 */
-                langCode: string;
-                /** @description 是否启用 */
-                isEnabled: boolean;
-                /** @description 备注说明 */
-                remark?: ((string | null) | null) | null;
-                /** @description 国家地区对象 */
-                regionObj: (({
-                    /**
-                     * @description 国家地区ID
-                     * @example 1
-                     */
-                    value: number;
-                    /**
-                     * @description 国家地区二位编码
-                     * @example CN
-                     */
-                    label: string;
-                } | null) | null) | null;
                 /** @description 部门对象 */
                 departmentObj: (({
                     /**
@@ -29213,13 +29113,36 @@ export interface components {
                      */
                     label: string;
                 }[];
-                /** @description 创建人ID */
-                creatorId: number;
+                /**
+                 * @description 语言代码
+                 * @example en-US
+                 * @example zh-CN
+                 */
+                langCode: string;
+                /** @description 国家地区对象 */
+                regionObj: (({
+                    /**
+                     * @description 国家地区ID
+                     * @example 1
+                     */
+                    value: number;
+                    /**
+                     * @description 国家地区二位编码
+                     * @example CN
+                     */
+                    label: string;
+                } | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
                 /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
@@ -29282,12 +29205,12 @@ export interface components {
                     /** @description 令牌前缀（前 12 字符），用于列表展示标识 */
                     tokenPrefix: string;
                     /**
-                     * @description 权限 code 列表（JSON 数组字符串），如 ["admin.system.user:read","admin.mail.account:edit"]
+                     * @description 权限 code 列表（JSON 数组字符串）
                      * @example ["admin.system.user:read"]
                      */
                     permissions: string;
                     /**
-                     * @description 允许的 IP 列表（JSON 数组字符串），如 ["192.168.1.0/24"]，null 表示不限制
+                     * @description 允许的 IP 列表（JSON 数组字符串），null 表示不限制
                      * @example ["192.168.1.0/24"]
                      */
                     ipWhitelist: ((string | null) | null) | null;
@@ -29297,21 +29220,21 @@ export interface components {
                      */
                     startTimeUtc: ((number | null) | null) | null;
                     /**
-                     * @description 过期时间（毫秒时间戳），null 表示永不过期
-                     * @example 1704067199000
-                     */
-                    expireTimeUtc: ((number | null) | null) | null;
-                    /**
                      * @description 上次使用时间（毫秒时间戳）
                      * @example 1672531199000
                      */
                     lastUsedTimeUtc: ((number | null) | null) | null;
                     /**
+                     * @description 过期时间（毫秒时间戳），null 表示永不过期
+                     * @example 1704067199000
+                     */
+                    expireTimeUtc: ((number | null) | null) | null;
+                    /**
                      * @description 令牌状态：active-活跃 / revoked-已吊销
                      * @enum {string}
                      */
                     status: "active" | "revoked";
-                    /** @description 备注说明 */
+                    /** @description 备注 */
                     remark: ((string | null) | null) | null;
                     /** @description 创建人ID */
                     creatorId: number;
@@ -29331,78 +29254,6 @@ export interface components {
             };
             message: string;
         };
-        "admin.system.api_token.get.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "admin.system.api_token.get.res": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description id
-                 * @example 1
-                 */
-                id: number;
-                /**
-                 * @description 令牌名称（描述性）
-                 * @example CI/CD 部署令牌
-                 * @example 监控系统只读令牌
-                 */
-                name: string;
-                /** @description 令牌前缀（前 12 字符），用于列表展示标识 */
-                tokenPrefix: string;
-                /**
-                 * @description 权限 code 列表（JSON 数组字符串），如 ["admin.system.user:read","admin.mail.account:edit"]
-                 * @example ["admin.system.user:read"]
-                 */
-                permissions: string;
-                /**
-                 * @description 允许的 IP 列表（JSON 数组字符串），如 ["192.168.1.0/24"]，null 表示不限制
-                 * @example ["192.168.1.0/24"]
-                 */
-                ipWhitelist: ((string | null) | null) | null;
-                /**
-                 * @description 生效时间（毫秒时间戳），null 表示立即生效
-                 * @example 1672531199000
-                 */
-                startTimeUtc: ((number | null) | null) | null;
-                /**
-                 * @description 过期时间（毫秒时间戳），null 表示永不过期
-                 * @example 1704067199000
-                 */
-                expireTimeUtc: ((number | null) | null) | null;
-                /**
-                 * @description 上次使用时间（毫秒时间戳）
-                 * @example 1672531199000
-                 */
-                lastUsedTimeUtc: ((number | null) | null) | null;
-                /**
-                 * @description 令牌状态：active-活跃 / revoked-已吊销
-                 * @enum {string}
-                 */
-                status: "active" | "revoked";
-                /** @description 备注说明 */
-                remark: ((string | null) | null) | null;
-                /** @description 创建人ID */
-                creatorId: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
-                createTimeUtc: number;
-                /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc: ((number | null) | null) | null;
-            };
-            message: string;
-        };
         "admin.system.api_token.add.req": {
             /**
              * @description 令牌名称（描述性）
@@ -29411,12 +29262,12 @@ export interface components {
              */
             name: string;
             /**
-             * @description 权限 code 列表（JSON 数组字符串），如 ["admin.system.user:read","admin.mail.account:edit"]
+             * @description 权限 code 列表（JSON 数组字符串）
              * @example ["admin.system.user:read"]
              */
             permissions: string;
             /**
-             * @description 允许的 IP 列表（JSON 数组字符串），如 ["192.168.1.0/24"]，null 表示不限制
+             * @description 允许的 IP 列表（JSON 数组字符串），null 表示不限制
              * @example ["192.168.1.0/24"]
              */
             ipWhitelist?: ((string | null) | null) | null;
@@ -29430,7 +29281,7 @@ export interface components {
              * @example 1704067199000
              */
             expireTimeUtc?: ((number | null) | null) | null;
-            /** @description 备注说明 */
+            /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
         "admin.system.api_token.add.res": {
@@ -29459,12 +29310,12 @@ export interface components {
              */
             name?: string;
             /**
-             * @description 权限 code 列表（JSON 数组字符串），如 ["admin.system.user:read","admin.mail.account:edit"]
+             * @description 权限 code 列表（JSON 数组字符串）
              * @example ["admin.system.user:read"]
              */
             permissions?: string;
             /**
-             * @description 允许的 IP 列表（JSON 数组字符串），如 ["192.168.1.0/24"]，null 表示不限制
+             * @description 允许的 IP 列表（JSON 数组字符串），null 表示不限制
              * @example ["192.168.1.0/24"]
              */
             ipWhitelist?: ((string | null) | null) | null;
@@ -29478,7 +29329,7 @@ export interface components {
              * @example 1704067199000
              */
             expireTimeUtc?: ((number | null) | null) | null;
-            /** @description 备注说明 */
+            /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
         "admin.system.api_token.update.res": {
@@ -29504,6 +29355,78 @@ export interface components {
              * @example 1
              */
             data: number;
+            message: string;
+        };
+        "admin.system.api_token.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.system.api_token.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 令牌名称（描述性）
+                 * @example CI/CD 部署令牌
+                 * @example 监控系统只读令牌
+                 */
+                name: string;
+                /** @description 令牌前缀（前 12 字符），用于列表展示标识 */
+                tokenPrefix: string;
+                /**
+                 * @description 权限 code 列表（JSON 数组字符串）
+                 * @example ["admin.system.user:read"]
+                 */
+                permissions: string;
+                /**
+                 * @description 允许的 IP 列表（JSON 数组字符串），null 表示不限制
+                 * @example ["192.168.1.0/24"]
+                 */
+                ipWhitelist: ((string | null) | null) | null;
+                /**
+                 * @description 生效时间（毫秒时间戳），null 表示立即生效
+                 * @example 1672531199000
+                 */
+                startTimeUtc: ((number | null) | null) | null;
+                /**
+                 * @description 上次使用时间（毫秒时间戳）
+                 * @example 1672531199000
+                 */
+                lastUsedTimeUtc: ((number | null) | null) | null;
+                /**
+                 * @description 过期时间（毫秒时间戳），null 表示永不过期
+                 * @example 1704067199000
+                 */
+                expireTimeUtc: ((number | null) | null) | null;
+                /**
+                 * @description 令牌状态：active-活跃 / revoked-已吊销
+                 * @enum {string}
+                 */
+                status: "active" | "revoked";
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
             message: string;
         };
         "admin.system.api_token.revoke.req": {
@@ -30027,12 +29950,12 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新人ID */
-                    updaterId?: ((number | null) | null) | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc?: ((number | null) | null) | null;
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -30196,12 +30119,12 @@ export interface components {
                  */
                 createTimeUtc: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -30322,12 +30245,12 @@ export interface components {
                     /** @description 创建人ID */
                     creatorId: number;
                     /** @description 更新人ID */
-                    updaterId?: ((number | null) | null) | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc?: ((number | null) | null) | null;
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -30479,12 +30402,12 @@ export interface components {
                 /** @description 创建人ID */
                 creatorId: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -30746,12 +30669,12 @@ export interface components {
                     /** @description 创建人ID */
                     creatorId: number;
                     /** @description 更新人ID */
-                    updaterId?: ((number | null) | null) | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc?: ((number | null) | null) | null;
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -30858,12 +30781,12 @@ export interface components {
                 /** @description 创建人ID */
                 creatorId: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -30946,12 +30869,12 @@ export interface components {
                     /** @description 创建人ID */
                     creatorId: number;
                     /** @description 更新人ID */
-                    updaterId?: ((number | null) | null) | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc?: ((number | null) | null) | null;
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -31062,12 +30985,12 @@ export interface components {
                 /** @description 创建人ID */
                 creatorId: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -31519,12 +31442,12 @@ export interface components {
                     /** @description 创建人ID */
                     creatorId: number;
                     /** @description 更新人ID */
-                    updaterId?: ((number | null) | null) | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc?: ((number | null) | null) | null;
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -31634,12 +31557,12 @@ export interface components {
                 /** @description 创建人ID */
                 creatorId: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -32573,12 +32496,12 @@ export interface components {
                     /** @description 创建人ID */
                     creatorId: number;
                     /** @description 更新人ID */
-                    updaterId?: ((number | null) | null) | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc?: ((number | null) | null) | null;
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -32697,12 +32620,12 @@ export interface components {
                 /** @description 创建人ID */
                 creatorId: number;
                 /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: ((number | null) | null) | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };

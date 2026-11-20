@@ -359,6 +359,7 @@ export function resolveContractFields(contract: CrudResourceContract): ResolvedF
         name: 'updaterId',
         schema: { type: ['number', 'null'], nullable: true, description: '更新人ID' },
         in: { list: true, detail: true, add: false, update: false, get: false, listAll: false },
+        requiredOn: contract.readonly ? [] : ['list', 'detail'],
         ui: { table: false, card: false, filter: false, form: false },
       });
     }
@@ -366,6 +367,7 @@ export function resolveContractFields(contract: CrudResourceContract): ResolvedF
       pushResolved({
         name: 'updateTimeUtc',
         preset: 'updateTimeUtc',
+        requiredOn: contract.readonly ? [] : ['list', 'detail'],
       });
     }
   }
