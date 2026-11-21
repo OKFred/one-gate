@@ -4,6 +4,7 @@ import {
   Button,
   ButtonBase,
   Chip,
+  Divider,
   LinearProgress,
   Paper,
   Stack,
@@ -50,8 +51,9 @@ export default function UsageSummary({
 }) {
   const t = useTranslation();
   const unknown = t('home.usage.unknown');
-  const attentionCount = data.metrics.filter((metric) => warningKey(metric) !== null).length;
-  const metrics = [...data.metrics]
+  const attentionAll = data.metrics.filter((metric) => warningKey(metric) !== null);
+  const attentionCount = attentionAll.length;
+  const attentionMetrics = [...attentionAll]
     .sort(
       (left, right) =>
         attentionPriority(right) - attentionPriority(left) ||
@@ -81,70 +83,82 @@ export default function UsageSummary({
                 data.metrics.some((metric) => knownPercentage(metric) === null)
               ? 'home.usage.summary.incomplete'
               : `home.usage.sync.${data.sync.state}`;
+  const costText =
+    singleCost && amount !== null
+      ? `${singleCost[0].currency} ${amount}`
+      : costGroups.length > 1
+        ? t('home.usage.summary.costGroups', { count: costGroups.length })
+        : t('home.usage.summary.unavailable');
 
   return (
-    <Paper variant="outlined" data-testid="usage-summary" sx={{ p: { xs: 2, sm: 3 }, minWidth: 0 }}>
-      <Stack spacing={2.5}>
+    <Paper
+      variant="outlined"
+      data-testid="usage-summary"
+      sx={{ px: { xs: 2, sm: 2.5 }, py: 1.5, minWidth: 0 }}
+    >
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={1.5}
+        sx={{ alignItems: { sm: 'center' }, justifyContent: 'space-between' }}
+      >
         <Stack
           direction="row"
-          spacing={1}
+          spacing={1.5}
           useFlexGap
-          sx={{ alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}
+          sx={{ alignItems: 'center', flexWrap: 'wrap', minWidth: 0 }}
         >
-          <Typography component="h2" variant="h6" sx={{ fontWeight: 600 }}>
+          <Typography component="h2" variant="subtitle2" sx={{ fontWeight: 600 }}>
             Cloudflare
           </Typography>
-          <Button
-            component={RouterLink}
-            to="/home?view=usage"
-            size="small"
-            endIcon={<ArrowForward />}
+          <Stack
+            direction="row"
+            spacing={0.75}
+            useFlexGap
+            sx={{ alignItems: 'baseline', flexWrap: 'wrap', minWidth: 0 }}
+            title={t('home.usage.costNote')}
           >
-            {t('home.usage.summary.open')}
-          </Button>
-        </Stack>
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1.5}
-          sx={{ alignItems: { sm: 'center' }, justifyContent: 'space-between' }}
-        >
-          <Box sx={{ minWidth: 0 }}>
-            <Typography variant="caption" color="text.secondary" title={t('home.usage.costNote')}>
-              {t('home.usage.costs')}
-            </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-              {singleCost && amount !== null
-                ? `${singleCost[0].currency} ${amount}`
-                : costGroups.length > 1
-                  ? t('home.usage.summary.costGroups', { count: costGroups.length })
-                  : t('home.usage.summary.unavailable')}
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
+            >
+              {costText}
             </Typography>
             {singleCost && (
               <Typography variant="caption" color="text.secondary">
                 {shortPeriod(singleCost[0].periodStartUtc, singleCost[0].periodEndUtc, unknown)}
               </Typography>
             )}
-          </Box>
-          <Stack spacing={0.75} sx={{ alignItems: { xs: 'flex-start', sm: 'flex-end' } }}>
-            {attentionCount > 0 && (
-              <Chip
-                size="small"
-                color="warning"
-                label={t('home.usage.attentionCount', { count: attentionCount })}
-              />
-            )}
-            <Typography
-              variant="caption"
-              color={data.sync.state === 'failed' || stale ? 'warning.main' : 'text.secondary'}
-              data-testid="usage-summary-status"
-            >
-              {t(statusKey)}
-            </Typography>
           </Stack>
+          {attentionCount > 0 && (
+            <Chip
+              size="small"
+              color="warning"
+              label={t('home.usage.attentionCount', { count: attentionCount })}
+            />
+          )}
+          <Typography
+            variant="caption"
+            color={data.sync.state === 'failed' || stale ? 'warning.main' : 'text.secondary'}
+            data-testid="usage-summary-status"
+          >
+            {t(statusKey)}
+          </Typography>
         </Stack>
-        {metrics.length > 0 ? (
+        <Button
+          component={RouterLink}
+          to="/home?view=usage"
+          size="small"
+          endIcon={<ArrowForward />}
+          sx={{ flexShrink: 0, alignSelf: { xs: 'flex-start', sm: 'center' } }}
+        >
+          {t('home.usage.summary.open')}
+        </Button>
+      </Stack>
+      {attentionMetrics.length > 0 && (
+        <>
+          <Divider sx={{ my: 1.5 }} />
           <Stack spacing={0.5}>
-            {metrics.map((metric) => {
+            {attentionMetrics.map((metric) => {
               const percentage = knownPercentage(metric);
               const label = `${metric.product} · ${metricName(metric, t)}`;
               const estimated = metric.quality === 'estimated';
@@ -181,7 +195,6 @@ export default function UsageSummary({
                       <Typography variant="caption" color="text.secondary">
                         {estimated && metric.used !== null && Number.isFinite(metric.used) && '≈'}
                         {numberText(metric.used, unknown)} {metric.unit}
-                        {metric.quality === 'reference' && ` · ${qualityDescription}`}
                       </Typography>
                     </Box>
                     <Typography
@@ -189,13 +202,9 @@ export default function UsageSummary({
                       color={percentage === null ? 'text.secondary' : `${quotaColor(metric)}.main`}
                       sx={{ flexShrink: 0, fontWeight: 600 }}
                     >
-                      {metric.status === 'stale'
-                        ? t('home.usage.coverage.stale')
-                        : percentage === null
-                          ? hasQuota(metric)
-                            ? unknown
-                            : t('home.usage.quota.unknown')
-                          : `${estimated ? '≈' : ''}${numberText(percentage, unknown)}%`}
+                      {percentage !== null
+                        ? `${estimated ? '≈' : ''}${numberText(percentage, unknown)}%`
+                        : unknown}
                     </Typography>
                   </Stack>
                   {percentage !== null && (
@@ -210,12 +219,8 @@ export default function UsageSummary({
               );
             })}
           </Stack>
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            {t('home.usage.summary.noMetrics')}
-          </Typography>
-        )}
-      </Stack>
+        </>
+      )}
     </Paper>
   );
 }

@@ -39,6 +39,7 @@ test('home keeps only three priority rows and links to all usage details', async
   await expect(rows.filter({ hasText: 'Workers · Requests' })).toHaveCount(0);
   await expect(summary.getByText('5 need attention', { exact: true })).toBeVisible();
   await expect(summary.getByText('3 charge groups', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('home-shortcuts')).toBeVisible();
   await expect(page.getByTestId('usage-trend')).toHaveCount(0);
   await expect(page.getByTestId('usage-card')).toHaveCount(0);
   await expect(page.getByRole('combobox')).toHaveCount(0);
@@ -48,6 +49,7 @@ test('home keeps only three priority rows and links to all usage details', async
   await expect(page.getByRole('button', { name: 'Request refresh', exact: true })).toHaveCount(0);
   await expect(page.getByText('Billing Read permission missing', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Billing range is not covered', { exact: true })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Calendar', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Open AI chat', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Open map', exact: true })).toBeVisible();
   await expect.poll(() => fixture.overviewRequests.at(-1)?.days).toBe(1);
@@ -58,6 +60,57 @@ test('home keeps only three priority rows and links to all usage details', async
   await expect(page.getByTestId('usage-card').filter({ hasText: 'Unknown storage' })).toBeVisible();
   await expect(page.getByTestId('usage-trend')).toHaveCount(1);
   await expect.poll(() => fixture.overviewRequests.at(-1)?.days).toBe(7);
+});
+
+test('home collapses Cloudflare metrics into a compact status strip when no metrics need attention', async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date(usageFixtureNow));
+  const overview = usageOverview();
+  const baseMetric = overview.metrics[0];
+  overview.costs = [{ ...overview.costs[0], amount: '0' }];
+  overview.metrics = [
+    {
+      ...baseMetric,
+      id: 'r2-storage',
+      product: 'R2',
+      name: 'R2 Data Storage (First 10GB-Month included)',
+      unit: 'GB-months',
+      used: 0.0013,
+      limit: 10,
+      remaining: 9.9987,
+      percentage: 0.0132,
+    },
+    {
+      ...baseMetric,
+      id: 'r2-class-b',
+      product: 'R2',
+      name: 'R2 Storage Class B Operations (First 10M included)',
+      unit: 'requests',
+      used: 37,
+      limit: 10_000_000,
+      remaining: 9_999_963,
+      percentage: 0.0004,
+    },
+  ];
+  await installCloudflareHomeFixture(page, { overview });
+  await page.goto('/#/home');
+
+  const shortcuts = page.getByTestId('home-shortcuts');
+  await expect(shortcuts.getByRole('link', { name: 'Calendar', exact: true })).toBeVisible();
+  await expect(shortcuts.getByRole('link', { name: 'Open map', exact: true })).toBeVisible();
+  await expect(shortcuts.getByRole('link', { name: 'Open AI chat', exact: true })).toBeVisible();
+
+  const summary = page.getByTestId('usage-summary');
+  await expect(summary).toBeVisible();
+  await expect(summary.getByText('USD 0', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('usage-summary-status')).toHaveText('Some data unavailable');
+  await expect(page.getByTestId('usage-summary-row')).toHaveCount(0);
+  await expect(summary.getByRole('progressbar')).toHaveCount(0);
+
+  await summary.getByRole('link', { name: 'View usage details', exact: true }).click();
+  await expect(page).toHaveURL(/#\/home\?view=usage$/u);
+  await expect(page.getByTestId('usage-card')).toHaveCount(2);
 });
 
 test('a single verified charge group retains its exact monetary total on the summary', async ({
@@ -119,13 +172,8 @@ for (const state of ['unknown', 'stale', 'partial', 'failed'] as const) {
     await expect(summary.getByText('0%', { exact: true })).toHaveCount(0);
     await expect(summary.getByText('Unavailable', { exact: true })).toBeVisible();
     await expect(page.getByText('Hidden diagnostics', { exact: true })).toHaveCount(0);
-    if (state === 'unknown') {
-      await expect(page.getByTestId('usage-summary-row')).toContainText('Unknown quota');
-      await expect(page.getByTestId('usage-summary-row').getByRole('progressbar')).toHaveCount(0);
-    }
-    if (state === 'stale') {
-      await expect(page.getByTestId('usage-summary-row')).toContainText('Stale data');
-    }
+    await expect(page.getByTestId('usage-summary-row')).toHaveCount(0);
+    await expect(summary.getByRole('progressbar')).toHaveCount(0);
   });
 }
 
@@ -158,9 +206,9 @@ test('summary keeps estimated, reference and unknown-consumption observations ho
       ...metric,
       id: 'estimated',
       name: 'Estimated requests',
-      used: 20,
-      remaining: 80,
-      percentage: 20,
+      used: 85,
+      remaining: 15,
+      percentage: 85,
       quality: 'estimated',
     },
     {
@@ -186,18 +234,12 @@ test('summary keeps estimated, reference and unknown-consumption observations ho
   await installCloudflareHomeFixture(page, { overview });
   await page.goto('/#/home');
   const rows = page.getByTestId('usage-summary-row');
+  await expect(rows).toHaveCount(1);
   const estimated = rows.filter({ hasText: 'Estimated requests' });
-  const reference = rows.filter({ hasText: 'Reference requests' });
-  const unknown = rows.filter({ hasText: 'Unknown consumption' });
-  await expect(estimated).toContainText(/≈\s*20 requests/u);
-  await expect(estimated.getByText(/≈\s*20%/u)).toBeVisible();
-  await expect(reference).toContainText(/40 requests\s*·\s*Reference/u);
-  await expect(reference.getByRole('progressbar')).toHaveCount(0);
-  await expect(reference.getByText(/40%/u)).toHaveCount(0);
-  await expect(unknown.getByText('Unknown', { exact: true })).toBeVisible();
-  await expect(unknown.getByText('Unknown quota', { exact: true })).toHaveCount(0);
-  await expect(unknown.getByRole('progressbar')).toHaveCount(0);
-  await expect(unknown.getByText('80%', { exact: true })).toHaveCount(0);
+  await expect(estimated).toContainText(/≈\s*85 requests/u);
+  await expect(estimated.getByText(/≈\s*85%/u)).toBeVisible();
+  await expect(rows.filter({ hasText: 'Reference requests' })).toHaveCount(0);
+  await expect(rows.filter({ hasText: 'Unknown consumption' })).toHaveCount(0);
   await expect(page.getByTestId('usage-summary-status')).toHaveText('Some data needs verification');
 });
 
@@ -245,15 +287,15 @@ test('a late detail response cannot overwrite the newer summary snapshot', async
   await page.getByRole('link', { name: 'View usage details', exact: true }).click();
   await expect.poll(() => detailStarted).toBe(true);
   fixture.overview.metrics = [
-    { ...fixture.overview.metrics[0], used: 10, remaining: 90, percentage: 10 },
+    { ...fixture.overview.metrics[0], used: 85, remaining: 15, percentage: 85 },
   ];
   await page.getByRole('link', { name: 'Back to home', exact: true }).click();
   await expect(page.getByTestId('usage-summary-row')).toHaveCount(1);
-  await expect(page.getByTestId('usage-summary-row')).toContainText('10%');
+  await expect(page.getByTestId('usage-summary-row')).toContainText('85%');
   release();
   await expect.poll(() => detailFinished).toBe(true);
   await expect(page.getByText('Obsolete pending metric', { exact: true })).toHaveCount(0);
-  await expect(page.getByTestId('usage-summary-row')).toContainText('10%');
+  await expect(page.getByTestId('usage-summary-row')).toContainText('85%');
 });
 
 test('Chinese dark summary fits a 320px viewport and keeps secondary content off the homepage', async ({
