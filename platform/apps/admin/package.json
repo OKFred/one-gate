@@ -1,5 +1,5 @@
 {
-  "name": "@hodor/admin",
+  "name": "@hodor/web-admin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,6 +13,7 @@
     "@cloudflare/realtimekit-react-ui": "^2.0.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@hodor/contracts": "workspace:*",
     "@hodor/ui": "workspace:*",
     "@iconify-icons/material-symbols": "^1.2.58",
     "@iconify/react": "^6.0.2",
@@ -40,7 +41,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "@module-federation/vite": "^1.16.12",
+    "@module-federation/vite": "1.16.12",
     "@types/leaflet": "^1.9.22",
     "@vitejs/plugin-react": "^6.0.2",
     "typescript": "~5.8.3",

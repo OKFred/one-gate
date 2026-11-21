@@ -15,10 +15,16 @@ import { Close as CloseIcon } from '@mui/icons-material';
 import { SchemaForm, DynamicForm } from '@/components/Form/index';
 import type { SchemaCrudConfig } from '../types';
 
-interface FormDialogProps<TRecord, TFilters, TApiData, TExtra = unknown> {
+interface FormDialogProps<
+  TRecord,
+  TFilters,
+  TApiData,
+  TExtra = unknown,
+  TKey extends string | number = number,
+> {
   open: boolean;
   onClose: () => void;
-  editId: number | null;
+  editId: number | string | null;
   form: Partial<TRecord>;
   setForm: React.Dispatch<React.SetStateAction<Partial<TRecord>>>;
   formLoading: boolean;
@@ -29,7 +35,7 @@ interface FormDialogProps<TRecord, TFilters, TApiData, TExtra = unknown> {
     clearFieldError: (path: string) => void;
     rootSchema?: Record<string, unknown>;
   };
-  config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra, never, never>;
+  config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra, never, never, TKey>;
   resolvedSchema: Record<string, unknown> | null;
   extraContext?: TExtra;
   onSubmit: (e: React.FormEvent) => void;
@@ -37,7 +43,13 @@ interface FormDialogProps<TRecord, TFilters, TApiData, TExtra = unknown> {
   t: (key: string) => string;
 }
 
-export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
+export function FormDialog<
+  TRecord,
+  TFilters,
+  TApiData,
+  TExtra = unknown,
+  TKey extends string | number = number,
+>({
   open,
   onClose,
   editId,
@@ -53,7 +65,7 @@ export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
   onSubmit,
   isMobile,
   t,
-}: FormDialogProps<TRecord, TFilters, TApiData, TExtra>) {
+}: FormDialogProps<TRecord, TFilters, TApiData, TExtra, TKey>) {
   const theme = useTheme();
 
   return (
@@ -79,7 +91,7 @@ export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {editId ? t('dialog.edit') : t('dialog.add')}
+          {editId !== null && editId !== undefined ? t('dialog.edit') : t('dialog.add')}
         </Box>
         {isMobile && (
           <IconButton edge="end" color="inherit" onClick={onClose} aria-label="close">
@@ -114,7 +126,7 @@ export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
             <SchemaForm schema={resolvedSchema} contextValue={errorContextValue}>
               <Box sx={{ pt: 2 }}>
                 {config.form.renderForm ? (
-                  config.form.renderForm(form, setForm, isMobile, t, extraContext)
+                  config.form.renderForm(form, setForm, isMobile, t, extraContext, !!editId)
                 ) : (
                   <DynamicForm
                     schema={resolvedSchema}

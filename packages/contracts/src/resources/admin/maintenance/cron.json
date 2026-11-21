@@ -1,0 +1,226 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/maintenance/cron",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取定时任务列表",
+      "add": "添加定时任务",
+      "update": "更新定时任务",
+      "delete": "删除定时任务",
+      "get": "获取定时任务信息"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "cron.filter.keywordPlaceholder"
+    },
+    "sortableFields": ["id", "name", "lastRunTimeUtc", "runCount", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": false
+      }
+    },
+    {
+      "name": "name",
+      "schema": {
+        "type": "string",
+        "description": "任务名称",
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "cron.field.name",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${name}" },
+        "form": {
+          "show": true,
+          "widget": "text",
+          "required": true,
+          "placeholderKey": "form.pleaseEnter",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "jobKey",
+      "schema": {
+        "type": "string",
+        "description": "任务唯一标识键",
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "cron.field.jobKey",
+        "table": { "show": true },
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "select",
+          "required": true,
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "cronExpression",
+      "schema": {
+        "type": "string",
+        "description": "Cron 表达式",
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "cron.field.cronExpression",
+        "table": { "show": true },
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "required": true,
+          "placeholderKey": "cron.field.cronExpressionPlaceholder",
+          "defaultValue": "*/5 * * * *"
+        }
+      }
+    },
+    {
+      "name": "status",
+      "schema": {
+        "type": "boolean",
+        "description": "状态 (false: 禁用, true: 启用)"
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false, "listFilter": true },
+      "ui": {
+        "labelKey": "filter.enabledStatus",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "card": {
+          "role": "tag",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "filter": {
+          "show": true,
+          "type": "select",
+          "labelKey": "filter.enabledStatus",
+          "includeAllOption": true,
+          "options": [
+            { "labelKey": "status.enabled", "value": true },
+            { "labelKey": "status.disabled", "value": false }
+          ]
+        },
+        "form": {
+          "show": true,
+          "widget": "switch",
+          "labelKey": "cron.field.statusLabel",
+          "defaultValue": true
+        }
+      }
+    },
+    {
+      "name": "runCount",
+      "schema": {
+        "type": "number",
+        "description": "累计运行次数"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "cron.field.runCount",
+        "table": { "show": true },
+        "card": { "role": "content", "labelKey": "cron.field.runCount" },
+        "form": false
+      }
+    },
+    {
+      "name": "lastRunTimeUtc",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "上次运行的毫秒时间戳"
+      },
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "cron.field.lastRunTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": false,
+        "form": false
+      }
+    },
+    {
+      "name": "nextRunTimeUtc",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "下次运行的毫秒时间戳"
+      },
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "cron.field.nextRunTime",
+        "table": { "show": true },
+        "card": false,
+        "form": false
+      }
+    },
+    {
+      "name": "parameters",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "JSON 格式参数",
+        "maxLength": 1000
+      },
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "cron.field.parameters",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 3,
+          "placeholderKey": "form.pleaseEnter",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    }
+  ]
+}

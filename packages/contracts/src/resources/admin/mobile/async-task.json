@@ -1,0 +1,334 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/mobile/async-task",
+  "readonly": true,
+  "auditFields": true,
+  "permissions": {
+    "add": false,
+    "edit": false,
+    "delete": false
+  },
+  "api": {
+    "summaries": {
+      "list": "分页获取异步任务"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": false,
+    "add": false,
+    "update": false,
+    "delete": false
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "mobile.asyncTask.taskId",
+      "placeholderKey": "common.searchPlaceholder"
+    },
+    "sortableFields": ["id", "taskId", "clientId", "status", "priority", "expiresAtUtc", "createTimeUtc"],
+    "showSortControls": true,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    },
+    "sortFieldLabelKeys": {
+      "id": "columns.id",
+      "taskId": "mobile.asyncTask.taskId",
+      "clientId": "mobile.device.clientId",
+      "status": "status.label",
+      "priority": "mobile.asyncTask.priority",
+      "expiresAtUtc": "mobile.asyncTask.expiresAtUtc",
+      "createTimeUtc": "columns.createTime"
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": false, "get": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "taskId",
+      "schema": {
+        "type": "string",
+        "description": "任务唯一标识 (UUID)",
+        "maxLength": 100
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "mobile.asyncTask.taskId",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${taskId}" }
+      }
+    },
+    {
+      "name": "clientId",
+      "schema": {
+        "type": "string",
+        "description": "设备标识",
+        "maxLength": 100
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "mobile.device.clientId",
+        "table": { "show": true },
+        "card": { "role": "content", "labelKey": "mobile.device.clientId" },
+        "filter": { "show": true, "type": "text" }
+      }
+    },
+    {
+      "name": "cat",
+      "schema": {
+        "type": "string",
+        "description": "任务分类 (shell, autojs6 等)",
+        "maxLength": 50
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "mobile.asyncTask.cat",
+        "table": { "show": true },
+        "card": { "role": "content", "labelKey": "mobile.asyncTask.cat" }
+      }
+    },
+    {
+      "name": "status",
+      "schema": {
+        "type": "string",
+        "enum": ["PENDING", "RUNNING", "SUCCESS", "FAILURE", "TIMEOUT", "REJECTED", "CANCELLED"],
+        "description": "任务状态"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "status.label",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "filled",
+          "options": [
+            { "value": "PENDING", "label": "PENDING", "color": "warning" },
+            { "value": "RUNNING", "label": "RUNNING", "color": "primary" },
+            { "value": "SUCCESS", "label": "SUCCESS", "color": "success" },
+            { "value": "FAILURE", "label": "FAILURE", "color": "error" },
+            { "value": "TIMEOUT", "label": "TIMEOUT", "color": "default" },
+            { "value": "REJECTED", "label": "REJECTED", "color": "warning" },
+            { "value": "CANCELLED", "label": "CANCELLED", "color": "default" }
+          ]
+        },
+        "card": { "role": "tag" },
+        "filter": {
+          "show": true,
+          "type": "select",
+          "options": [
+            { "label": "PENDING", "value": "PENDING" },
+            { "label": "RUNNING", "value": "RUNNING" },
+            { "label": "SUCCESS", "value": "SUCCESS" },
+            { "label": "FAILURE", "value": "FAILURE" },
+            { "label": "TIMEOUT", "value": "TIMEOUT" },
+            { "label": "REJECTED", "value": "REJECTED" },
+            { "label": "CANCELLED", "value": "CANCELLED" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "priority",
+      "schema": {
+        "type": "string",
+        "enum": ["HIGH", "NORMAL", "LOW"],
+        "description": "手机端队列调度优先级"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "mobile.asyncTask.priority",
+        "table": {
+          "show": true,
+          "renderer": "enumChip",
+          "variant": "filled",
+          "options": [
+            { "value": "HIGH", "label": "HIGH", "color": "error" },
+            { "value": "NORMAL", "label": "NORMAL", "color": "primary" },
+            { "value": "LOW", "label": "LOW", "color": "default" }
+          ]
+        },
+        "card": { "role": "content", "labelKey": "mobile.asyncTask.priority" },
+        "filter": {
+          "show": true,
+          "type": "select",
+          "options": [
+            { "label": "HIGH", "value": "HIGH" },
+            { "label": "NORMAL", "value": "NORMAL" },
+            { "label": "LOW", "value": "LOW" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "preemptRunning",
+      "schema": {
+        "type": "boolean",
+        "description": "是否显式抢占不高于当前优先级的运行任务"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "mobile.asyncTask.preemptRunning",
+        "table": {
+          "show": true,
+          "renderer": "booleanText",
+          "trueLabelKey": "mobile.asyncTask.yes",
+          "falseLabelKey": "mobile.asyncTask.no"
+        },
+        "card": false
+      }
+    },
+    {
+      "name": "preemptedByTaskId",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "抢占当前任务的任务标识",
+        "maxLength": 100
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "mobile.asyncTask.preemptedByTaskId",
+        "table": { "show": true, "fallback": "-" },
+        "card": false
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": { "role": "content", "labelKey": "columns.createTime" }
+      }
+    },
+    {
+      "name": "resultMessage",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "执行结果或失败原因"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "mobile.asyncTask.resultMessage",
+        "table": { "show": true, "truncate": 20, "tooltip": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "mobile.asyncTask.resultMessage", "fallback": "-" }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "column.remark", "fallback": "-" }
+      }
+    },
+    {
+      "name": "script",
+      "schema": { "type": "string", "description": "兼容字段；v2 任务仅保存 scriptId，不保存脚本源码" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "protocolVersion",
+      "schema": { "type": ["integer", "null"], "nullable": true, "description": "设备任务协议版本" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "scriptId",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "手机端可信脚本标识", "maxLength": 100 },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "scriptVersion",
+      "schema": { "type": ["integer", "null"], "nullable": true, "description": "手机端可信脚本版本" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "paramsJson",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "结构化任务参数 JSON" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "timeoutMs",
+      "schema": { "type": ["integer", "null"], "nullable": true, "description": "设备执行超时时间（毫秒）" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "traceId",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "任务链路追踪标识", "maxLength": 100 },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "resultCode",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "统一结果码", "maxLength": 100 },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "resultDataJson",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "结构化执行结果 JSON" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "startedAtUtc",
+      "schema": { "type": ["integer", "null"], "nullable": true, "description": "设备开始执行时间" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "finishedAtUtc",
+      "schema": { "type": ["integer", "null"], "nullable": true, "description": "设备完成执行时间" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "expiresAtUtc",
+      "schema": { "type": "integer", "description": "任务预期过期时间" },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    }
+  ]
+}

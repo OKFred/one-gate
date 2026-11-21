@@ -1,0 +1,168 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/oss/config",
+  "permissions": "none",
+  "operations": {
+    "listAll": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "name", "isEnabled", "isDefault", "createTimeUtc"],
+    "showSortControls": false
+  },
+  "fields": [
+    {
+      "name": "name",
+      "schema": { "type": "string", "description": "配置名称", "maxLength": 100 },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "oss.config.name",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "title" },
+        "form": { "show": true, "widget": "text", "defaultValue": "" }
+      }
+    },
+    {
+      "name": "provider",
+      "schema": { "type": "string", "enum": ["S3", "R2"], "description": "存储提供商" },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "oss.config.provider",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "content", "labelKey": "oss.config.provider" },
+        "form": {
+          "show": true,
+          "widget": "select",
+          "span": 6,
+          "defaultValue": "S3",
+          "options": [
+            { "value": "S3", "label": "S3 Compatible" },
+            { "value": "R2", "label": "Cloudflare R2" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "bucket",
+      "schema": { "type": "string", "description": "存储桶名称" },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "oss.config.bucket",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "content", "labelKey": "oss.config.bucket" },
+        "form": { "show": true, "widget": "text", "span": 6, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "endpoint",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "服务地址" },
+      "ui": {
+        "labelKey": "oss.config.endpoint",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "placeholder": "http://localhost:9000",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "accountId",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "账户 ID (仅 R2 需要)" },
+      "ui": {
+        "labelKey": "oss.config.accountId",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "text",
+          "visibleWhen": { "field": "provider", "equals": "R2" },
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    },
+    {
+      "name": "region",
+      "schema": { "type": "string", "default": "auto", "description": "区域" },
+      "ui": {
+        "labelKey": "oss.config.region",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "text", "span": 6, "defaultValue": "auto" }
+      }
+    },
+    {
+      "name": "accessKey",
+      "schema": { "type": "string", "description": "访问密钥 AK" },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "oss.config.accessKey",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "text", "defaultValue": "" }
+      }
+    },
+    {
+      "name": "secretKey",
+      "schema": { "type": "string", "description": "私有密钥 SK" },
+      "requiredOn": ["add", "list", "detail"],
+      "ui": {
+        "labelKey": "oss.config.secretKey",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "password", "defaultValue": "" }
+      }
+    },
+    {
+      "name": "isDefault",
+      "schema": { "type": "boolean", "description": "是否为默认配置" },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "oss.config.isDefault",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "hideWhenFalse": true,
+          "trueLabelKey": "oss.config.isDefault",
+          "trueColor": "primary",
+          "variant": "outlined",
+          "fallback": "-"
+        },
+        "card": {
+          "role": "tag",
+          "hideWhenFalse": true,
+          "trueLabelKey": "oss.config.isDefault",
+          "color": "primary"
+        },
+        "form": { "show": true, "widget": "switch", "span": 6, "defaultValue": false }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "filter": false,
+        "form": { "show": true, "widget": "switch", "span": 6, "defaultValue": true }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "ui": { "form": false }
+    }
+  ]
+}

@@ -10,7 +10,12 @@ import { setEnv } from "@hodor/core/utils/env.js";
 import createApp from "../src/index.js";
 
 async function main(): Promise<void> {
-  const output = process.argv[2];
+  const args = process.argv.slice(2).filter((arg) => arg !== "--");
+  const outFlagIndex = args.indexOf("--output");
+  const output =
+    outFlagIndex >= 0
+      ? args[outFlagIndex + 1]
+      : args.find((a) => !a.startsWith("-"));
   if (!output) throw new Error("OpenAPI output path is required");
 
   setEnv({ BASE_API_PATH: "/api/v1", NODE_ENV: "development" });

@@ -1,0 +1,321 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/mail/log",
+  "readonly": true,
+  "auditFields": false,
+  "permissions": "none",
+  "api": {
+    "basePath": "/api/v1/admin/mail/log",
+    "endpoints": {
+      "listAll": "/api/v1/admin/mail/log/list_all"
+    },
+    "summaries": {
+      "list": "获取邮件日志列表",
+      "listAll": "获取邮件日志全量列表",
+      "get": "获取邮件日志",
+      "add": "添加邮件日志"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": true,
+    "get": true,
+    "add": true,
+    "update": false,
+    "delete": false
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "mailTo", "mailFrom", "sendStatus", "createTimeUtc"],
+    "showSortControls": true,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    },
+    "sortFieldLabelKeys": {
+      "id": "columns.id",
+      "mailTo": "log.table.recipient",
+      "mailFrom": "log.table.sender",
+      "sendStatus": "columns.status",
+      "createTimeUtc": "columns.createTime"
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": false, "get": true, "listAll": true },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "title",
+      "schema": {
+        "type": "string",
+        "description": "邮件标题",
+        "examples": ["Welcome to register on our platform!"]
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": false, "listAll": true },
+      "ui": {
+        "labelKey": "log.table.subject",
+        "table": { "show": true, "truncate": 30, "tooltip": true, "fallback": "-" },
+        "card": { "role": "title", "truncate": 40 }
+      }
+    },
+    {
+      "name": "mailTo",
+      "schema": {
+        "type": "string",
+        "format": "email",
+        "description": "收件人邮箱地址",
+        "examples": ["receiver@example.com"]
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": false, "listAll": true },
+      "ui": {
+        "labelKey": "log.table.recipient",
+        "table": { "show": true, "truncate": 25, "tooltip": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "log.table.recipient" }
+      }
+    },
+    {
+      "name": "mailFrom",
+      "schema": {
+        "type": "string",
+        "format": "email",
+        "description": "发件人邮箱地址",
+        "examples": ["sender@example.com"]
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": false, "listAll": true },
+      "ui": {
+        "labelKey": "log.table.sender",
+        "table": { "show": true, "truncate": 25, "tooltip": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "log.table.sender" }
+      }
+    },
+    {
+      "name": "sendStatus",
+      "schema": {
+        "type": "boolean",
+        "description": "发送状态"
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": false, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "columns.status",
+        "table": {
+          "show": true,
+          "align": "center",
+          "renderer": "booleanChip",
+          "showIcon": true,
+          "trueLabelKey": "status.success",
+          "falseLabelKey": "status.failure",
+          "trueColor": "success",
+          "falseColor": "error",
+          "falseTooltipField": "exceptionDetails",
+          "variant": "filled"
+        },
+        "card": {
+          "role": "tag",
+          "trueLabelKey": "status.success",
+          "falseLabelKey": "status.failure",
+          "trueColor": "success",
+          "falseColor": "error"
+        },
+        "filter": false
+      }
+    },
+    {
+      "name": "templateId",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "邮件模板ID"
+      },
+      "requiredOn": ["list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": false, "listAll": true, "listFilter": true },
+      "ui": { "table": false, "card": false, "filter": false }
+    },
+    {
+      "name": "templateParams",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "邮件模板参数"
+      },
+      "requiredOn": ["list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "exceptionCode",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "异常代码"
+      },
+      "requiredOn": ["list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "exceptionDetails",
+      "schema": {
+        "type": ["string", "null"],
+        "nullable": true,
+        "description": "异常详情"
+      },
+      "requiredOn": ["list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": true },
+      "ui": {
+        "labelKey": "log.table.sendTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": { "role": "content", "labelKey": "log.table.sendTime" }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": false, "listAll": true },
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "column.remark" }
+      }
+    },
+    {
+      "name": "creatorId",
+      "schema": { "type": "number", "description": "创建人ID" },
+      "requiredOn": ["list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "creatorName",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "创建人名称" },
+      "requiredOn": ["list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "startTimeUtc",
+      "schema": { "type": "number", "description": "开始时间（UTC毫秒）" },
+      "in": { "list": false, "detail": false, "add": false, "update": false, "get": false, "listAll": false, "listFilter": true },
+      "ui": { "table": false, "card": false, "filter": false, "form": false }
+    },
+    {
+      "name": "endTimeUtc",
+      "schema": { "type": "number", "description": "结束时间（UTC毫秒）" },
+      "in": { "list": false, "detail": false, "add": false, "update": false, "get": false, "listAll": false, "listFilter": true },
+      "ui": { "table": false, "card": false, "filter": false, "form": false }
+    }
+  ],
+  "actions": [
+    {
+      "key": "view",
+      "type": "detail",
+      "icon": "Visibility",
+      "color": "primary"
+    }
+  ],
+  "detailDialog": {
+    "maxWidth": "md",
+    "titleKey": "page.details",
+    "titleIcon": "Email",
+    "sections": [
+      {
+        "items": [
+          {
+            "field": "sendStatus",
+            "labelKey": "columns.status",
+            "renderer": "booleanChip",
+            "trueLabelKey": "status.success",
+            "falseLabelKey": "status.failure",
+            "trueColor": "success",
+            "falseColor": "error"
+          }
+        ]
+      },
+      {
+        "titleKey": "log.table.basicInfo",
+        "items": [
+          { "field": "title", "labelKey": "log.table.subject", "fallback": "-" },
+          { "field": "mailTo", "labelKey": "log.table.recipient", "fallback": "-" },
+          { "field": "mailFrom", "labelKey": "log.table.sender", "fallback": "-" }
+        ]
+      },
+      {
+        "titleKey": "log.table.timeInfo",
+        "icon": "Schedule",
+        "items": [
+          { "field": "createTimeUtc", "labelKey": "columns.createTime", "renderer": "datetime", "fallback": "-" }
+        ]
+      },
+      {
+        "titleKey": "log.table.templateInfo",
+        "icon": "Description",
+        "visibleWhen": {
+          "any": [
+            { "field": "templateId", "truthy": true },
+            { "field": "templateParams", "truthy": true }
+          ]
+        },
+        "items": [
+          {
+            "field": "templateParams",
+            "labelKey": "log.table.templateParams",
+            "renderer": "jsonPre",
+            "visibleWhen": { "field": "templateParams", "truthy": true }
+          }
+        ]
+      },
+      {
+        "titleKey": "log.table.errorInfo",
+        "visibleWhen": {
+          "all": [
+            { "field": "sendStatus", "falsy": true },
+            {
+              "any": [
+                { "field": "exceptionCode", "truthy": true },
+                { "field": "exceptionDetails", "truthy": true }
+              ]
+            }
+          ]
+        },
+        "items": [
+          {
+            "field": "exceptionCode",
+            "labelKey": "log.table.errorCode",
+            "renderer": "alert",
+            "severity": "error",
+            "visibleWhen": { "field": "exceptionCode", "truthy": true }
+          },
+          {
+            "field": "exceptionDetails",
+            "labelKey": "log.table.errorDetails",
+            "renderer": "alert",
+            "severity": "error",
+            "visibleWhen": { "field": "exceptionDetails", "truthy": true }
+          }
+        ]
+      }
+    ]
+  }
+}

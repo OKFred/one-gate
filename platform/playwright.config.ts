@@ -17,7 +17,7 @@ export default defineConfig({
   webServer: e2eEnvironment.mockAuth
     ? [
         {
-          command: 'pnpm --filter @hodor/admin preview --host 127.0.0.1 --port 4173',
+          command: 'pnpm --filter @hodor/web-admin preview --host 127.0.0.1 --port 4173',
           url: e2eEnvironment.baseUrl,
           reuseExistingServer: !process.env.CI,
           timeout: 60_000,
@@ -29,7 +29,7 @@ export default defineConfig({
           timeout: 60_000,
         },
         {
-          command: 'pnpm --filter @hodor/enterprise preview --host 127.0.0.1 --port 4174',
+          command: 'pnpm --filter @hodor/web-enterprise preview --host 127.0.0.1 --port 4174',
           url: 'http://127.0.0.1:4174',
           reuseExistingServer: !process.env.CI,
           timeout: 60_000,

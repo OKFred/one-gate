@@ -1,0 +1,209 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/i18n/translation",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取多语言翻译列表",
+      "listAll": "获取所有多语言翻译（不分页）",
+      "get": "获取多语言翻译详情",
+      "add": "添加多语言翻译",
+      "update": "更新多语言翻译",
+      "delete": "删除多语言翻译"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": true,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "application", "business", "langCode", "tKey", "createTimeUtc"],
+    "showSortControls": true,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": false
+    },
+    "sortFieldLabelKeys": {
+      "id": "columns.id",
+      "application": "translation.table.application",
+      "business": "translation.table.business",
+      "langCode": "translation.table.langCode",
+      "tKey": "translation.table.tKey",
+      "createTimeUtc": "columns.createTime"
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": true },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "application",
+      "schema": {
+        "type": "string",
+        "description": "应用",
+        "examples": ["frontend", "backend", "common"],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "translation.table.application",
+        "table": { "show": true, "renderer": "enumChip", "color": "primary", "variant": "outlined" },
+        "card": { "role": "tag", "color": "primary", "variant": "outlined" },
+        "filter": { "show": true, "type": "text", "placeholderKey": "translation.table.application", "transform": "emptyToUndefined" },
+        "form": { "show": true, "widget": "text", "span": 6, "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "business",
+      "schema": {
+        "type": "string",
+        "description": "业务",
+        "examples": ["email", "order"],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "translation.table.business",
+        "table": { "show": true, "renderer": "enumChip", "color": "secondary", "variant": "outlined" },
+        "card": { "role": "tag", "color": "secondary", "variant": "outlined" },
+        "filter": { "show": true, "type": "text", "placeholderKey": "translation.table.business", "transform": "emptyToUndefined" },
+        "form": { "show": true, "widget": "text", "span": 6, "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "langCode",
+      "schema": {
+        "type": "string",
+        "description": "语言代码",
+        "examples": ["en-US", "zh-CN"],
+        "maxLength": 10
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "translation.table.langCode",
+        "table": { "show": true, "renderer": "enumChip", "variant": "outlined" },
+        "card": { "role": "tag", "variant": "outlined" },
+        "filter": { "show": true, "type": "text", "placeholderKey": "translation.table.langCode", "transform": "emptyToUndefined" },
+        "form": { "show": true, "widget": "text", "span": 6, "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "tKey",
+      "schema": {
+        "type": "string",
+        "description": "翻译键",
+        "pattern": "^[a-zA-Z0-9_]+(?:\\.[a-zA-Z0-9_]+)*$",
+        "examples": ["welcome.message", "businessType.i18n"],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "translation.table.tKey",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${tKey}" },
+        "form": { "show": true, "widget": "text", "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "tValue",
+      "schema": {
+        "type": "string",
+        "description": "翻译值",
+        "examples": ["Welcome to our application"],
+        "maxLength": 500
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "translation.table.tValue",
+        "table": { "show": true },
+        "card": { "role": "content", "labelKey": "translation.table.tValue" },
+        "form": { "show": true, "widget": "textarea", "rows": 4, "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "valueHash",
+      "schema": {
+        "type": "string",
+        "description": "值的SHA256哈希",
+        "examples": ["abc123..."],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": { "table": false, "card": false, "form": { "show": false, "defaultValue": "" } }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "filter.enabledStatus",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "default",
+          "variant": "outlined"
+        },
+        "card": { "role": "tag" },
+        "filter": { "show": true, "type": "select", "labelKey": "status.enabled", "includeAllOption": true },
+        "form": { "show": true, "widget": "switch", "labelKey": "status.enabled", "defaultValue": true }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": false
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "table": { "show": true, "fallback": "-" },
+        "card": { "role": "content", "labelKey": "column.remark", "fallback": "-" },
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 2,
+          "maxLength": 500,
+          "showCharCount": true,
+          "placeholderKey": "form.pleaseEnter",
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    }
+  ]
+}

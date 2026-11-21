@@ -20,6 +20,16 @@ export const permissions = {
     /** 底座 */
     base: {
       read: 'admin.base:read',
+      add: 'admin.base:add',
+      edit: 'admin.base:edit',
+      delete: 'admin.base:delete',
+      /** 自动生成: map */
+      map: {
+        read: 'admin.base.map:read',
+        add: 'admin.base.map:add',
+        edit: 'admin.base.map:edit',
+        delete: 'admin.base.map:delete',
+      },
       /** sys_config */
       sys_config: {
         read: 'admin.base.sys_config:read',
@@ -349,6 +359,16 @@ export const permissions = {
     /** 移动端管理 */
     mobile: {
       read: 'admin.mobile:read',
+      add: 'admin.mobile:add',
+      edit: 'admin.mobile:edit',
+      delete: 'admin.mobile:delete',
+      /** 自动生成: tiktok_task */
+      tiktok_task: {
+        read: 'admin.mobile.tiktok_task:read',
+        add: 'admin.mobile.tiktok_task:add',
+        edit: 'admin.mobile.tiktok_task:edit',
+        delete: 'admin.mobile.tiktok_task:delete',
+      },
       /** device */
       device: {
         read: 'admin.mobile.device:read',

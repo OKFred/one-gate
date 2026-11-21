@@ -1,32 +1,15 @@
-import {
-  IndexVO,
-  UserUniqueVO,
-  UserVO,
-  UserListVO,
-  UserAddVO,
-  UserUpdateVO,
-  UserListKeys,
-  UserDetailKeys,
-  UserGetKeys,
-  UserDeleteKeys,
-  UserAddKeys,
-  UserUpdateKeys,
-  UserUniqueKeys,
-  UserSortableKeys,
-  type UserPOLike,
-  type UserVOLike,
-  type UserAddVOLike,
-  type UserUpdateVOLike,
-  type UserDeleteVOLike,
-  type UserGetVOLike,
-  UserBasePO,
-} from "./model";
+import type { UserPOLike, UserVOLike } from "./model";
 import { utils as departmentUtils } from "../department/service";
 import { utils as roleUtils } from "../role/service";
 import { registry } from "../../common/registry.js";
-import type { FromSchema, JSONSchema } from "json-schema-to-ts";
+import type { FromSchema } from "json-schema-to-ts";
 import { hashPassword, verifyPassword } from "@hodor/core/utils/crypto";
-import type { RequiredKeys, UserObj } from "@hodor/core/types/app";
+import type { UserObj } from "@hodor/core/types/app";
+import { adminSystemUserBackendSchemas } from "@hodor/contracts/resources";
+import {
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import {
   preventSuperAdminDelete,
   preventSuperAdminDisable,
@@ -36,83 +19,21 @@ import {
   preventMissingRegion,
   preventInvalidLangCode,
 } from "./prevention";
-import {
-  listAllReqBase,
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
-import {
-  bodyAdapter,
-  bodyUserAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
-import type { API } from "@hodor/core/middleware/encapsulation";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { kv } from "@hodor/core/middleware/cache";
 import { userRepository } from "./repository";
 
-const listAllReq = {
-  type: "object",
-  properties: {
-    ...listAllReqBase,
-    isEnabled: UserVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof UserPOLike)[]>(UserSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const listAllRes = {
-  type: "array",
-  items: {
-    type: "object",
-    properties: {
-      ...IndexVO,
-      ...UserUniqueVO,
-      ...UserBasePO,
-    },
-    required: [...UserGetKeys, ...UserUniqueKeys],
-    additionalProperties: false,
-  },
-} as const satisfies JSONSchema;
+const S = adminSystemUserBackendSchemas;
+
 async function onListAll(
-  params: FromSchema<typeof listAllReq>
-): Promise<FromSchema<typeof listAllRes>> {
+  params: FromSchema<typeof S.listAllReq>
+): Promise<FromSchema<typeof S.listAllRes>> {
   return await userRepository.findAll(params);
 }
-const listAllApi = {
-  req: listAllReq,
-  res: listAllRes,
-  pathInfo: {
-    path: "/listAll",
-    method: "post",
-    summary: "获取所有用户（不分页）",
-  } as const,
-  adapter: bodyAdapter,
-  service: onListAll,
-  permission: { action: "read" },
-} satisfies API;
 
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    isEnabled: UserVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof UserPOLike)[]>(UserSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<Omit<UserPOLike, "password">>[]>(
-    {
-      ...UserListVO,
-    },
-    [...UserListKeys]
-  ),
-} as const satisfies JSONSchema;
 async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
@@ -126,46 +47,16 @@ async function onList(
   });
 
   const rowsFiltered = list.map((row) => {
-    const { password, ...rest } = row; // 注意：不返回密码字段
+    const { password: _password, ...rest } = row; // 注意：不返回密码字段
     return rest;
   });
-  const totalPage = Math.ceil(total / finalPageSize);
-  return {
-    total,
-    totalPage,
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list: rowsFiltered,
-  };
+  return buildPagedListResult(rowsFiltered, total, pageNo, finalPageSize);
 }
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取用户列表",
-  } as const,
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
 
-const addReq = {
-  type: "object",
-  properties: {
-    ...UserAddVO,
-  } satisfies Partial<Record<keyof UserAddVOLike, JSONSchema>>,
-  required: [...UserAddKeys] as const satisfies RequiredKeys<UserAddVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const addRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
 async function onAdd(
-  params: FromSchema<typeof addReq>,
+  params: FromSchema<typeof S.addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
+): Promise<number> {
   const { userId: creatorId } = userObj;
   const {
     username,
@@ -194,7 +85,7 @@ async function onAdd(
     username,
     password,
     langCode,
-    remark,
+    remark: remark ?? null,
     departmentId,
     regionId,
     roleIdArr,
@@ -203,36 +94,11 @@ async function onAdd(
   });
   return insertedId;
 }
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加用户",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
 
-const updateReq = {
-  type: "object",
-  properties: {
-    ...UserUpdateVO,
-  },
-  required: [
-    ...UserUpdateKeys,
-  ] as const satisfies RequiredKeys<UserUpdateVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const updateRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
 async function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof updateRes> | null> {
+): Promise<number> {
   const { userId: updaterId } = userObj;
   const { id, departmentObj, regionObj, roleArr, langCode, ...rest } = params;
 
@@ -264,35 +130,10 @@ async function onUpdate(
   kv.delete(`system.auth.bundle:${id}`).catch(() => {});
   return updatedId;
 }
-const updateApi = {
-  req: updateReq,
-  res: updateRes,
-  pathInfo: {
-    path: "/update",
-    method: "post",
-    summary: "更新用户",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
 
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...UserDeleteKeys,
-  ] as const satisfies RequiredKeys<UserDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
 async function onDelete(
-  params: FromSchema<typeof deleteReq>
-): Promise<FromSchema<typeof deleteRes> | null> {
+  params: FromSchema<typeof S.deleteReq>
+): Promise<number> {
   const { id } = params;
   const thisUser = await onGet({ id });
 
@@ -302,44 +143,21 @@ async function onDelete(
   kv.delete(`system.auth.bundle:${id}`).catch(() => {});
   return deletedId;
 }
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除用户",
-  } as const,
-  adapter: bodyAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
-
-const getReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [...UserGetKeys] as const satisfies RequiredKeys<UserGetVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const getRes = {
-  type: "object",
-  properties: {
-    ...UserVO,
-  },
-  required: [...UserDetailKeys] as const satisfies RequiredKeys<UserVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
 
 export type { UserObj };
 async function onGet(
-  params: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes> | null> {
+  params: FromSchema<typeof S.getReq>
+): Promise<FromSchema<typeof S.getRes>> {
   const { id } = params;
   const row = await userRepository.findById(id);
   preventEmpty(row);
-  const { password, departmentId, regionId, roleIdArr, ...rest } = row;
+  const {
+    password: _password,
+    departmentId,
+    regionId,
+    roleIdArr,
+    ...rest
+  } = row;
   const { departmentObj, regionObj, roleArr } = await getDTOs({
     departmentId,
     regionId,
@@ -352,18 +170,6 @@ async function onGet(
     roleArr,
   };
 }
-const getApi = {
-  req: getReq,
-  res: getRes,
-  pathInfo: {
-    path: "/get",
-    method: "post",
-    summary: "获取用户",
-  } as const,
-  adapter: bodyAdapter,
-  service: onGet,
-  permission: { action: "read" },
-} satisfies API;
 
 async function convertPassword(base64Password: string): Promise<string> {
   const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
@@ -547,11 +353,11 @@ export const utils = {
   onInsert,
 };
 
-export default {
-  listAll: listAllApi,
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  delete: deleteApi,
-  get: getApi,
-};
+export default createCrudApis(S, {
+  listAll: { summary: "获取所有用户（不分页）", handler: onListAll },
+  list: { summary: "获取用户列表", handler: onList },
+  add: { summary: "添加用户", handler: onAdd },
+  update: { summary: "更新用户", handler: onUpdate },
+  delete: { summary: "删除用户", handler: onDelete },
+  get: { summary: "获取用户", handler: onGet },
+});

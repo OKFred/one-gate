@@ -72,10 +72,11 @@ pnpm run db:generate
 
 在 `service.ts` 中描述并暴露 REST 端点：
 
+- **优先采用顶层共享契约装配 CRUD 路由**：标准或扩展 CRUD 资源优先在 `packages/contracts/src/resources/<app>/.../<resource>.json` 中定义单份契约，并在 `service.ts` 中引入 `@hodor/contracts/resources` 导出的 `*BackendSchemas`，结合 `@hodor/core/middleware/encapsulation/crud` 提供的 `createCrudApis` 与 `buildPagedListResult` 自动装配标准端点（`list`、`listAll`、`add`、`update`、`delete`、`deleteWithUndo`、`get`），仅在存在额外定制端点（如 `extra`）或非标准外接接口（如 Docker Swarm 代理、KV 缓存）时补充独立 `API` 定义。
 - **所有业务接口设计必须且只能使用 POST 请求**：禁止使用 GET、PUT、DELETE 等其他方法，以保证高阶 `encapsulation` 中间件能正确且安全地从 JSON Body 中提取与校验数据。
-- **禁止在 `service.ts` 中硬编码 API 请求或响应的字段定义 (Properties)**：为了保证类型与数据模型规范的集中管理，无论该业务是否有数据表对应，API 接口的 properties 字段属性必须定义在 `model.ts` 中（如封装为 `[Domain]ReqVO`、`[Domain]ResVO` 等），而在 `service.ts` 的 JSON Schema 定义中，只需解构引用 `model.ts` 里的定义。
+- **禁止在 `service.ts` 中硬编码请求或响应字段定义 (Properties)**：标准 CRUD 资源由 `@hodor/contracts` 的契约 JSON 编译提供闭合 Schema；定制扩展端点的字段属性必须定义在 `model.ts` 中（如 `[Domain]ReqVO`、`[Domain]ResVO`），并在 `service.ts` 中解构引用。
 - 返回的列表及详情应严格遵守 JSON Schema 规范进行类型声明。
-- **严禁在 `service.ts` 中直接调用 `encapsulation` 挂载**：`service.ts` 的默认导出必须是包含各个 API 定义的纯对象（即强制推导为 `Record<string, API>` 类型，如 `export default { get: getApi, update: updateApi }`）。
+- **严禁在 `service.ts` 中直接调用 `encapsulation` 挂载**：`service.ts` 的默认导出必须是包含各个 API 定义的纯对象（即强制推导为 `Record<string, API>` 类型，如 `export default createCrudApis(S, { ... })`）。
 - **独立的路由挂载入口**：领域服务必须在同级目录新建的 `[module]/index.ts` 中调用 `encapsulation(service, "...")` 导出 `app`，并在子包的根 `index.ts` 下统一挂载路由，确保业务代码与挂载行为完全解耦。
 
 ---
@@ -103,11 +104,14 @@ pnpm run db:generate
 1. **`server/packages/core/src/db/initMenu.ts`**: 挂载侧边栏导航树。
 2. **`server/packages/core/src/db/initPermissions.ts`**: 新增对应的访问权限控制节点。
 3. **`server/packages/core/src/db/initTranslation.ts`**: 集中导入多语言翻译对象（中文/英文）。
-4. **`server/packages/core/src/types/business.ts`**: 扩展 `BusinessKey` 联合类型。
+4. **`server/packages/core/src/types/business.ts`**: 可通过根目录一键同步命令自动推导更新 `BusinessKey` 联合类型与前端类型/权限。
 
 同步命令：
 
 ```bash
-# 在 server 目录下执行本地同步（刷新 local.db）
-pnpm run db:init node
+# 在仓库根目录执行离线全栈同步（契约生成与构建 + BusinessKey + 权限码 + openapi.d.ts + 契约全维校验）
+pnpm run sync:all
+
+# 在 server 目录下执行本地数据库初始化（刷新 local.db）
+pnpm --dir server run db:init node
 ```

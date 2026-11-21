@@ -1,122 +1,28 @@
-import {
-  IndexVO,
-  TranslationVO,
-  TranslationListVO,
-  TranslationAddVO,
-  TranslationUpdateVO,
-  TranslationListKeys,
-  TranslationDetailKeys,
-  TranslationGetKeys,
-  TranslationDeleteKeys,
-  TranslationAddKeys,
-  TranslationUpdateKeys,
-  TranslationSortableKeys,
-  type TranslationPOLike,
-  type TranslationVOLike,
-  type TranslationAddVOLike,
-  type TranslationUpdateVOLike,
-  type TranslationDeleteVOLike,
-  type TranslationGetVOLike,
-} from "./model";
+import { IndexVO, TranslationVO } from "./model";
 import * as translationRepository from "./repository";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
-
+import type { UserObj } from "@hodor/core/types/app";
+import { adminI18nTranslationBackendSchemas } from "@hodor/contracts/resources";
 import {
-  listAllReqBase,
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
-import {
-  bodyAdapter,
-  bodyUserAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
+import { bodyAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
-
 import { kv } from "@hodor/core/middleware/cache";
 
-const listAllReq = {
-  type: "object",
-  properties: {
-    ...listAllReqBase,
-    application: TranslationVO["application"],
-    business: TranslationVO["business"],
-    langCode: TranslationVO["langCode"],
-    isEnabled: TranslationVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(
-      TranslationSortableKeys
-    ),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listAllRes = {
-  type: "array",
-  items: {
-    type: "object",
-    properties: {
-      id: IndexVO.id,
-      application: TranslationVO.application,
-      business: TranslationVO.business,
-      langCode: TranslationVO.langCode,
-      tKey: TranslationVO.tKey,
-      tValue: TranslationVO.tValue,
-      isEnabled: TranslationVO.isEnabled,
-    },
-    required: [...TranslationGetKeys],
-    additionalProperties: false,
-  },
-} as const satisfies JSONSchema;
+const S = adminI18nTranslationBackendSchemas;
 
 async function onListAll(
-  params: FromSchema<typeof listAllReq>
-): Promise<FromSchema<typeof listAllRes>> {
+  params: FromSchema<typeof S.listAllReq>
+): Promise<FromSchema<typeof S.listAllRes>> {
   return await translationRepository.findPageAll(params);
 }
 
-const listAllApi = {
-  req: listAllReq,
-  res: listAllRes,
-  pathInfo: {
-    path: "/listAll",
-    method: "post",
-    summary: "获取所有多语言翻译（不分页）",
-  } as const,
-  adapter: bodyAdapter,
-  service: onListAll,
-} satisfies API;
-
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    application: TranslationVO["application"],
-    business: TranslationVO["business"],
-    langCode: TranslationVO["langCode"],
-    isEnabled: TranslationVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(
-      TranslationSortableKeys
-    ),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<TranslationPOLike>[]>(
-    {
-      ...TranslationListVO,
-    },
-    [...TranslationListKeys]
-  ),
-} as const satisfies JSONSchema;
-
 async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
@@ -133,52 +39,24 @@ async function onList(
     isEnabled: params.isEnabled,
   });
 
-  const totalPage = finalPageSize === 0 ? 0 : Math.ceil(total / finalPageSize);
-  return {
-    total,
-    totalPage,
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list,
-  };
+  return buildPagedListResult(list, total, pageNo, finalPageSize);
 }
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取多语言翻译列表",
-  } as const,
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
-
-const addReq = {
-  type: "object",
-  properties: {
-    ...TranslationAddVO,
-  } satisfies Partial<Record<keyof TranslationAddVOLike, JSONSchema>>,
-  required: [
-    ...TranslationAddKeys,
-  ] as const satisfies RequiredKeys<TranslationAddVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const addRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onAdd(
-  params: FromSchema<typeof addReq>,
+  params: FromSchema<typeof S.addReq>,
   userObj: Pick<UserObj, "userId">
-): Promise<FromSchema<typeof addRes> | null> {
+): Promise<number> {
   const { userId: creatorId } = userObj;
 
   const addData = {
-    ...params,
+    application: params.application,
+    business: params.business,
+    langCode: params.langCode,
+    tKey: params.tKey,
+    tValue: params.tValue,
+    valueHash: params.valueHash,
+    remark: params.remark ?? null,
+    isEnabled: params.isEnabled,
     creatorId,
   };
   const transId = await translationRepository.onInsert(addData);
@@ -191,38 +69,10 @@ async function onAdd(
   return transId;
 }
 
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加多语言翻译",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
-
-const updateReq = {
-  type: "object",
-  properties: {
-    ...TranslationUpdateVO,
-  },
-  required: [
-    ...TranslationUpdateKeys,
-  ] as const satisfies RequiredKeys<TranslationUpdateVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const updateRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onUpdate(
-  params: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof S.updateReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof updateRes> | null> {
+): Promise<number> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
   const previousRecord = await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
@@ -253,37 +103,9 @@ async function onUpdate(
   return updateRow.id;
 }
 
-const updateApi = {
-  req: updateReq,
-  res: updateRes,
-  pathInfo: {
-    path: "/update",
-    method: "post",
-    summary: "更新多语言翻译",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
-
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...TranslationDeleteKeys,
-  ] as const satisfies RequiredKeys<TranslationDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
 async function onDelete(
-  params: FromSchema<typeof deleteReq>
-): Promise<FromSchema<typeof deleteRes> | null> {
+  params: FromSchema<typeof S.deleteReq>
+): Promise<number> {
   const { id } = params;
   // 先取出记录（若不存在则 preventEmpty 抛出），用于删除后的缓存同步
   const record = await onGet({ id });
@@ -297,62 +119,14 @@ async function onDelete(
   return row.id;
 }
 
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除多语言翻译",
-  } as const,
-  adapter: bodyAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
-
-const getReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...TranslationGetKeys,
-  ] as const satisfies RequiredKeys<TranslationGetVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const getRes = {
-  type: "object",
-  properties: {
-    ...TranslationVO,
-  },
-  required: [
-    ...TranslationDetailKeys,
-  ] as const satisfies RequiredKeys<TranslationVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 async function onGet(
-  params: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes>> {
+  params: FromSchema<typeof S.getReq>
+): Promise<FromSchema<typeof S.getRes>> {
   const { id } = params;
   const row = await translationRepository.findById(id);
   preventEmpty(row);
   return row;
 }
-
-const getApi = {
-  req: getReq,
-  res: getRes,
-  pathInfo: {
-    path: "/get",
-    method: "post",
-    summary: "获取多语言翻译",
-  } as const,
-  adapter: bodyAdapter,
-  service: onGet,
-  permission: { action: "read" },
-} satisfies API;
 
 async function getTranslationsByIds(
   ids: number[]
@@ -364,8 +138,8 @@ async function getTranslationsByIds(
 const checkDuplicateReq = {
   type: "object",
   properties: {
-    tValue: TranslationVO.tValue,
-    valueHash: TranslationVO.valueHash,
+    tValue: S.voProperties.tValue,
+    valueHash: S.voProperties.valueHash,
     excludeId: {
       ...IndexVO.id,
       description: "要排除的记录 ID（可选）",
@@ -439,7 +213,10 @@ async function calculateSHA256(text: string): Promise<string> {
 }
 
 async function cacheSync(
-  record: FromSchema<typeof addReq>,
+  record: Pick<
+    FromSchema<typeof S.addReq>,
+    "application" | "langCode" | "tKey" | "tValue"
+  >,
   operation: "add" | "update" | "delete"
 ) {
   const cacheKey = `i18n.translation:${record.langCode}.${record.tKey}`;
@@ -472,12 +249,16 @@ export const utils = {
   verifyTKeyUnique,
 };
 
-export default {
-  listAll: listAllApi,
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  delete: deleteApi,
-  get: getApi,
-  checkDuplicate: checkDuplicateApi,
-};
+export default createCrudApis(S, {
+  listAll: {
+    permission: false,
+    summary: "获取所有多语言翻译（不分页）",
+    handler: onListAll,
+  },
+  list: { summary: "获取多语言翻译列表", handler: onList },
+  add: { summary: "添加多语言翻译", handler: onAdd },
+  update: { summary: "更新多语言翻译", handler: onUpdate },
+  delete: { summary: "删除多语言翻译", handler: onDelete },
+  get: { summary: "获取多语言翻译", handler: onGet },
+  extra: { checkDuplicate: checkDuplicateApi },
+});

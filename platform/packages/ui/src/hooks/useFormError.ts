@@ -22,7 +22,7 @@ export function useFormErrorContext() {
  */
 export function useFormError(initialSchema?: Record<string, unknown>) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [rootSchema] = useState<Record<string, unknown> | undefined>(initialSchema);
+  const rootSchema = initialSchema;
 
   const handleFormError = useCallback((err: unknown) => {
     const e = err as {

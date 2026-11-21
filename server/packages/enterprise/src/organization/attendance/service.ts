@@ -1,149 +1,71 @@
+import type { FromSchema } from "json-schema-to-ts";
+import { enterpriseOrganizationAttendanceBackendSchemas } from "@hodor/contracts/resources";
 import {
-  AttendanceVO,
-  AttendanceListKeys,
-  AttendanceGetKeys,
-  AttendanceAddKeys,
-  AttendanceUpdateKeys,
-  AttendanceSortableKeys,
-  type AttendancePOLike,
-  type AttendanceVOLike,
-} from "./model";
-import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { RequiredKeys } from "@hodor/core/types/app";
-import {
-  listAllReqBase,
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
-import {
-  bodyAdapter,
-  bodyUserAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
-import type { API } from "@hodor/core/middleware/encapsulation";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
+import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { UserObj } from "@hodor/core/types/app.js";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
+import { AttendanceSortableKeys, type AttendancePOLike } from "./model";
 import { preventTimeTravel } from "./prevention";
 import * as attendanceRepository from "./repository";
 
-const listAllReq = {
-  type: "object",
-  properties: {
-    ...listAllReqBase,
-    status: AttendanceVO["status"],
-    employeeId: AttendanceVO["employeeId"],
-    date: AttendanceVO["date"],
-    orderBy: orderByWrapper<(keyof AttendancePOLike)[]>(AttendanceSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
+const S = enterpriseOrganizationAttendanceBackendSchemas;
 
-const listAllRes = {
-  type: "array",
-  items: {
-    type: "object",
-    properties: {
-      ...AttendanceVO,
-    },
-    required: ["id", "employeeId", "date", "status"],
-    additionalProperties: false,
-  },
-} as const satisfies JSONSchema;
-
-async function onListAll(
-  params: FromSchema<typeof listAllReq>,
-  userObj: UserObj
-): Promise<FromSchema<typeof listAllRes>> {
-  return await attendanceRepository.findPageAll(params);
+function toSortableKey(val?: string): keyof AttendancePOLike | undefined {
+  return AttendanceSortableKeys.find((k) => k === val);
 }
 
-const listAllApi = {
-  req: listAllReq,
-  res: listAllRes,
-  pathInfo: {
-    path: "/listAll",
-    method: "post",
-    summary: "获取所有考勤记录（不分页）",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onListAll,
-  permission: { action: "read" },
-} satisfies API;
+function toAttendanceStatus(val?: number): 0 | 1 | 2 | 3 | undefined {
+  if (val === 0 || val === 1 || val === 2 || val === 3) return val;
+  return undefined;
+}
 
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    status: AttendanceVO["status"],
-    employeeId: AttendanceVO["employeeId"],
-    date: AttendanceVO["date"],
-    orderBy: orderByWrapper<(keyof AttendancePOLike)[]>(AttendanceSortableKeys),
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper<RequiredKeys<AttendanceVOLike>[]>(
-    {
-      ...AttendanceVO,
-    },
-    [...AttendanceListKeys]
-  ),
-} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof S.listAllReq>,
+  _userObj: UserObj
+): Promise<FromSchema<typeof S.listAllRes>> {
+  return await attendanceRepository.findPageAll({
+    status: toAttendanceStatus(params.status),
+    employeeId: params.employeeId,
+    date: params.date,
+    orderBy: toSortableKey(params.orderBy),
+    descend: params.descend,
+  });
+}
 
 async function onList(
-  params: FromSchema<typeof listReq>,
-  userObj: UserObj
-): Promise<FromSchema<typeof listRes>> {
-  const { pageNo = 1, pageSize = 10 } = params;
+  params: FromSchema<typeof S.listReq>,
+  _userObj: UserObj
+): Promise<FromSchema<typeof S.listRes>> {
+  const {
+    pageNo = 1,
+    pageSize = 10,
+    keyword,
+    status,
+    employeeId,
+    date,
+  } = params;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   const { total, list } = await attendanceRepository.findPage({
-    ...params,
     pageNo,
     pageSize: finalPageSize,
+    orderBy: toSortableKey(params.orderBy),
+    descend: params.descend,
+    keyword,
+    status: toAttendanceStatus(status),
+    employeeId,
+    date,
   });
 
-  return {
-    total,
-    totalPage: Math.ceil(total / finalPageSize),
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list,
-  };
+  return buildPagedListResult(list, total, pageNo, finalPageSize);
 }
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取考勤记录列表",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
-
-const addReq = {
-  type: "object",
-  properties: {
-    ...AttendanceVO,
-  },
-  required: [...AttendanceAddKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const addRes = {
-  type: "number",
-} as const satisfies JSONSchema;
-
 async function onAdd(
-  params: any, // Simplified for brevity in writing, can be typed strictly
+  params: FromSchema<typeof S.addReq>,
   userObj: UserObj
 ): Promise<number | null> {
   const { userId: creatorId } = userObj;
@@ -158,7 +80,7 @@ async function onAdd(
     date,
     checkInTime,
     checkOutTime,
-    status,
+    status: toAttendanceStatus(status) ?? 0,
     remark,
     creatorId,
   });
@@ -166,29 +88,10 @@ async function onAdd(
   return insertedId || null;
 }
 
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加考勤记录",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onAdd,
-  permission: { action: "add" },
-} satisfies API;
-
-const updateReq = {
-  type: "object",
-  properties: {
-    ...AttendanceVO,
-  },
-  required: [...AttendanceUpdateKeys],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
+async function onUpdate(
+  params: FromSchema<typeof S.updateReq>,
+  userObj: UserObj
+): Promise<number | null> {
   const { userId: updaterId } = userObj;
   const { id, employeeId, date, checkInTime, checkOutTime, status, remark } =
     params;
@@ -201,7 +104,7 @@ async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
     date,
     checkInTime,
     checkOutTime,
-    status,
+    status: toAttendanceStatus(status),
     remark,
     updaterId,
     updateTimeUtc: Date.now(),
@@ -210,31 +113,9 @@ async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
   return row.id;
 }
 
-const updateApi = {
-  req: updateReq,
-  res: addRes,
-  pathInfo: {
-    path: "/update",
-    method: "post",
-    summary: "更新考勤记录",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdate,
-  permission: { action: "edit" },
-} satisfies API;
-
-const deleteReq = {
-  type: "object",
-  properties: {
-    id: AttendanceVO.id,
-  },
-  required: ["id"],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 async function onDelete(
-  params: FromSchema<typeof deleteReq>,
-  userObj: UserObj
+  params: FromSchema<typeof S.deleteReq>,
+  _userObj: UserObj
 ): Promise<number | null> {
   const { id } = params;
   const row = await attendanceRepository.onDelete(id);
@@ -242,65 +123,43 @@ async function onDelete(
   return row.id;
 }
 
-const deleteApi = {
-  req: deleteReq,
-  res: addRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除考勤记录",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onDelete,
-  permission: { action: "delete" },
-} satisfies API;
-
-const getReq = {
-  type: "object",
-  properties: {
-    id: AttendanceVO.id,
-  },
-  required: ["id"],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const getRes = {
-  type: "object",
-  properties: {
-    ...AttendanceVO,
-  },
-  required: ["id", "employeeId", "date", "status"],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
 async function onGet(
-  params: FromSchema<typeof getReq>,
-  userObj: UserObj
-): Promise<any> {
+  params: FromSchema<typeof S.getReq>,
+  _userObj: UserObj
+): Promise<FromSchema<typeof S.getRes>> {
   const { id } = params;
   const row = await attendanceRepository.findById(id);
   preventEmpty(row);
   return row;
 }
 
-const getApi = {
-  req: getReq,
-  res: getRes,
-  pathInfo: {
-    path: "/get",
-    method: "post",
+export default createCrudApis(S, {
+  listAll: {
+    adapter: bodyUserAdapter,
+    summary: "获取所有考勤记录（不分页）",
+    handler: onListAll,
+  },
+  list: {
+    adapter: bodyUserAdapter,
+    summary: "获取考勤记录列表",
+    handler: onList,
+  },
+  add: {
+    summary: "添加考勤记录",
+    handler: onAdd,
+  },
+  update: {
+    summary: "更新考勤记录",
+    handler: onUpdate,
+  },
+  delete: {
+    adapter: bodyUserAdapter,
+    summary: "删除考勤记录",
+    handler: onDelete,
+  },
+  get: {
+    adapter: bodyUserAdapter,
     summary: "获取考勤记录详情",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onGet,
-  permission: { action: "read" },
-} satisfies API;
-
-export default {
-  listAll: listAllApi,
-  list: listApi,
-  add: addApi,
-  update: updateApi,
-  delete: deleteApi,
-  get: getApi,
-};
+    handler: onGet,
+  },
+});

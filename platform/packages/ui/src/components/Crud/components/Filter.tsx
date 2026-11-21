@@ -13,6 +13,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import {
   FilterList as FilterIcon,
@@ -85,18 +87,19 @@ export function Filter<TFilters>({
           <Stack spacing={2}>
             {filterFields.map((f) => {
               const val = (filters as unknown as Record<string, unknown>)[f.name as string];
+              const isKeyword = Boolean(f.isKeyword || f.name === 'keyword');
               if (f.type === 'text') {
                 return (
                   <TextField
                     key={f.name as string}
                     label={f.label || t('filter.keyword')}
                     placeholder={f.placeholder || t('filter.keywordLabel')}
-                    value={f.name === 'keyword' ? keywordInput : val || ''}
+                    value={isKeyword ? keywordInput : val || ''}
                     onChange={(e) => handleFilterChange(f.name, e.target.value)}
                     size="small"
                     fullWidth
                     slotProps={
-                      f.name === 'keyword'
+                      isKeyword && f.searchIcon !== false
                         ? {
                             input: {
                               startAdornment: (
@@ -127,7 +130,11 @@ export function Filter<TFilters>({
                         } else if (v === 'false') {
                           handleFilterChange(f.name, false);
                         } else {
-                          handleFilterChange(f.name, v);
+                          const matchedOpt = f.options?.find((opt) => String(opt.value) === v);
+                          handleFilterChange(
+                            f.name,
+                            matchedOpt && matchedOpt.value !== null ? matchedOpt.value : v,
+                          );
                         }
                       }}
                     >
@@ -141,6 +148,20 @@ export function Filter<TFilters>({
                       ))}
                     </Select>
                   </FormControl>
+                );
+              }
+              if (f.type === 'switch') {
+                return (
+                  <FormControlLabel
+                    key={f.name as string}
+                    control={
+                      <Switch
+                        checked={Boolean(val)}
+                        onChange={(e) => handleFilterChange(f.name, e.target.checked)}
+                      />
+                    }
+                    label={f.label || String(f.name)}
+                  />
                 );
               }
               return null;

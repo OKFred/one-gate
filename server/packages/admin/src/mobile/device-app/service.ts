@@ -1,21 +1,15 @@
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { Context, UserObj } from "@hodor/core/types/app";
+import { adminMobileDeviceAppBackendSchemas } from "@hodor/contracts/resources";
 import {
-  listReqBase,
-  listResponseWrapper,
-  orderByWrapper,
-} from "@hodor/core/middleware/encapsulation/common.schema";
+  buildPagedListResult,
+  createCrudApis,
+} from "@hodor/core/middleware/encapsulation/crud";
 import {
-  bodyAdapter,
   bodyUserContextAdapter,
   rawAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import {
-  MobileDeviceAppVO,
-  MobileDeviceAppListKeys,
-  MobileDeviceAppSortableKeys,
-} from "./model";
 import { mobileDeviceAppRepo } from "./repository";
 import { mobileAppRepo } from "../app/repository";
 import { mobileAppVersionRepo } from "../app-version/repository";
@@ -33,52 +27,47 @@ import { adaptDeviceHttpError } from "../device/interfaces/http/error.js";
 import { reportTokenFromContext } from "../device/interfaces/http/report-token.js";
 import { completeAuthenticatedLegacyDeviceAppCallback } from "./legacy-callback.js";
 
+const S = adminMobileDeviceAppBackendSchemas;
+
 // 列表 (分页)
-const listReq = {
-  type: "object",
-  properties: {
-    ...listReqBase,
-    clientId: { type: "string" },
-    appId: { type: "integer" },
-    installStatus: MobileDeviceAppVO["installStatus"],
-    orderBy: orderByWrapper<(typeof MobileDeviceAppSortableKeys)[number][]>([
-      ...MobileDeviceAppSortableKeys,
-    ]),
-  },
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  ...listResponseWrapper(MobileDeviceAppVO, [...MobileDeviceAppListKeys]),
-} as const satisfies JSONSchema;
-
 async function onList(
-  params: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+  params: FromSchema<typeof S.listReq>
+): Promise<FromSchema<typeof S.listRes>> {
   const res = await mobileDeviceAppRepo.list({
     clientId: params.clientId,
     appId: params.appId,
     installStatus: params.installStatus,
     orderBy: params.orderBy,
     descend: params.descend,
-    pageNo: params.pageNo,
-    pageSize: params.pageSize,
+    pageNo: params.pageNo ?? 1,
+    pageSize: params.pageSize ?? 10,
   });
 
-  return {
-    ...res,
-    list: res.list as unknown as FromSchema<typeof listRes>["list"],
-  };
-}
+  const mappedList = res.list.map((row) => ({
+    id: row.id,
+    clientId: row.clientId,
+    appId: row.appId,
+    appName: row.appName || row.appPackageName || String(row.appId),
+    appIconUrl: row.appIconUrl ?? null,
+    appPackageName: row.appPackageName ?? "",
+    installedVersionName: row.installedVersionName,
+    installedVersionCode: row.installedVersionCode,
+    installStatus: row.installStatus,
+    lastSyncTimeUtc: row.lastSyncTimeUtc,
+    remark: row.remark ?? null,
+    creatorId: row.creatorId,
+    createTimeUtc: row.createTimeUtc,
+    updaterId: row.updaterId ?? null,
+    updateTimeUtc: row.updateTimeUtc ?? null,
+  }));
 
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: { path: "/list", method: "post", summary: "获取设备应用关联列表" },
-  adapter: bodyAdapter,
-  service: onList,
-  permission: { action: "read" },
-} satisfies API;
+  return buildPagedListResult(
+    mappedList,
+    res.total,
+    params.pageNo,
+    params.pageSize
+  );
+}
 
 // Sync / Install
 const taskReq = {
@@ -345,9 +334,14 @@ const callbackApi = {
   permission: { action: "read" }, // Allow webhook? In real app this would bypass permissions or use specific token.
 } satisfies API;
 
-export default {
-  list: listApi,
-  sync: syncApi,
-  install: installApi,
-  callback: callbackApi,
-};
+export default createCrudApis(S, {
+  list: {
+    summary: "获取设备应用关联列表",
+    handler: onList,
+  },
+  extra: {
+    sync: syncApi,
+    install: installApi,
+    callback: callbackApi,
+  },
+});

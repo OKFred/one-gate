@@ -1,0 +1,289 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/system/user",
+  "auditFields": true,
+  "api": {
+    "summaries": {
+      "list": "获取用户列表",
+      "listAll": "获取所有用户（不分页）",
+      "get": "获取用户",
+      "add": "添加用户",
+      "update": "更新用户",
+      "delete": "删除用户"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": true,
+    "get": true,
+    "add": true,
+    "update": true,
+    "delete": true
+  },
+  "filters": {
+    "keyword": {
+      "enabled": true,
+      "labelKey": "filter.keyword",
+      "placeholderKey": "filter.keywordLabel"
+    },
+    "sortableFields": ["id", "username", "langCode", "regionId", "departmentId", "isEnabled", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": false
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": true, "get": true, "listAll": true },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "username",
+      "schema": {
+        "type": "string",
+        "description": "用户名",
+        "examples": ["user"],
+        "maxLength": 100
+      },
+      "requiredOn": ["add", "list", "detail", "get"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "login.username",
+        "table": { "show": true },
+        "card": { "role": "title", "template": "${username}" },
+        "form": { "show": true, "widget": "text", "required": true, "defaultValue": "" }
+      }
+    },
+    {
+      "name": "password",
+      "schema": {
+        "type": "string",
+        "description": "密码",
+        "examples": ["QWRtaW5AM=="]
+      },
+      "requiredOn": ["add"],
+      "in": { "list": false, "detail": false, "add": true, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "user.table.password",
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "password",
+          "required": true,
+          "toggleVisibility": true,
+          "visibleWhen": "add",
+          "valueTransform": "base64",
+          "defaultValue": ""
+        }
+      }
+    },
+    {
+      "name": "departmentId",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "部门ID",
+        "examples": [1],
+        "minimum": 1
+      },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": false, "add": false, "update": false, "listAll": true },
+      "ui": {
+        "labelKey": "me.department",
+        "table": { "show": true, "fallback": "--" },
+        "card": { "role": "content", "labelKey": "me.department" },
+        "form": false
+      }
+    },
+    {
+      "name": "departmentObj",
+      "schema": {
+        "type": ["object", "null"],
+        "nullable": true,
+        "description": "部门对象",
+        "properties": {
+          "value": { "type": "number", "description": "部门ID", "examples": [1], "minimum": 1 },
+          "label": { "type": "string", "description": "部门名称", "examples": ["研发部"], "maxLength": 100 }
+        },
+        "required": ["value", "label"],
+        "additionalProperties": false
+      },
+      "requiredOn": ["add", "detail"],
+      "in": { "list": false, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "me.department",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "text", "defaultValue": null }
+      }
+    },
+    {
+      "name": "roleIdArr",
+      "schema": {
+        "type": "array",
+        "description": "角色ID数组",
+        "items": { "type": "number", "examples": [1], "minimum": 1 }
+      },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": false, "add": false, "update": false, "listAll": true },
+      "ui": {
+        "labelKey": "me.role",
+        "table": { "show": true, "fallback": "--" },
+        "card": { "role": "content", "labelKey": "me.role" },
+        "form": false
+      }
+    },
+    {
+      "name": "roleArr",
+      "schema": {
+        "type": "array",
+        "description": "角色数组",
+        "items": {
+          "type": "object",
+          "properties": {
+            "value": { "type": "number", "description": "角色ID", "examples": [1], "minimum": 1 },
+            "label": { "type": "string", "description": "角色名称", "examples": ["管理员"], "maxLength": 100 }
+          },
+          "required": ["value", "label"],
+          "additionalProperties": false
+        }
+      },
+      "requiredOn": ["add", "detail"],
+      "in": { "list": false, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "me.role",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "text", "defaultValue": [] }
+      }
+    },
+    {
+      "name": "langCode",
+      "schema": {
+        "type": "string",
+        "description": "语言代码",
+        "examples": ["en-US", "zh-CN"],
+        "maxLength": 10
+      },
+      "requiredOn": ["add", "list", "detail"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "labelKey": "column.language",
+        "table": { "show": true, "fallback": "--" },
+        "card": { "role": "content", "labelKey": "column.language" },
+        "form": { "show": true, "widget": "text", "defaultValue": "" }
+      }
+    },
+    {
+      "name": "regionId",
+      "schema": {
+        "type": ["number", "null"],
+        "nullable": true,
+        "description": "国家地区ID",
+        "examples": [1],
+        "minimum": 1
+      },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": false, "add": false, "update": false, "listAll": true },
+      "ui": {
+        "labelKey": "me.region",
+        "table": { "show": true, "fallback": "--" },
+        "card": { "role": "content", "labelKey": "me.region" },
+        "form": false
+      }
+    },
+    {
+      "name": "regionObj",
+      "schema": {
+        "type": ["object", "null"],
+        "nullable": true,
+        "description": "国家地区对象",
+        "properties": {
+          "value": { "type": "number", "description": "国家地区ID", "examples": [1], "minimum": 1 },
+          "label": { "type": "string", "description": "国家地区二位编码", "examples": ["CN"], "maxLength": 100 }
+        },
+        "required": ["value", "label"],
+        "additionalProperties": false
+      },
+      "requiredOn": ["add", "detail"],
+      "in": { "list": false, "detail": true, "add": true, "update": true, "listAll": false },
+      "ui": {
+        "labelKey": "me.region",
+        "table": false,
+        "card": false,
+        "form": { "show": true, "widget": "text", "defaultValue": null }
+      }
+    },
+    {
+      "name": "isEnabled",
+      "preset": "isEnabled",
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true, "listFilter": true },
+      "ui": {
+        "labelKey": "columns.status",
+        "table": {
+          "show": true,
+          "renderer": "booleanChip",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "error",
+          "variant": "outlined"
+        },
+        "card": {
+          "role": "tag",
+          "trueLabelKey": "status.enabled",
+          "falseLabelKey": "status.disabled",
+          "trueColor": "success",
+          "falseColor": "error"
+        },
+        "filter": false,
+        "form": {
+          "show": true,
+          "widget": "switch",
+          "labelKey": "status.enabled",
+          "defaultValue": true,
+          "disabledWhen": { "field": "id", "equals": 1 }
+        }
+      }
+    },
+    {
+      "name": "createTimeUtc",
+      "preset": "createTimeUtc",
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "add": false, "update": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.createTime",
+        "table": { "show": true, "renderer": "datetime", "fallback": "--" },
+        "card": { "role": "content", "labelKey": "columns.createTime" }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": ["add"],
+      "in": { "list": true, "detail": true, "add": true, "update": true, "listAll": true },
+      "ui": {
+        "table": false,
+        "card": false,
+        "form": {
+          "show": true,
+          "widget": "textarea",
+          "rows": 3,
+          "maxLength": 500,
+          "showCharCount": true,
+          "valueTransform": "emptyToNull",
+          "defaultValue": null
+        }
+      }
+    }
+  ]
+}

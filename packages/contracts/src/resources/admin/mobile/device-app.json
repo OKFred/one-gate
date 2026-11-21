@@ -1,0 +1,177 @@
+{
+  "$schema": "../../../../schema/crud-resource.schema.json",
+  "version": 1,
+  "resource": "admin/mobile/device-app",
+  "readonly": true,
+  "auditFields": true,
+  "permissions": "none",
+  "permissionNamespace": "admin.mobile.device_app",
+  "api": {
+    "summaries": {
+      "list": "获取设备应用关联列表"
+    }
+  },
+  "operations": {
+    "list": true,
+    "listAll": false,
+    "get": false,
+    "add": false,
+    "update": false,
+    "delete": false
+  },
+  "filters": {
+    "keyword": { "enabled": false },
+    "sortableFields": ["id", "clientId", "appId", "installedVersionCode", "installStatus", "lastSyncTimeUtc", "createTimeUtc"],
+    "showSortControls": false,
+    "defaultSort": {
+      "orderBy": "id",
+      "descend": true
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "preset": "id",
+      "in": { "list": true, "detail": true, "add": false, "update": false, "get": false, "listAll": false },
+      "ui": {
+        "labelKey": "columns.id",
+        "table": { "show": true, "renderer": "text" },
+        "card": { "role": "subtitle", "labelKey": "columns.id" }
+      }
+    },
+    {
+      "name": "clientId",
+      "schema": {
+        "type": "string",
+        "description": "设备标识",
+        "maxLength": 100
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "mobile.device.clientId",
+        "table": { "show": true },
+        "card": { "role": "subtitle", "labelKey": "mobile.device.clientId" },
+        "filter": { "show": true, "type": "text" }
+      }
+    },
+    {
+      "name": "appId",
+      "schema": {
+        "type": "integer",
+        "description": "关联 mobile_app.id"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "mobile.deviceApp.appId",
+        "table": false,
+        "card": false,
+        "filter": { "show": true, "type": "text", "transform": "number" }
+      }
+    },
+    {
+      "name": "appName",
+      "schema": { "type": "string", "description": "应用名称" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "mobile.deviceApp.app",
+        "table": {
+          "show": true,
+          "titleKey": "mobile.deviceApp.app",
+          "renderer": "mediaStackedText",
+          "imageField": "appIconUrl",
+          "imageSize": 32,
+          "primaryField": "appName",
+          "secondaryField": "appPackageName",
+          "fallback": "-"
+        },
+        "card": { "role": "title", "template": "${appName}" }
+      }
+    },
+    {
+      "name": "appIconUrl",
+      "schema": { "type": ["string", "null"], "nullable": true, "description": "应用图标" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    },
+    {
+      "name": "appPackageName",
+      "schema": { "type": "string", "description": "应用包名" },
+      "requiredOn": ["list"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "table": false,
+        "card": { "role": "content", "labelKey": "mobile.app.packageName" }
+      }
+    },
+    {
+      "name": "installedVersionName",
+      "schema": {
+        "type": "string",
+        "description": "已安装的版本名",
+        "maxLength": 50
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "mobile.deviceApp.installedVersionName",
+        "table": { "show": true },
+        "card": { "role": "content", "labelKey": "mobile.deviceApp.installedVersionName" }
+      }
+    },
+    {
+      "name": "installedVersionCode",
+      "schema": {
+        "type": "integer",
+        "description": "已安装的版本号"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "mobile.deviceApp.installedVersionCode",
+        "table": { "show": true },
+        "card": false
+      }
+    },
+    {
+      "name": "installStatus",
+      "schema": {
+        "type": "string",
+        "enum": ["INSTALLED", "INSTALLING", "FAILED", "UNINSTALLED"],
+        "description": "状态 (INSTALLED, INSTALLING, FAILED, UNINSTALLED)"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true, "listFilter": true },
+      "ui": {
+        "labelKey": "mobile.deviceApp.installStatus",
+        "table": { "show": true },
+        "card": { "role": "tag" },
+        "filter": false
+      }
+    },
+    {
+      "name": "lastSyncTimeUtc",
+      "schema": {
+        "type": "integer",
+        "description": "最后一次同步时间"
+      },
+      "requiredOn": ["list", "detail"],
+      "in": { "list": true, "detail": true },
+      "ui": {
+        "labelKey": "mobile.deviceApp.lastSyncTimeUtc",
+        "table": { "show": true, "renderer": "datetime", "fallback": "-" },
+        "card": { "role": "content", "labelKey": "mobile.deviceApp.lastSyncTimeUtc" }
+      }
+    },
+    {
+      "name": "remark",
+      "preset": "remark",
+      "requiredOn": [],
+      "in": { "list": true, "detail": true },
+      "ui": { "table": false, "card": false }
+    }
+  ]
+}

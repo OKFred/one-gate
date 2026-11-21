@@ -78,6 +78,7 @@ export const TextField = ({
             pattern: fieldProps.pattern,
             min: fieldProps.min,
             max: fieldProps.max,
+            ...(manualSlotProps?.htmlInput as Record<string, unknown> | undefined),
             ...manualInputProps,
           } as Record<string, unknown>,
         }}
