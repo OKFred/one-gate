@@ -176,6 +176,27 @@ function collectEndpointsFromContract(contract: CrudResourceContract): string[] 
   return [...urls];
 }
 
+function collectRegexPatterns(
+  obj: unknown,
+  pathPrefix: string,
+  out: Array<{ location: string; pattern: string }>,
+): void {
+  if (Array.isArray(obj)) {
+    obj.forEach((item, idx) => collectRegexPatterns(item, `${pathPrefix}[${idx}]`, out));
+    return;
+  }
+  if (!obj || typeof obj !== 'object') return;
+
+  for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+    const nextPath = pathPrefix ? `${pathPrefix}.${k}` : k;
+    if (k === 'pattern' && typeof v === 'string') {
+      out.push({ location: nextPath, pattern: v });
+    } else if (v && typeof v === 'object') {
+      collectRegexPatterns(v, nextPath, out);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const metaSchema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8')) as Schema;
   const jsonFiles = collectJsonFiles(RESOURCES_DIR);
@@ -255,6 +276,22 @@ async function main(): Promise<void> {
         const hasEn = uiEn.has(key) || appLocales.en.has(key);
         if (!hasZh) errors.push(`[${rel}] Missing zh-CN i18n key "${key}"`);
         if (!hasEn) errors.push(`[${rel}] Missing en-US i18n key "${key}"`);
+      }
+    }
+
+    // 5. 正则表达式（含浏览器 HTML pattern /v 模式）兼容性校验
+    const patterns: Array<{ location: string; pattern: string }> = [];
+    collectRegexPatterns(contract, '', patterns);
+    for (const { location, pattern } of patterns) {
+      for (const flags of ['', 'v'] as const) {
+        try {
+          new RegExp(pattern, flags);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          errors.push(
+            `[${rel}] Invalid regex at "${location}" (flags="${flags || 'default'}"): ${msg}`,
+          );
+        }
       }
     }
   }

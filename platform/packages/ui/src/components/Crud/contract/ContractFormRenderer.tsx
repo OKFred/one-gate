@@ -706,6 +706,7 @@ export function ContractFormRenderer<TRecord extends Record<string, unknown>>({
             helperText={helperText}
             multiline={ui.rows !== undefined && ui.rows > 1 && showPlain}
             rows={ui.rows !== undefined && ui.rows > 1 && showPlain ? ui.rows : undefined}
+            inputProps={{ autoComplete: 'new-password' }}
             fullWidth
             slotProps={
               ui.toggleVisibility

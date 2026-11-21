@@ -36,7 +36,7 @@
         "description": "Webhook 来源，例如 feishu",
         "minLength": 1,
         "maxLength": 50,
-        "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+        "pattern": "^[A-Za-z][A-Za-z0-9_\\-]*$"
       },
       "requiredOn": ["add", "list", "detail"],
       "in": { "list": true, "detail": true, "add": true, "update": true, "listFilter": true },

@@ -9,12 +9,18 @@ export interface ContractRoutePageProps {
   load: ContractLoader;
 }
 
+interface LoadedContractState {
+  load: ContractLoader;
+  contract: CrudResourceContract;
+}
+
 const contractCache = new WeakMap<ContractLoader, CrudResourceContract>();
 
 export function ContractRoutePage({ load }: ContractRoutePageProps) {
-  const [contract, setContract] = useState<CrudResourceContract | null>(
-    () => contractCache.get(load) ?? null,
-  );
+  const [loaded, setLoaded] = useState<LoadedContractState | null>(() => {
+    const cached = contractCache.get(load);
+    return cached ? { load, contract: cached } : null;
+  });
 
   useEffect(() => {
     const cached = contractCache.get(load);
@@ -25,7 +31,7 @@ export function ContractRoutePage({ load }: ContractRoutePageProps) {
     void load().then((mod) => {
       contractCache.set(load, mod.default);
       if (active) {
-        setContract(mod.default);
+        setLoaded({ load, contract: mod.default });
       }
     });
     return () => {
@@ -33,7 +39,8 @@ export function ContractRoutePage({ load }: ContractRoutePageProps) {
     };
   }, [load]);
 
-  const resolvedContract = contractCache.get(load) ?? contract;
+  const resolvedContract =
+    contractCache.get(load) ?? (loaded?.load === load ? loaded.contract : null);
 
   if (!resolvedContract) {
     return (
@@ -43,5 +50,5 @@ export function ContractRoutePage({ load }: ContractRoutePageProps) {
     );
   }
 
-  return <ContractCrudPage contract={resolvedContract} />;
+  return <ContractCrudPage key={resolvedContract.resource} contract={resolvedContract} />;
 }

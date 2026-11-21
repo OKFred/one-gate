@@ -1,6 +1,7 @@
 import Ajv from 'ajv';
 import type { ErrorObject } from 'ajv';
 import localize from 'ajv-i18n';
+import addFormats from 'ajv-formats';
 import addErrors from 'ajv-errors';
 import { useCallback, useMemo } from 'react';
 import { authUtils } from '@/utils/auth';
@@ -8,6 +9,7 @@ import { authUtils } from '@/utils/auth';
 // 初始化 Ajv 实例
 // allErrors: true 允许收集所有错误而非在第一个错误时停止
 const ajv = new Ajv({ allErrors: true, strict: false });
+addFormats(ajv);
 addErrors(ajv);
 
 /**

@@ -25,7 +25,7 @@ export function buildContractRoutes(
 
     routes.push({
       path: finalPath,
-      element: createElement(ContractRoutePage, { load: entry.load }),
+      element: createElement(ContractRoutePage, { key: finalPath, load: entry.load }),
     });
   }
 
