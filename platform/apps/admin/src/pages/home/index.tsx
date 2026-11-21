@@ -4,6 +4,7 @@ import {
   Alert,
   Box,
   Button,
+  ButtonBase,
   Chip,
   CircularProgress,
   FormControl,
@@ -191,6 +192,30 @@ function UsageHomePage({ summaryOnly }: { summaryOnly: boolean }) {
   const highUsageCount = metrics.filter((metric) => warningKey(metric) !== null).length;
   const knownQuotaCount = metrics.filter(hasQuota).length;
   const stale = metrics.some((metric) => metric.status === 'stale');
+  const shortcuts = [
+    {
+      to: '/calendar',
+      title: t('calendar.open'),
+      description: t('home.shortcuts.calendarDesc'),
+      icon: CalendarMonth,
+    },
+    {
+      to: '/home?view=map',
+      title: t('map.open'),
+      description: t('home.shortcuts.mapDesc'),
+      icon: MapOutlined,
+    },
+    ...(chatAllowed
+      ? [
+          {
+            to: '/admin/ai/chat',
+            title: t('home.openChat'),
+            description: t('home.shortcuts.chatDesc'),
+            icon: AutoAwesome,
+          },
+        ]
+      : []),
+  ];
 
   return (
     <Stack
@@ -206,6 +231,11 @@ function UsageHomePage({ summaryOnly }: { summaryOnly: boolean }) {
           <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
             {allowed && !summaryOnly ? t('home.usage.title') : t('home.title')}
           </Typography>
+          {summaryOnly && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {t('home.subtitle')}
+            </Typography>
+          )}
           {allowed && data && !summaryOnly && (
             <Typography variant="caption" color="text.secondary" sx={{ overflowWrap: 'anywhere' }}>
               {data.account?.name ?? data.account?.id ?? t('home.usage.noAccount')}
@@ -214,57 +244,153 @@ function UsageHomePage({ summaryOnly }: { summaryOnly: boolean }) {
             </Typography>
           )}
         </Box>
-        <Stack
-          direction="row"
-          spacing={1}
-          useFlexGap
-          sx={{ alignItems: 'center', flexShrink: 0, flexWrap: 'wrap', maxWidth: '100%' }}
-        >
-          {!summaryOnly && (
+        {!summaryOnly && (
+          <Stack
+            direction="row"
+            spacing={1}
+            useFlexGap
+            sx={{ alignItems: 'center', flexShrink: 0, flexWrap: 'wrap', maxWidth: '100%' }}
+          >
             <Button component={RouterLink} to="/home" startIcon={<ArrowBack />} size="small">
               {t('home.usage.summary.back')}
             </Button>
-          )}
-          <Button component={RouterLink} to="/calendar" startIcon={<CalendarMonth />} size="small">
-            {t('calendar.open')}
-          </Button>
-          <Button
-            component={RouterLink}
-            to="/home?view=map"
-            startIcon={<MapOutlined />}
-            size="small"
-          >
-            {t('map.open')}
-          </Button>
-          {chatAllowed && (
             <Button
               component={RouterLink}
-              to="/admin/ai/chat"
-              startIcon={<AutoAwesome />}
+              to="/calendar"
+              startIcon={<CalendarMonth />}
               size="small"
             >
-              {t('home.openChat')}
+              {t('calendar.open')}
             </Button>
-          )}
-          {mayRefresh && !summaryOnly && (
             <Button
-              variant="outlined"
+              component={RouterLink}
+              to="/home?view=map"
+              startIcon={<MapOutlined />}
               size="small"
-              startIcon={refreshing ? <CircularProgress size={16} color="inherit" /> : <Refresh />}
-              disabled={refreshing || loading}
-              onClick={() => void refresh()}
             >
-              {t('home.usage.refresh')}
+              {t('map.open')}
             </Button>
-          )}
-        </Stack>
+            {chatAllowed && (
+              <Button
+                component={RouterLink}
+                to="/admin/ai/chat"
+                startIcon={<AutoAwesome />}
+                size="small"
+              >
+                {t('home.openChat')}
+              </Button>
+            )}
+            {mayRefresh && (
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={
+                  refreshing ? <CircularProgress size={16} color="inherit" /> : <Refresh />
+                }
+                disabled={refreshing || loading}
+                onClick={() => void refresh()}
+              >
+                {t('home.usage.refresh')}
+              </Button>
+            )}
+          </Stack>
+        )}
       </Stack>
-      {permissionsLoading && <LinearProgress aria-label={t('home.usage.loading')} />}
-      {!allowed && !permissionsLoading && (
-        <Paper variant="outlined" sx={{ p: 3 }}>
-          <Typography>{t('home.welcome')}</Typography>
-        </Paper>
+      {summaryOnly && (
+        <Box component="section" aria-label={t('home.shortcuts.title')}>
+          <Box
+            data-testid="home-shortcuts"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, minmax(0, 1fr))',
+                md: 'repeat(3, minmax(0, 1fr))',
+              },
+              gap: 2,
+            }}
+          >
+            {shortcuts.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Paper
+                  key={item.to}
+                  variant="outlined"
+                  sx={{
+                    minWidth: 0,
+                    overflow: 'hidden',
+                    transition: (theme) =>
+                      theme.transitions.create(['border-color', 'background-color'], {
+                        duration: theme.transitions.duration.shortest,
+                      }),
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <ButtonBase
+                    component={RouterLink}
+                    to={item.to}
+                    aria-label={item.title}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 1.5,
+                      width: '100%',
+                      height: '100%',
+                      p: 2,
+                      textAlign: 'left',
+                      '&.Mui-focusVisible': {
+                        outline: '2px solid',
+                        outlineColor: 'primary.main',
+                        outlineOffset: -2,
+                      },
+                    }}
+                  >
+                    <Box
+                      aria-hidden="true"
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 1.5,
+                        bgcolor: 'action.selected',
+                        color: 'primary.main',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Icon fontSize="small" />
+                    </Box>
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                        {item.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
+                        {item.description}
+                      </Typography>
+                    </Box>
+                  </ButtonBase>
+                </Paper>
+              );
+            })}
+          </Box>
+        </Box>
       )}
+      {permissionsLoading && <LinearProgress aria-label={t('home.usage.loading')} />}
+      {!allowed &&
+        !permissionsLoading &&
+        (summaryOnly ? (
+          <Typography variant="body2" color="text.secondary">
+            {t('home.welcome')}
+          </Typography>
+        ) : (
+          <Paper variant="outlined" sx={{ p: 3 }}>
+            <Typography>{t('home.welcome')}</Typography>
+          </Paper>
+        ))}
       {allowed && (
         <>
           {loading && <LinearProgress aria-label={t('home.usage.loading')} />}
