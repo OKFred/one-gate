@@ -120,7 +120,7 @@ describe("safeFetch & SSRF Protection", () => {
       );
 
       await expect(
-        safeFetchJson("https://api.local/failure")
+        safeFetchJson("https://93.184.216.34/failure")
       ).rejects.toSatisfy((error: unknown) => {
         const message =
           error instanceof BusinessError &&

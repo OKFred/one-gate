@@ -133,7 +133,7 @@ describe("public access metadata and current database guards", () => {
     );
     await db
       .update(apiTokenTable)
-      .set({ status: "active", expireTimeUtc: Date.now() - 1 })
+      .set({ status: "active", expireTimeUtc: Date.now() - 60_000 })
       .where(eq(apiTokenTable.id, 30));
     expect(await allowed(systemAccess.tokenUsableSql(30, permission))).toBe(
       false

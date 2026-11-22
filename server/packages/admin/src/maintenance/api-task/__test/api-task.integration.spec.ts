@@ -30,6 +30,7 @@ describe("API Task 全链路集成测试", () => {
 
   afterEach(async () => {
     await clearTestData(db, testTables);
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
@@ -167,7 +168,7 @@ describe("API Task 全链路集成测试", () => {
         {
           taskKey: "schema_test",
           name: "Schema测试",
-          baseUrl: "http://api.local",
+          baseUrl: "http://93.184.216.34",
           path: "/test",
           method: "POST",
           responseSchema: JSON.stringify({
@@ -193,7 +194,7 @@ describe("API Task 全链路集成测试", () => {
           forEach: (cb: any) => cb("application/json", "content-type"),
         },
         statusText: "OK",
-        url: "http://api.local/test",
+        url: "http://93.184.216.34/test",
         redirected: false,
       });
       vi.stubGlobal("fetch", mockFetch);
@@ -261,7 +262,7 @@ describe("API Task 全链路集成测试", () => {
         {
           taskKey: "http_cron_trigger",
           name: "HTTP 定时任务",
-          baseUrl: "http://api.local",
+          baseUrl: "http://93.184.216.34",
           path: "/cron/execute",
           method: "GET",
           timeoutMs: 30000,
@@ -294,7 +295,7 @@ describe("API Task 全链路集成测试", () => {
           forEach: () => {},
         },
         statusText: "OK",
-        url: "http://api.local/cron/execute",
+        url: "http://93.184.216.34/cron/execute",
       });
       vi.stubGlobal("fetch", mockFetch);
 
@@ -326,7 +327,7 @@ describe("API Task 全链路集成测试", () => {
         {
           taskKey: "concurrency_test",
           name: "并发抢锁任务",
-          baseUrl: "http://api.local",
+          baseUrl: "http://93.184.216.34",
           path: "/concurrency",
           method: "GET",
           timeoutMs: 30000,
