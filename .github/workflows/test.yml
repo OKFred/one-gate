@@ -85,6 +85,12 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build shared contracts
         run: pnpm run contracts:build
+      - name: Test and typecheck shared contracts
+        run: pnpm --filter @hodor/contracts test && pnpm --filter @hodor/contracts typecheck
+      - name: Architecture guardrails
+        run: pnpm run check:architecture
+      - name: Backend lint
+        run: pnpm --dir server run lint:check
       - name: Check asset DDL matches current models
         run: |
           pnpm exec tsc --noEmit --strict --skipLibCheck --module ESNext --moduleResolution Bundler --target ESNext --types node scripts/generate-enterprise-assets.ts
@@ -111,8 +117,8 @@ jobs:
       - name: Node tests
         run: pnpm exec vitest run --config vitest.config.node.mts --maxWorkers=2
         working-directory: server/apps/server
-      - name: Worker and D1 retention and enterprise isolation regression
-        run: pnpm exec vitest run --config vitest.config.workers.mts recycle-bin soft-delete department-cleanup undo.integration tenant-isolation enterprise-http asset access-metadata disabled-role-auth cloudflare-usage ai/chat calendar mobile-task-runtime mobile/async-task/runtime task-control-publish device-report-route-whitelist --maxWorkers=1
+      - name: Worker and D1 test suite
+        run: pnpm exec vitest run --config vitest.config.workers.mts --maxWorkers=1
         working-directory: server/apps/server
       - name: Backend application types
         run: pnpm exec tsc --noEmit -p apps/server/tsconfig.json
@@ -142,10 +148,15 @@ jobs:
         run: corepack enable && corepack install --global pnpm@11.5.0
       - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
-      - name: Build shared contracts
-        run: pnpm run contracts:build
       - name: Build and validate shared contracts
         run: pnpm run contracts:build && pnpm run contracts:check
+      - name: Check feature map freshness
+        run: pnpm run feature-map:check
+      - name: Architecture guardrails
+        run: pnpm run check:architecture
+      - name: Frontend lint
+        run: pnpm run lint:check
+        working-directory: platform
       - name: Reject native browser dialogs
         run: pnpm run check:native-dialogs
         working-directory: platform
@@ -158,8 +169,8 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps --no-shell chromium
         working-directory: platform
-      - name: Mocked auth, recycle bin, undo and enterprise isolation tests
-        run: pnpm exec playwright test auth/auth-ui.spec.ts recycle-bin/recycle-bin.spec.ts delete-undo/ enterprise-assets/ api-token/ cloudflare-home/ calendar/ mobile-task-runtime/ --project=chromium
+      - name: Mocked E2E test suite
+        run: pnpm exec playwright test --project=chromium
         working-directory: platform
       - name: Personal asset spaces and evidence boundary tests
         run: pnpm run test:e2e:personal-assets
