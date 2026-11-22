@@ -12,7 +12,8 @@ import { isPostgresBackend } from "./postgresql/runtime";
  * 使用交叉类型 (Intersection Type) 合并 LibSQL 和 D1 的 API 声明，
  * 解决联合类型在处理具有重载的方法（如 .select()）以及驱动特有方法（如 .batch()）时的类型推导问题。
  */
-export type AppDatabase = LibSQLDatabase<any> & DrizzleD1Database<any>;
+export type AppDatabase = LibSQLDatabase<Record<string, never>> &
+  DrizzleD1Database<Record<string, never>>;
 
 /**
  * 从 drizzle-orm/d1 的参数中提取 D1 绑定类型
@@ -29,7 +30,7 @@ let _d1Binding: D1Binding | null = null;
 export function setD1Binding(d1Binding: D1Binding) {
   if (!d1Binding) return;
   _d1Binding = d1Binding;
-  _db = drizzleD1(d1Binding) as any as AppDatabase;
+  _db = drizzleD1(d1Binding) as unknown as AppDatabase;
 }
 
 /**
@@ -42,7 +43,7 @@ export function getDb(): AppDatabase {
 
   // Check if we have a stored D1 binding
   if (_d1Binding) {
-    _db = drizzleD1(_d1Binding) as any as AppDatabase;
+    _db = drizzleD1(_d1Binding) as unknown as AppDatabase;
     return _db;
   }
 
@@ -51,7 +52,7 @@ export function getDb(): AppDatabase {
     const fileName = getEnv("DB_FILE_NAME");
     const url = fileName || ":memory:";
     const client = createClient({ url });
-    _db = drizzleLibsql(client) as any as AppDatabase;
+    _db = drizzleLibsql(client) as unknown as AppDatabase;
     return _db;
   } catch (e) {
     // If in Worker, we might expect this to fail if called before middleware
@@ -72,8 +73,10 @@ export function getDb(): AppDatabase {
 export const db = new Proxy({} as AppDatabase, {
   get(_, prop) {
     const target = getDb();
-    const value = (target as any)[prop];
-    return typeof value === "function" ? value.bind(target) : value;
+    const value: unknown = Reflect.get(target, prop, target);
+    return typeof value === "function"
+      ? (value as (...args: unknown[]) => unknown).bind(target)
+      : value;
   },
 });
 

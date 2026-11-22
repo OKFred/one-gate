@@ -1,8 +1,6 @@
-import { StorageProvider } from "./types";
+import type { StorageProvider } from "./types";
 import { S3Provider } from "./providers/s3";
-import { R2Provider } from "./providers/r2";
-import { Context } from "hono";
-import { App } from "../../types/app";
+import { isR2BucketLike, R2Provider } from "./providers/r2";
 
 /**
  * OSS 配置接口
@@ -20,14 +18,21 @@ export interface OssConfig {
 /**
  * 初始化存储驱动 (支持传入配置对象或从环境变量读取)
  */
-export function getStorage(config: OssConfig, env: any = {}): StorageProvider {
+export function getStorage(
+  config: OssConfig,
+  env: unknown = {}
+): StorageProvider {
   const provider = config.provider.toUpperCase();
-  const bucketBinding = env[config.bucket] || env.BUCKET;
+  const envRecord =
+    typeof env === "object" && env !== null
+      ? (env as Record<string, unknown>)
+      : {};
+  const candidate = envRecord[config.bucket] ?? envRecord.BUCKET;
 
   // 仅在 R2 且存在原生绑定时使用 R2Provider
-  if (provider === "R2" && config.accountId && bucketBinding) {
+  if (provider === "R2" && config.accountId && isR2BucketLike(candidate)) {
     return new R2Provider({
-      bucketBinding,
+      bucketBinding: candidate,
       bucketName: config.bucket,
       accountId: config.accountId,
       accessKeyId: config.accessKeyId,

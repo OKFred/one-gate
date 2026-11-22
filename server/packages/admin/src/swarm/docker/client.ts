@@ -4,11 +4,140 @@ import {
   BusinessErrorCode,
 } from "@hodor/core/middleware/errorHandler/businessError";
 
+export type DockerServiceRecord = Record<string, unknown>;
+export type DockerServiceSpec = Record<string, unknown>;
+
+export interface DockerTask {
+  ID?: string;
+  NodeID?: string;
+  Status?: {
+    State?: string;
+    ContainerStatus?: {
+      ContainerID?: string;
+    };
+  };
+  Spec?: {
+    Resources?: {
+      Reservations?: {
+        NanoCPUs?: number;
+        MemoryBytes?: number;
+      };
+      Limits?: {
+        NanoCPUs?: number;
+        MemoryBytes?: number;
+      };
+    };
+  };
+}
+
+export interface DockerNode {
+  ID?: string;
+  Spec?: {
+    Name?: string;
+    Role?: string;
+    Availability?: string;
+  };
+  Description?: {
+    Hostname?: string;
+    Resources?: {
+      NanoCPUs?: number;
+      MemoryBytes?: number;
+    };
+    Engine?: {
+      EngineVersion?: string;
+    };
+  };
+  Status?: {
+    State?: string;
+    Addr?: string;
+  };
+}
+
+export interface DockerServiceStatItem {
+  taskId: string;
+  containerId: string;
+  nodeId: string;
+  cpuPercent: number;
+  memoryUsage: number;
+  memoryLimit: number;
+  memoryPercent: number;
+  networkRx: number;
+  networkTx: number;
+  blkRead: number;
+  blkWrite: number;
+}
+
+interface DockerContainerStats {
+  cpu_stats?: {
+    cpu_usage?: {
+      total_usage?: number;
+      percpu_usage?: unknown[];
+    };
+    system_cpu_usage?: number;
+    online_cpus?: number;
+  };
+  precpu_stats?: {
+    cpu_usage?: {
+      total_usage?: number;
+    };
+    system_cpu_usage?: number;
+  };
+  memory_stats?: {
+    usage?: number;
+    limit?: number;
+    stats?: {
+      cache?: number;
+      inactive_file?: number;
+    };
+  };
+  networks?: Record<string, { rx_bytes?: number; tx_bytes?: number }>;
+  blkio_stats?: {
+    io_service_bytes_recursive?: Array<{ op?: string; value?: number }>;
+  };
+}
+
+interface CfMtlsFetcher {
+  fetch(input: string | Request, init?: RequestInit): Promise<Response>;
+}
+
+type NodeRequestInit = RequestInit & { dispatcher?: unknown };
+
+function resolveMtlsFetcher(bindingName?: string): CfMtlsFetcher | undefined {
+  if (!bindingName) return undefined;
+  const envMap = getAllEnv() as Record<string, unknown>;
+  const candidate = envMap[bindingName];
+  if (
+    candidate &&
+    typeof candidate === "object" &&
+    "fetch" in candidate &&
+    typeof (candidate as { fetch?: unknown }).fetch === "function"
+  ) {
+    return candidate as CfMtlsFetcher;
+  }
+  return undefined;
+}
+
+function formatConnectionErrorDetail(err: unknown): string {
+  const errRecord =
+    err && typeof err === "object"
+      ? (err as { cause?: unknown; message?: unknown })
+      : undefined;
+  const causeMsg =
+    errRecord?.cause &&
+    typeof errRecord.cause === "object" &&
+    "message" in errRecord.cause &&
+    typeof (errRecord.cause as { message?: unknown }).message === "string"
+      ? (errRecord.cause as { message: string }).message
+      : undefined;
+  const msg = causeMsg || (err instanceof Error ? err.message : String(err));
+  return msg.replace(/^Error: /, "").trim();
+}
+
 export class DockerClient {
-  private baseUrl: string;
-  private apiVersion: string;
+  private baseUrl = "";
+  private apiVersion = "";
   private isInitialized = false;
-  private dispatcher?: any;
+  private dispatcher?: unknown;
   private cfMtlsBinding?: string;
 
   constructor() {
@@ -95,19 +224,17 @@ export class DockerClient {
   ): Promise<Response> {
     await this.ensureInitialized();
 
-    const cfMtls = this.cfMtlsBinding
-      ? getAllEnv()[this.cfMtlsBinding]
-      : undefined;
-    if (cfMtls && typeof cfMtls.fetch === "function") {
+    const cfMtls = resolveMtlsFetcher(this.cfMtlsBinding);
+    if (cfMtls) {
       // Cloudflare Worker：直接通过 mTLS 绑定连接
       return await cfMtls.fetch(url, init);
     }
 
     // Node.js：注入 TLS dispatcher (如果存在)
-    if (this.dispatcher) {
-      (init as any).dispatcher = this.dispatcher;
-    }
-    return await fetch(url, init);
+    const requestInit: NodeRequestInit = this.dispatcher
+      ? { ...init, dispatcher: this.dispatcher }
+      : init;
+    return await fetch(url, requestInit);
   }
 
   /**
@@ -131,12 +258,12 @@ export class DockerClient {
     }
     const url = `${host}/${options.apiVersion}/_ping`;
 
-    const fetchOptions: any = {
+    const fetchOptions: NodeRequestInit = {
       method: "GET",
       signal: AbortSignal.timeout(5000), // 设置 5 秒超时
     };
 
-    let dispatcher: any = undefined;
+    let dispatcher: unknown = undefined;
     const isNode =
       typeof process !== "undefined" && process.versions?.node != null;
 
@@ -159,13 +286,11 @@ export class DockerClient {
       }
     }
 
-    const cfMtls = options.cfMtlsBinding
-      ? getAllEnv()[options.cfMtlsBinding]
-      : undefined;
+    const cfMtls = resolveMtlsFetcher(options.cfMtlsBinding);
 
     try {
       let response: Response;
-      if (cfMtls && typeof cfMtls.fetch === "function") {
+      if (cfMtls) {
         response = await cfMtls.fetch(url, fetchOptions);
       } else {
         if (dispatcher) {
@@ -177,10 +302,7 @@ export class DockerClient {
     } catch (err) {
       console.error("testRawConnection connection failed:", err);
       // 提取底层网络错误的可读描述
-      const cause = (err as any)?.cause;
-      const detail = (cause?.message || (err as Error)?.message || String(err))
-        .replace(/^Error: /, "")
-        .trim();
+      const detail = formatConnectionErrorDetail(err);
       throw new BusinessError(BusinessErrorCode.DOCKER_API_ERROR, { detail });
     }
   }
@@ -195,18 +317,18 @@ export class DockerClient {
     return url;
   }
 
-  private async request<T = any>(
+  private async request<T = unknown>(
     method: string,
     path: string,
     options?: {
-      body?: any;
+      body?: unknown;
       queryParams?: Record<string, string>;
     }
   ): Promise<T> {
     await this.ensureInitialized();
     const url = this.getUrl(path, options?.queryParams);
     const headers: Record<string, string> = {};
-    let requestBody: any = undefined;
+    let requestBody: string | undefined = undefined;
 
     if (options?.body !== undefined) {
       headers["Content-Type"] = "application/json";
@@ -223,8 +345,8 @@ export class DockerClient {
       const text = await response.text();
       let detail = text;
       try {
-        const json = JSON.parse(text);
-        if (json.message) detail = json.message;
+        const json = JSON.parse(text) as { message?: unknown };
+        if (typeof json.message === "string") detail = json.message;
       } catch {
         // text 不是 JSON，直接使用原始文本
       }
@@ -240,31 +362,38 @@ export class DockerClient {
       return (await response.json()) as T;
     }
 
-    return (await response.text()) as any;
+    return (await response.text()) as unknown as T;
   }
 
   /**
    * 列出所有服务
    */
-  async listServices(filters?: Record<string, string[]>): Promise<any[]> {
+  async listServices(
+    filters?: Record<string, string[]>
+  ): Promise<DockerServiceRecord[]> {
     const queryParams: Record<string, string> = {};
     if (filters) {
       queryParams.filters = JSON.stringify(filters);
     }
-    return this.request("GET", "/services", { queryParams });
+    return this.request<DockerServiceRecord[]>("GET", "/services", {
+      queryParams,
+    });
   }
 
   /**
    * 获取单个服务详情
    */
-  async inspectService(idOrName: string): Promise<any> {
-    return this.request("GET", `/services/${encodeURIComponent(idOrName)}`);
+  async inspectService(idOrName: string): Promise<DockerServiceRecord> {
+    return this.request<DockerServiceRecord>(
+      "GET",
+      `/services/${encodeURIComponent(idOrName)}`
+    );
   }
 
   /**
    * 创建服务
    */
-  async createService(spec: any): Promise<{ ID: string }> {
+  async createService(spec: DockerServiceSpec): Promise<{ ID: string }> {
     return this.request<{ ID: string }>("POST", "/services/create", {
       body: spec,
     });
@@ -275,7 +404,7 @@ export class DockerClient {
    */
   async updateService(
     idOrName: string,
-    spec: any,
+    spec: DockerServiceSpec,
     version: number
   ): Promise<void> {
     await this.request(
@@ -298,12 +427,12 @@ export class DockerClient {
   /**
    * 列出所有任务 (用于查找到活跃容器运行状态)
    */
-  async listTasks(filters?: Record<string, string[]>): Promise<any[]> {
+  async listTasks(filters?: Record<string, string[]>): Promise<DockerTask[]> {
     const queryParams: Record<string, string> = {};
     if (filters) {
       queryParams.filters = JSON.stringify(filters);
     }
-    return this.request("GET", "/tasks", { queryParams });
+    return this.request<DockerTask[]>("GET", "/tasks", { queryParams });
   }
 
   /**
@@ -369,13 +498,13 @@ export class DockerClient {
   /**
    * 获取 Swarm 服务下所有运行容器的负载实时监控数据
    */
-  async getServiceStats(idOrName: string): Promise<any[]> {
+  async getServiceStats(idOrName: string): Promise<DockerServiceStatItem[]> {
     const tasks = await this.listTasks({
       service: [idOrName],
       "desired-state": ["running"],
     });
 
-    const statsResults: any[] = [];
+    const statsResults: DockerServiceStatItem[] = [];
 
     await Promise.all(
       tasks.map(async (task) => {
@@ -390,7 +519,7 @@ export class DockerClient {
           const response = await this.performFetch(url, { method: "GET" });
           if (!response.ok) return;
 
-          const stats = (await response.json()) as any;
+          const stats = (await response.json()) as DockerContainerStats;
 
           // 1. CPU 使用率公式折算
           let cpuPercent = 0;
@@ -452,9 +581,9 @@ export class DockerClient {
           }
 
           statsResults.push({
-            taskId: task.ID,
+            taskId: task.ID || "",
             containerId,
-            nodeId: task.NodeID,
+            nodeId: task.NodeID || "",
             cpuPercent: Math.round(cpuPercent * 100) / 100,
             memoryUsage,
             memoryLimit,
@@ -464,7 +593,7 @@ export class DockerClient {
             blkRead,
             blkWrite,
           });
-        } catch (e) {
+        } catch {
           // 容器 stats 报错静默处理
         }
       })
@@ -476,12 +605,12 @@ export class DockerClient {
   /**
    * 列出所有 Swarm 节点
    */
-  async listNodes(filters?: Record<string, string[]>): Promise<any[]> {
+  async listNodes(filters?: Record<string, string[]>): Promise<DockerNode[]> {
     const queryParams: Record<string, string> = {};
     if (filters) {
       queryParams.filters = JSON.stringify(filters);
     }
-    return this.request("GET", "/nodes", { queryParams });
+    return this.request<DockerNode[]>("GET", "/nodes", { queryParams });
   }
 }
 

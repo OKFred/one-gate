@@ -17,6 +17,13 @@ export interface PresignedUrlOptions {
   customMetadata?: Record<string, string>;
 }
 
+export type StoragePutBody = string | Uint8Array | Buffer | ReadableStream;
+
+export interface StoragePutOptions {
+  contentType?: string;
+  customMetadata?: Record<string, string>;
+}
+
 export interface StorageListOptions {
   prefix?: string;
   limit?: number;
@@ -52,12 +59,16 @@ export interface StorageProvider {
   /**
    * 获取对象内容
    */
-  get(key: string): Promise<ReadableStream | Buffer | null>;
+  get(key: string): Promise<ReadableStream | Uint8Array | Buffer | null>;
 
   /**
    * 上传对象 (服务器端)
    */
-  put(key: string, body: any, options?: any): Promise<void>;
+  put(
+    key: string,
+    body: StoragePutBody,
+    options?: StoragePutOptions
+  ): Promise<void>;
 
   /**
    * 删除对象

@@ -2,11 +2,98 @@ import { findWorkflowById, onLogInsert, onLogUpdate } from "./repository";
 import { registry } from "@hodor/admin/common/registry.js";
 import { SUPER_ADMIN_ID } from "@hodor/core/db/init";
 
+interface CdpCloseEvent {
+  code?: number;
+  reason?: string;
+  wasClean?: boolean;
+}
+
+interface CdpMessageEvent {
+  data?: unknown;
+}
+
+interface CdpSocketLike {
+  onopen: (() => void) | null;
+  onerror: ((err: unknown) => void) | null;
+  onclose: ((event: CdpCloseEvent) => void) | null;
+  onmessage: ((event: CdpMessageEvent) => void) | null;
+  send(data: string): void;
+  close(): void;
+  accept?: () => void;
+}
+
+interface CdpUpgradeResponse {
+  webSocket?: CdpSocketLike;
+}
+
+interface CdpResponseMessage {
+  id?: number;
+  result?: unknown;
+  error?: { message?: string; [key: string]: unknown };
+}
+
+interface CdpRequestPayload {
+  id: number;
+  method: string;
+  params: Record<string, unknown>;
+  sessionId?: string;
+}
+
+interface CdpEvaluateResult {
+  result?: { value?: unknown };
+  exceptionDetails?: {
+    text?: string;
+    exception?: { description?: string };
+  };
+}
+
+interface WorkflowNodeData {
+  label?: string;
+  action?: string;
+  selector?: string;
+  value?: string;
+  code?: string;
+  image?: string;
+  command?: string;
+}
+
+interface WorkflowNode {
+  id: string;
+  type?: string;
+  data?: WorkflowNodeData;
+}
+
+interface WorkflowEdge {
+  source: string;
+  target: string;
+}
+
+interface WorkflowGraph {
+  nodes?: WorkflowNode[];
+  edges?: WorkflowEdge[];
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (error && typeof error === "object") {
+    if (
+      "message" in error &&
+      typeof (error as { message?: unknown }).message === "string"
+    ) {
+      return (error as { message: string }).message;
+    }
+    return JSON.stringify(error);
+  }
+  return String(error);
+}
+
 // 轻量级原生 CDP 客户端封装，基于全局 WebSocket
 class CDPClient {
-  private ws: any;
+  private ws: CdpSocketLike | null = null;
   private id = 0;
-  private pending = new Map<number, (res: any) => void>();
+  private pending = new Map<number, (res: CdpResponseMessage) => void>();
 
   constructor(
     private wsUrl: string,
@@ -38,8 +125,8 @@ class CDPClient {
                 Authorization: `Bearer ${this.authToken}`,
               },
             })
-            .then((res: any) => {
-              const ws = res.webSocket;
+            .then((res) => {
+              const ws = (res as unknown as CdpUpgradeResponse).webSocket;
               if (!ws) {
                 return reject(
                   new Error(
@@ -47,60 +134,67 @@ class CDPClient {
                   )
                 );
               }
-              ws.accept();
+              ws.accept?.();
               this.ws = ws;
               this.setupHandlers(resolve, reject, true);
             })
-            .catch((err: any) => {
+            .catch((err: unknown) => {
               reject(err);
             });
         } else {
           // 自托管模式，使用普通的 globalThis.WebSocket
-          this.ws = new globalThis.WebSocket(this.wsUrl);
+          this.ws = new globalThis.WebSocket(
+            this.wsUrl
+          ) as unknown as CdpSocketLike;
           this.setupHandlers(resolve, reject, false);
         }
-      } catch (e: any) {
-        return reject(new Error(`WebSocket 初始化失败: ${e.message}`));
+      } catch (e: unknown) {
+        return reject(new Error(`WebSocket 初始化失败: ${getErrorMessage(e)}`));
       }
     });
   }
 
   private setupHandlers(
     resolve: () => void,
-    reject: (err: any) => void,
+    reject: (err: unknown) => void,
     isAlreadyOpen: boolean
   ) {
+    const ws = this.ws;
+    if (!ws) return;
+
     if (isAlreadyOpen) {
       console.log(
         `[Workflow Engine] WebSocket connected successfully (via Fetch Upgrade).`
       );
       resolve();
     } else {
-      this.ws.onopen = () => {
+      ws.onopen = () => {
         console.log(`[Workflow Engine] WebSocket connected successfully.`);
         resolve();
       };
     }
-    this.ws.onerror = (err: any) => {
+    ws.onerror = (err: unknown) => {
       console.error("[Workflow Engine] WebSocket error detail:", err);
-      const errDetail =
-        err?.message ||
-        (err && typeof err === "object" ? JSON.stringify(err) : String(err));
+      const errDetail = getErrorMessage(err);
       reject(
         new Error(
           `WebSocket 连接失败: ${errDetail || "未知错误"}。请检查 CDP 调试地址是否已启动并正确配置。`
         )
       );
     };
-    this.ws.onclose = (event: any) => {
+    ws.onclose = (event: CdpCloseEvent) => {
       console.warn(
         `[Workflow Engine] WebSocket closed. code: ${event?.code}, reason: ${event?.reason}, wasClean: ${event?.wasClean}`
       );
     };
-    this.ws.onmessage = (event: any) => {
+    ws.onmessage = (event: CdpMessageEvent) => {
       try {
-        const msg = JSON.parse(event.data);
-        if (msg.id && this.pending.has(msg.id)) {
+        const rawData =
+          typeof event.data === "string"
+            ? event.data
+            : String(event.data ?? "");
+        const msg = JSON.parse(rawData) as CdpResponseMessage;
+        if (typeof msg.id === "number" && this.pending.has(msg.id)) {
           const resolvePending = this.pending.get(msg.id);
           if (resolvePending) {
             resolvePending(msg);
@@ -113,18 +207,26 @@ class CDPClient {
     };
   }
 
-  send(method: string, params: any = {}, sessionId?: string): Promise<any> {
+  send<T = Record<string, unknown>>(
+    method: string,
+    params: Record<string, unknown> = {},
+    sessionId?: string
+  ): Promise<T> {
     return new Promise((resolve, reject) => {
+      if (!this.ws) {
+        reject(new Error("CDP WebSocket 未连接"));
+        return;
+      }
       const msgId = ++this.id;
       this.pending.set(msgId, (res) => {
         if (res.error) {
           reject(new Error(res.error.message || JSON.stringify(res.error)));
         } else {
-          resolve(res.result);
+          resolve(res.result as T);
         }
       });
       try {
-        const payload: any = { id: msgId, method, params };
+        const payload: CdpRequestPayload = { id: msgId, method, params };
         if (sessionId) {
           payload.sessionId = sessionId;
         }
@@ -140,7 +242,7 @@ class CDPClient {
     if (this.ws) {
       try {
         this.ws.close();
-      } catch (e) {}
+      } catch {}
     }
   }
 }
@@ -152,7 +254,7 @@ export interface LogStep {
   status: "success" | "failed" | "skipped";
   message: string;
   screenshot?: string; // base64
-  result?: any; // 执行返回值
+  result?: unknown; // 执行返回值
   time: number;
 }
 
@@ -198,15 +300,16 @@ export async function runWorkflow(
 
   try {
     // 解析 nodes 与 edges
-    const flow = JSON.parse(workflow.flowData);
-    const nodes = flow.nodes || [];
-    const edges = flow.edges || [];
+    const flow = JSON.parse(workflow.flowData) as WorkflowGraph;
+    const nodes: WorkflowNode[] = flow.nodes || [];
+    const edges: WorkflowEdge[] = flow.edges || [];
 
     // 拓扑/执行排序
     // 找出起点节点 (即没有输入连接的节点，或者触发器节点)
     const triggerNodes = nodes.filter(
-      (n: any) =>
-        n.type === "start" || !edges.some((e: any) => e.target === n.id)
+      (n: WorkflowNode) =>
+        n.type === "start" ||
+        !edges.some((e: WorkflowEdge) => e.target === n.id)
     );
     if (triggerNodes.length === 0) {
       throw new Error("工作流缺乏起点节点(Start Node)。");
@@ -214,7 +317,7 @@ export async function runWorkflow(
 
     // 依次执行节点链
     // 简单遍历：从起点出发，每次寻找出度 edge 的下一个节点，线性串行执行
-    let currentNode = triggerNodes[0];
+    let currentNode: WorkflowNode | null = triggerNodes[0] ?? null;
     const visited = new Set<string>();
 
     // 获取激活的默认配置，用于 CDP 浏览器连接
@@ -222,7 +325,7 @@ export async function runWorkflow(
 
     while (currentNode && !visited.has(currentNode.id)) {
       visited.add(currentNode.id);
-      const { id: nodeId, data = {}, type: nodeType } = currentNode;
+      const { id: nodeId, data = {}, type: nodeType = "" } = currentNode;
       const nodeName = data.label || nodeType;
 
       let normalizedType = nodeType;
@@ -311,9 +414,9 @@ export async function runWorkflow(
                     "无法从 HTTP 接口解析出 webSocketDebuggerUrl"
                   );
                 }
-              } catch (e: any) {
+              } catch (e: unknown) {
                 throw new Error(
-                  `连接 CDP 调试地址 ${baseUrl} 失败: ${e.message}`
+                  `连接 CDP 调试地址 ${baseUrl} 失败: ${getErrorMessage(e)}`
                 );
               }
             } else {
@@ -341,9 +444,9 @@ export async function runWorkflow(
                     "无法从 HTTP 接口解析出 webSocketDebuggerUrl"
                   );
                 }
-              } catch (e: any) {
+              } catch (e: unknown) {
                 throw new Error(
-                  `连接 CDP 调试地址 ${hostUrl} 失败: ${e.message}`
+                  `连接 CDP 调试地址 ${hostUrl} 失败: ${getErrorMessage(e)}`
                 );
               }
             }
@@ -356,16 +459,22 @@ export async function runWorkflow(
           await cdpClient.connect();
 
           // 创建新 Page 页面
-          const targetRes = await cdpClient.send("Target.createTarget", {
-            url: "about:blank",
-          });
+          const targetRes = await cdpClient.send<{ targetId: string }>(
+            "Target.createTarget",
+            {
+              url: "about:blank",
+            }
+          );
           targetId = targetRes.targetId;
 
           // 关联会话
-          const sessionRes = await cdpClient.send("Target.attachToTarget", {
-            targetId,
-            flatten: true,
-          });
+          const sessionRes = await cdpClient.send<{ sessionId: string }>(
+            "Target.attachToTarget",
+            {
+              targetId,
+              flatten: true,
+            }
+          );
           sessionId = sessionRes.sessionId;
 
           // 激活 Page 域
@@ -381,7 +490,7 @@ export async function runWorkflow(
           // 等待页面完全加载
           let loaded = false;
           for (let i = 0; i < 30; i++) {
-            const stateRes = await cdpClient.send(
+            const stateRes = await cdpClient.send<CdpEvaluateResult>(
               "Runtime.evaluate",
               { expression: "document.readyState" },
               sessionId as string
@@ -400,7 +509,7 @@ export async function runWorkflow(
             message: `成功导航到页面: ${value} (加载状态: ${loaded ? "完毕" : "超时"})`,
           });
         } else if (action === "click") {
-          const evalRes = await cdpClient.send(
+          const evalRes = await cdpClient.send<CdpEvaluateResult>(
             "Runtime.evaluate",
             {
               expression: `(() => {
@@ -427,7 +536,7 @@ export async function runWorkflow(
             .replace(/\\/g, "\\\\")
             .replace(/"/g, '\\"')
             .replace(/\n/g, "\\n");
-          const evalRes = await cdpClient.send(
+          const evalRes = await cdpClient.send<CdpEvaluateResult>(
             "Runtime.evaluate",
             {
               expression: `(() => {
@@ -452,7 +561,7 @@ export async function runWorkflow(
             message: `成功向输入框 ${selector} 填入内容`,
           });
         } else if (action === "screenshot") {
-          const shotRes = await cdpClient.send(
+          const shotRes = await cdpClient.send<{ data?: string }>(
             "Page.captureScreenshot",
             { format: "png" },
             sessionId as string
@@ -466,7 +575,7 @@ export async function runWorkflow(
             screenshot: shotRes.data, // base64
           });
         } else if (action === "extract") {
-          const evalRes = await cdpClient.send(
+          const evalRes = await cdpClient.send<CdpEvaluateResult>(
             "Runtime.evaluate",
             {
               expression: selector
@@ -475,7 +584,9 @@ export async function runWorkflow(
             },
             sessionId as string
           );
-          const extractedText = evalRes?.result?.value || "";
+          const rawValue = evalRes?.result?.value;
+          const extractedText =
+            typeof rawValue === "string" ? rawValue : String(rawValue ?? "");
           await appendStepLog({
             nodeId,
             nodeName,
@@ -497,7 +608,7 @@ ${expression}
 })()`;
           }
 
-          const evalRes = await cdpClient.send(
+          const evalRes = await cdpClient.send<CdpEvaluateResult>(
             "Runtime.evaluate",
             {
               expression,
@@ -601,7 +712,7 @@ ${expression}
             serviceName,
             200
           );
-        } catch (e) {}
+        } catch {}
 
         // 删除服务释放资源
         await registry.swarm_docker.removeService(serviceId);
@@ -622,9 +733,12 @@ ${expression}
       }
 
       // 寻下一节点
-      const nextEdge = edges.find((e: any) => e.source === currentNode.id);
+      const nextEdge = edges.find(
+        (e: WorkflowEdge) => e.source === currentNode?.id
+      );
       if (nextEdge) {
-        currentNode = nodes.find((n: any) => n.id === nextEdge.target);
+        currentNode =
+          nodes.find((n: WorkflowNode) => n.id === nextEdge.target) ?? null;
       } else {
         currentNode = null;
       }
@@ -637,11 +751,9 @@ ${expression}
         endTimeUtc: Date.now(),
       });
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(`[Workflow Engine] Execute error:`, err);
-    const errMsg =
-      err?.message ||
-      (err && typeof err === "object" ? JSON.stringify(err) : String(err));
+    const errMsg = getErrorMessage(err);
     await appendStepLog({
       nodeId: "error",
       nodeName: "引擎异常捕获",
@@ -662,7 +774,7 @@ ${expression}
       if (targetId) {
         try {
           await cdpClient.send("Target.closeTarget", { targetId });
-        } catch (e) {}
+        } catch {}
       }
       cdpClient.close();
     }
