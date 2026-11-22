@@ -9,7 +9,9 @@
     "contracts:build": "pnpm --filter @hodor/contracts build",
     "contracts:check": "pnpm --filter @hodor/contracts validate",
     "check:architecture": "node scripts/check-architecture.mjs",
+    "feature-map:generate": "node scripts/generate-feature-map.mjs",
+    "feature-map:check": "node scripts/generate-feature-map.mjs --check",
     "sync:openapi": "node scripts/sync-openapi.mjs",
-    "sync:all": "pnpm run contracts:generate && pnpm run contracts:build && pnpm --dir server run sync:business && pnpm --dir server run sync:permissions && pnpm run sync:openapi && pnpm run contracts:check"
+    "sync:all": "pnpm run contracts:generate && pnpm run contracts:build && pnpm --dir server run sync:business && pnpm --dir server run sync:permissions && pnpm run sync:openapi && pnpm run contracts:check && pnpm run feature-map:generate"
   }
 }
