@@ -12,8 +12,47 @@ import type {
   KVListResult,
 } from "./index.d";
 
+export interface CloudflareKVBinding {
+  get(
+    key: string,
+    options?: KVGetOptions | "text" | "json" | "arrayBuffer" | "stream"
+  ): Promise<unknown>;
+  put(
+    key: string,
+    value: string | ArrayBuffer | ReadableStream,
+    options?: KVPutOptions
+  ): Promise<void>;
+  delete(key: string): Promise<void>;
+  list(options?: KVListOptions): Promise<KVListResult>;
+}
+
+interface IterableCacheStore {
+  iterator?: (
+    options: Record<string, unknown>
+  ) => AsyncIterable<[string, unknown]>;
+}
+
+type CacheWithStores = Cache & {
+  stores?: IterableCacheStore[];
+};
+
+function isCloudflareKVBinding(value: unknown): value is CloudflareKVBinding {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "get" in value &&
+    typeof (value as { get: unknown }).get === "function" &&
+    "put" in value &&
+    typeof (value as { put: unknown }).put === "function" &&
+    "delete" in value &&
+    typeof (value as { delete: unknown }).delete === "function" &&
+    "list" in value &&
+    typeof (value as { list: unknown }).list === "function"
+  );
+}
+
 // 内部存储，用于缓存 KV 绑定和实例
-const _kvBindings = new Map<string, any>();
+const _kvBindings = new Map<string, CloudflareKVBinding>();
 const _kvInstances = new Map<string, KVStorage>();
 
 /**
@@ -34,21 +73,14 @@ export class KVStorage {
    * 获取底层存储执行器
    * 根据运行时决定使用 KV 或内存缓存
    */
-  private getExecutor(): { realKV?: any; cache?: Cache } {
+  private getExecutor(): { realKV?: CloudflareKVBinding; cache?: Cache } {
     const runtime = getRuntimeKey();
 
     if (runtime === "workerd") {
-      // 1. 尝试从内部绑定存储获取
       const binding = _kvBindings.get(this.bindingName);
-
-      // 2. 尝试从环境变量获取绑定
       const envKV = binding || getEnv(this.bindingName);
 
-      if (
-        envKV &&
-        typeof (envKV as any)?.get === "function" &&
-        typeof (envKV as any)?.put === "function"
-      ) {
+      if (isCloudflareKVBinding(envKV)) {
         return { realKV: envKV };
       }
 
@@ -74,7 +106,7 @@ export class KVStorage {
     options?: KVGetOptions | "text" | "json" | "arrayBuffer" | "stream"
   ): Promise<T | null> {
     const { realKV, cache } = this.getExecutor();
-    let value: any;
+    let value: unknown;
 
     if (realKV) {
       value = await realKV.get(key, options);
@@ -87,7 +119,7 @@ export class KVStorage {
     }
 
     // 如果是真实 KV，它已经处理好了类型转换
-    if (realKV) return value;
+    if (realKV) return value as T;
 
     // 处理 cache-manager 的类型参数
     let type: string = "text";
@@ -115,26 +147,27 @@ export class KVStorage {
    */
   async put(
     key: string,
-    value: string | object | ArrayBuffer,
+    value: string | object | ArrayBuffer | ReadableStream,
     options?: KVPutOptions
   ): Promise<void> {
     const { realKV, cache } = this.getExecutor();
 
     if (realKV) {
-      let finalValue = value;
+      let finalValue: string | ArrayBuffer | ReadableStream;
       if (
         typeof value === "object" &&
         !(value instanceof ArrayBuffer) &&
         !(value instanceof ReadableStream)
       ) {
         finalValue = JSON.stringify(value);
+      } else {
+        finalValue = value;
       }
-      await realKV.put(key, finalValue as any, options);
+      await realKV.put(key, finalValue, options);
       return;
     }
 
     if (cache) {
-      // 处理不同类型的值 (用于内存缓存)
       let serializedValue: string;
       if (typeof value === "string") {
         serializedValue = value;
@@ -187,7 +220,7 @@ export class KVStorage {
 
     if (cache) {
       try {
-        const store = (cache as any).stores?.[0];
+        const store = (cache as CacheWithStores).stores?.[0];
         if (store?.iterator) {
           let count = 0;
           for await (const [key] of store.iterator({})) {
@@ -219,7 +252,7 @@ export class KVStorage {
       // CF Workers KV 不支持直接 clear，需要分页列出并删除
       let list = await realKV.list();
       while (list.keys.length > 0) {
-        await Promise.all(list.keys.map((k: any) => realKV.delete(k.name)));
+        await Promise.all(list.keys.map((k) => realKV.delete(k.name)));
         if (list.list_complete) break;
         list = await realKV.list({ cursor: list.cursor });
       }
@@ -232,8 +265,8 @@ export class KVStorage {
 /**
  * 设置 KV 绑定
  */
-export function setKVBinding(kvBinding: any, name: string = "KV") {
-  if (!kvBinding) return;
+export function setKVBinding(kvBinding: unknown, name: string = "KV") {
+  if (!isCloudflareKVBinding(kvBinding)) return;
   _kvBindings.set(name, kvBinding);
 }
 
@@ -265,7 +298,9 @@ export function getKV(): KVStorage {
 export const kv = new Proxy({} as KVStorage, {
   get(_, prop) {
     const target = getKV();
-    const value = (target as any)[prop];
-    return typeof value === "function" ? value.bind(target) : value;
+    const value: unknown = Reflect.get(target, prop, target);
+    return typeof value === "function"
+      ? (value as (...args: unknown[]) => unknown).bind(target)
+      : value;
   },
 });

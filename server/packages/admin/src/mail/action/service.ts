@@ -11,6 +11,48 @@ import { getRuntimeKey } from "hono/adapter";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { preventSendFailure } from "./prevention";
 
+type MailAccountSummary = Awaited<
+  ReturnType<typeof mailAccountService.listAll.service>
+>[number];
+type MailAccountFull = NonNullable<
+  Awaited<ReturnType<typeof mailAccountService.get.service>>
+>;
+type MailAccountRecord =
+  MailAccountFull | (MailAccountSummary & { password?: string });
+
+type MailTemplateSummary = Awaited<
+  ReturnType<typeof mailTemplateService.listAll.service>
+>[number];
+type MailTemplateFull = NonNullable<
+  Awaited<ReturnType<typeof mailTemplateService.get.service>>
+>;
+type MailTemplateRecord = MailTemplateFull | MailTemplateSummary;
+
+function extractMailError(
+  error: unknown,
+  defaultCode: string,
+  detailKey: "stack" | "response",
+  defaultDetails: string
+): { code: string; details: string } {
+  const errRecord =
+    error && typeof error === "object"
+      ? (error as {
+          code?: unknown;
+          message?: unknown;
+          stack?: unknown;
+          response?: unknown;
+        })
+      : undefined;
+  const code = errRecord?.code ? String(errRecord.code) : defaultCode;
+  const primary = errRecord?.[detailKey];
+  const fallbackMsg = errRecord?.message;
+  const details =
+    (typeof primary === "string" && primary) ||
+    (typeof fallbackMsg === "string" && fallbackMsg) ||
+    defaultDetails;
+  return { code, details };
+}
+
 const sendReq = {
   type: "object",
   properties: {
@@ -134,7 +176,7 @@ async function onSend(
   } = bodyObj;
 
   // 1. 获取邮件账户信息（支持 ID 查寻找 或 级联级降级寻找）
-  let accountObj: any = null;
+  let accountObj: MailAccountRecord | null | undefined = null;
   if (accountId) {
     accountObj = await mailAccountService.get.service({ id: accountId });
   } else {
@@ -143,11 +185,11 @@ async function onSend(
     });
     if (scope === "biz" && tenantId) {
       accountObj = allAccounts.find(
-        (a: any) => a.scope === "biz" && a.tenantId === tenantId
+        (a) => a.scope === "biz" && a.tenantId === tenantId
       );
     }
     if (!accountObj) {
-      accountObj = allAccounts.find((a: any) => a.scope === "sys");
+      accountObj = allAccounts.find((a) => a.scope === "sys");
     }
     if (!accountObj && allAccounts.length > 0) {
       accountObj = allAccounts[0];
@@ -161,14 +203,14 @@ async function onSend(
   let finalTemplateId: string | undefined = undefined;
   let finalTemplateParams: string | undefined = undefined;
 
-  let templateObj: any = null;
+  let templateObj: MailTemplateRecord | null | undefined = null;
   if (templateId) {
     templateObj = await mailTemplateService.get.service({ id: templateId });
   } else if (templateName) {
     const allTemplates = await mailTemplateService.listAll.service({
       isEnabled: true,
     });
-    templateObj = allTemplates.find((t: any) => t.name === templateName);
+    templateObj = allTemplates.find((t) => t.name === templateName);
   }
 
   if (templateObj) {
@@ -210,7 +252,7 @@ async function onSend(
           startTls: [587].includes(accountObj.port),
           credentials: {
             username: accountObj.mailAddress,
-            password: accountObj.password,
+            password: accountObj.password ?? "",
           },
         },
         {
@@ -228,11 +270,16 @@ async function onSend(
       // 注意：worker-mailer 的 send 返回结构可能根据版本不同，这里先统一映射
       accepted = receiverArr.map((r) => ({ name: r.name, address: r.address }));
       sendStatus = true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendStatus = false;
-      exceptionCode = error.code || "WORKER_MAILER_ERROR";
-      exceptionDetails =
-        error.stack || error.message || "Unknown error in Workers mailer";
+      const errInfo = extractMailError(
+        error,
+        "WORKER_MAILER_ERROR",
+        "stack",
+        "Unknown error in Workers mailer"
+      );
+      exceptionCode = errInfo.code;
+      exceptionDetails = errInfo.details;
     }
   } else {
     // Node.js 运行环境：保持使用 nodemailer
@@ -243,7 +290,7 @@ async function onSend(
       secure: accountObj.port === 465, // true for 465, false for other ports
       auth: {
         user: accountObj.mailAddress,
-        pass: accountObj.password,
+        pass: accountObj.password ?? "",
       },
     });
 
@@ -273,11 +320,16 @@ async function onSend(
       });
 
       sendStatus = true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       sendStatus = false;
-      exceptionCode = error.code || "NODEMAILER_ERROR";
-      exceptionDetails =
-        error.response || error.message || "Unknown error in Node mailer";
+      const errInfo = extractMailError(
+        error,
+        "NODEMAILER_ERROR",
+        "response",
+        "Unknown error in Node mailer"
+      );
+      exceptionCode = errInfo.code;
+      exceptionDetails = errInfo.details;
     }
   }
 

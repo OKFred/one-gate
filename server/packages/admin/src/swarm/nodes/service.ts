@@ -1,7 +1,11 @@
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import { bodyAdapter } from "@hodor/core/middleware/encapsulation/adapter";
-import { dockerClient } from "../docker/client";
+import {
+  dockerClient,
+  type DockerNode,
+  type DockerTask,
+} from "../docker/client";
 import { listReq, listRes } from "./model";
 
 /**
@@ -14,7 +18,7 @@ async function onList(
   const nodes = await dockerClient.listNodes();
 
   // 2. 获取集群所有正在运行中的任务副本
-  let tasks: any[] = [];
+  let tasks: DockerTask[] = [];
   try {
     tasks = await dockerClient.listTasks({
       "desired-state": ["running"],
@@ -56,7 +60,7 @@ async function onList(
   }
 
   // 4. 组装节点展示模型
-  const resultList = nodes.map((node: any) => {
+  const resultList = nodes.map((node: DockerNode) => {
     const nodeId = node.ID || "";
     const metrics = nodeMetricsMap.get(nodeId) || {
       count: 0,

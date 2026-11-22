@@ -1,5 +1,10 @@
 import { DOMParser as XMLDOMParser } from "xmldom";
 
+interface PolyfillableGlobal {
+  DOMParser?: unknown;
+  Node?: Record<string, number>;
+}
+
 let polyfilled = false;
 
 /**
@@ -9,12 +14,14 @@ let polyfilled = false;
 export function applyAwsPolyfills() {
   if (polyfilled) return;
 
-  if (!(globalThis as any).DOMParser) {
-    (globalThis as any).DOMParser = XMLDOMParser as any;
+  const globalObj = globalThis as unknown as PolyfillableGlobal;
+
+  if (!globalObj.DOMParser) {
+    globalObj.DOMParser = XMLDOMParser;
   }
 
-  if (!(globalThis as any).Node) {
-    (globalThis as any).Node = {
+  if (!globalObj.Node) {
+    globalObj.Node = {
       ELEMENT_NODE: 1,
       ATTRIBUTE_NODE: 2,
       TEXT_NODE: 3,

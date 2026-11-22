@@ -7,12 +7,14 @@ import {
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import {
+import type {
   StorageProvider,
   StorageObjectMetadata,
   PresignedUrlOptions,
   StorageListOptions,
   StorageListResult,
+  StoragePutBody,
+  StoragePutOptions,
 } from "../types";
 import { applyAwsPolyfills } from "../awsPolyfill";
 
@@ -90,21 +92,38 @@ export class S3Provider implements StorageProvider {
     });
   }
 
-  async get(key: string): Promise<any> {
+  async get(key: string): Promise<ReadableStream | Uint8Array | Buffer | null> {
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
     });
     const response = await this.client.send(command);
-    return response.Body;
+    const body = response.Body;
+    if (!body) return null;
+    if (
+      body instanceof ReadableStream ||
+      Buffer.isBuffer(body) ||
+      body instanceof Uint8Array
+    ) {
+      return body;
+    }
+    if (typeof body.transformToWebStream === "function") {
+      return body.transformToWebStream();
+    }
+    return await body.transformToByteArray();
   }
 
-  async put(key: string, body: any, options?: any): Promise<void> {
+  async put(
+    key: string,
+    body: StoragePutBody,
+    options?: StoragePutOptions
+  ): Promise<void> {
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: key,
       Body: body,
       ContentType: options?.contentType,
+      Metadata: options?.customMetadata,
     });
     await this.client.send(command);
   }
