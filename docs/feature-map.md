@@ -6,7 +6,7 @@
 
 - **可访问页面路由总计**：`64` 个（纯 JSON 契约 `16` + 契约扩展壳 `18` + 自定义业务页 `30`）
 - **嵌入式契约总计**：`4` 份（挂载于 `/admin/base/log` 多 Tab，不单独注册路由）
-- **Playwright E2E 套件总计**：`21` 个
+- **Playwright E2E 套件总计**：`22` 个
 
 ## 核心用户旅程 (Top Journeys)
 
@@ -28,11 +28,11 @@
 | 路由 | 菜单 / 功能名 | 实现形态 | 源码 / 契约位置 | E2E 覆盖 |
 | --- | --- | --- | --- | --- |
 | `/admin/ai/chat` | 管理后台 / AI / AI 助手对话 | 自定义业务页 | `platform/apps/admin/src/pages/ai/chat/index.tsx` | `auth-ui.spec.ts`, `cloudflare-home.spec.ts` |
-| `/admin/ai/config` | 管理后台 / AI / 模型配置 | 纯 JSON 契约（零 TSX） | `packages/contracts/src/resources/admin/ai/config.json` | - |
+| `/admin/ai/config` | 管理后台 / AI / 模型配置 | 纯 JSON 契约（零 TSX） | `packages/contracts/src/resources/admin/ai/config.json` | `contract-crud.spec.ts` |
 | `/admin/ai/search` | 管理后台 / AI / 全局 AI 搜索 | 自定义业务页 | `platform/apps/admin/src/pages/ai/search/index.tsx` | - |
-| `/admin/base/log` | 管理后台 / 底座 / 日志 | 自定义业务页 | `platform/apps/admin/src/pages/base/log/index.tsx` | - |
+| `/admin/base/log` | 管理后台 / 底座 / 日志 | 自定义业务页 | `platform/apps/admin/src/pages/base/log/index.tsx` | `contract-crud.spec.ts` |
 | `/admin/base/sys_config` | 管理后台 / 底座 / 系统配置底座 | 纯 JSON 契约（零 TSX） | `packages/contracts/src/resources/admin/base/sys_config.json` | `role-delete-undo.spec.ts` |
-| `/admin/base/webhook_config` | 管理后台 / 底座 / Webhook 配置 | 纯 JSON 契约（零 TSX） | `packages/contracts/src/resources/admin/base/webhook_config.json` | - |
+| `/admin/base/webhook_config` | 管理后台 / 底座 / Webhook 配置 | 纯 JSON 契约（零 TSX） | `packages/contracts/src/resources/admin/base/webhook_config.json` | `contract-crud.spec.ts` |
 | `/admin/data/schema_form` | 管理后台 / 数据库 / 动态表单 | 契约扩展页 (`ContractCrudPage`) | `packages/contracts/src/resources/admin/data/schema_form.json` + `platform/apps/admin/src/pages/data/schema_form/index.tsx` | - |
 | `/admin/data/schema_form_data` | 管理后台 / 数据库 / 表单数据 | 契约扩展页 (`ContractCrudPage`) | `packages/contracts/src/resources/admin/data/schema_form_data.json` + `platform/apps/admin/src/pages/data/schema_form_data/index.tsx` | - |
 | `/admin/i18n/language` | 管理后台 / 国际化 / 语言 | 纯 JSON 契约（零 TSX） | `packages/contracts/src/resources/admin/i18n/language.json` | - |
@@ -40,7 +40,7 @@
 | `/admin/i18n/translation` | 管理后台 / 国际化 / 翻译 | 契约扩展页 (`ContractCrudPage`) | `packages/contracts/src/resources/admin/i18n/translation.json` + `platform/apps/admin/src/pages/i18n/translation/index.tsx` | - |
 | `/admin/mail` | 邮件模块根重定向 | 自定义业务页 | `platform/apps/admin/src/pages/mail/index.tsx` | - |
 | `/admin/mail/account` | 管理后台 / 邮件管理 / 账户 | 纯 JSON 契约（零 TSX） | `packages/contracts/src/resources/admin/mail/account.json` | - |
-| `/admin/mail/log` | 管理后台 / 邮件管理 / 日志 | 纯 JSON 契约（只读） | `packages/contracts/src/resources/admin/mail/log.json` | - |
+| `/admin/mail/log` | 管理后台 / 邮件管理 / 日志 | 纯 JSON 契约（只读） | `packages/contracts/src/resources/admin/mail/log.json` | `contract-crud.spec.ts` |
 | `/admin/mail/send` | 管理后台 / 邮件管理 / 发送 | 自定义业务页 | `platform/apps/admin/src/pages/mail/send/index.tsx` | - |
 | `/admin/mail/template` | 管理后台 / 邮件管理 / 模板 | 契约扩展页 (`ContractCrudPage`) | `packages/contracts/src/resources/admin/mail/template.json` + `platform/apps/admin/src/pages/mail/template/index.tsx` | - |
 | `/admin/maintenance/api-docs` | 管理后台 / 运维 / API 文档 | 契约扩展页 (`ContractCrudPage`) | `packages/contracts/src/resources/admin/maintenance/api-docs.json` + `platform/apps/admin/src/pages/maintenance/api-docs/index.tsx` | - |
@@ -122,6 +122,7 @@
 | `platform/e2e/cloudflare-home/cloudflare-home.spec.ts` | Mock 隔离 | `/admin/ai/chat`, `/home` |
 | `platform/e2e/cloudflare-home/home-summary.spec.ts` | Mock 隔离 | `/home` |
 | `platform/e2e/cloudflare-home/usage-trend-math.spec.ts` | 单测 / 实机 | `/home` |
+| `platform/e2e/contract-crud/contract-crud.spec.ts` | Mock 隔离 | `/admin/ai/config`, `/admin/base/log`, `/admin/base/webhook_config`, `/admin/mail/log` |
 | `platform/e2e/delete-undo/api-failure.spec.ts` | 单测 / 实机 | `/admin/system/department`, `/admin/system/role` |
 | `platform/e2e/delete-undo/crud-resource-switch.spec.ts` | Mock 隔离 | `/admin/system/role` |
 | `platform/e2e/delete-undo/delete-undo.spec.ts` | Mock 隔离 | `/admin/recycle-bin`, `/admin/system/department` |
@@ -134,5 +135,5 @@
 | `platform/e2e/platform-errors/login-limit.spec.ts` | Mock 隔离 | `/login` |
 | `platform/e2e/platform-errors/platform-errors.spec.ts` | 单测 / 实机 | 纯逻辑单测 / API 层 |
 | `platform/e2e/recycle-bin/recycle-bin.spec.ts` | Mock 隔离 | `/admin/recycle-bin`, `/admin/system/department` |
-| `platform/e2e/smoke/hodor-device.spec.ts` | 单测 / 实机 | `/admin/mobile/device` |
+| `platform/e2e/smoke/hodor-device.spec.ts` | Mock 隔离 | `/admin/mobile/device` |
 | `platform/e2e/tianditu/tianditu.spec.ts` | Mock 隔离 | `/home` |
