@@ -55,7 +55,7 @@ export class DockerClient {
             typeof process !== "undefined" && process.versions?.node != null;
           if (isNode) {
             // Node.js 运行时：通过 undici.Agent 挂载数据库读取的证书文本
-            // @ts-ignore
+            // @ts-expect-error undici may not have declarations installed in all server targets
             const { Agent } = await import("undici");
             const caCert = config.caCert as string | undefined;
             const clientCert = config.clientCert as string | undefined;
@@ -142,7 +142,7 @@ export class DockerClient {
 
     if (options.tlsVerify && isNode) {
       try {
-        // @ts-ignore
+        // @ts-expect-error undici may not have declarations installed in all server targets
         const { Agent } = await import("undici");
         if (options.caCert && options.clientCert && options.clientKey) {
           dispatcher = new Agent({

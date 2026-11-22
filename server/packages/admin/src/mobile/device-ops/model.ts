@@ -12,11 +12,7 @@ import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 
 /** Operations session status. */
 export type DeviceOpsSessionStatus =
-  | "PENDING_DEVICE"
-  | "CONNECTED"
-  | "CLOSED"
-  | "REJECTED"
-  | "EXPIRED";
+  "PENDING_DEVICE" | "CONNECTED" | "CLOSED" | "REJECTED" | "EXPIRED";
 
 /** Short-lived device operations session. */
 export const mobileDeviceOpsSessionTable = sqliteTable(

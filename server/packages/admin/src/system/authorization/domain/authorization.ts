@@ -44,11 +44,7 @@ export interface AuthorizationConnection extends AuthorizationConnectionValues {
 }
 
 export type CedarInputValue =
-  | boolean
-  | string
-  | number
-  | readonly CedarInputValue[]
-  | CedarInputRecord;
+  boolean | string | number | readonly CedarInputValue[] | CedarInputRecord;
 
 export interface CedarInputRecord {
   readonly [key: string]: CedarInputValue;

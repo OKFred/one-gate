@@ -2,11 +2,10 @@ import { createRequire } from "node:module";
 import { cloudflareTest } from "@cloudflare/vitest-pool-workers";
 import { defineConfig } from "vitest/config";
 import path from "path";
-import fs from "fs";
 
-function workersCjsRequirePgProtocolPlugin() {
+function workersCjsRequireInteropPlugin() {
   return {
-    name: "workers-cjs-require-pg-protocol",
+    name: "workers-cjs-require-interop",
     enforce: "pre" as const,
     resolveId(
       source: string,
@@ -15,22 +14,30 @@ function workersCjsRequirePgProtocolPlugin() {
     ): string | null {
       const nodeResolve = options?.custom?.["node-resolve"] as
         { isRequire?: boolean } | undefined;
-      if (!nodeResolve?.isRequire || !importer || source !== "pg-protocol") {
+      if (!nodeResolve?.isRequire || !importer) {
         return null;
       }
       const cleanImporter = importer
         .split("?")[0]
         .replace(/^\/([A-Za-z]:\/)/, "$1");
-      return createRequire(cleanImporter)
-        .resolve("pg-protocol/dist/index.js")
-        .replace(/\\/g, "/");
+      if (source === "pg-protocol") {
+        return createRequire(cleanImporter)
+          .resolve("pg-protocol/dist/index.js")
+          .replace(/\\/g, "/");
+      }
+      if (source === "luxon") {
+        return createRequire(cleanImporter)
+          .resolve("luxon")
+          .replace(/\\/g, "/");
+      }
+      return null;
     },
   };
 }
 
 export default defineConfig({
   plugins: [
-    workersCjsRequirePgProtocolPlugin(),
+    workersCjsRequireInteropPlugin(),
     cloudflareTest({
       remoteBindings: false,
       wrangler: { configPath: "./wrangler.jsonc" },
@@ -57,7 +64,14 @@ export default defineConfig({
               __dirname,
               "../../packages/core/src/db/sql/admin/compliance_archives.sql"
             )
-            .replace(/\\/g, "/") + "$3",
+            .replace(/\\/g, "/") + "$2",
+      },
+      {
+        find: /^@hodor\/core\/db\/sql\/(admin\/)?base_(sys_|biz_|audit_)(.*)\.sql(\?raw)?$/,
+        replacement:
+          path
+            .resolve(__dirname, "../../packages/core/src/db/sql/admin")
+            .replace(/\\/g, "/") + "/base_$2$3.sql$4",
       },
       {
         find: /^@hodor\/core\/db\/sql\/(admin\/)?(oss_config|swarm_docker_config|rpa_config)\.sql(\?raw)?$/,
@@ -175,7 +189,7 @@ export default defineConfig({
       "**/node_modules/**",
       "../../packages/**/node_modules/**",
       "**/*.node.spec.ts",
-      "../../packages/*/src/**/*.node.spec.ts",
+      "../../packages/**/src/**/*.node.spec.ts",
     ],
   },
   ssr: {

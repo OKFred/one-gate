@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * 多语言缓存测试 (全局单实例版)
  * 运行: npx tsx test/cache/i18n.test.ts

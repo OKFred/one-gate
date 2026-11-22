@@ -5,9 +5,7 @@ export const IndexKey = ["id"] as const;
 export type IndexKeyLike = "id";
 /** @description 新增时省略的审计字段 */
 export type AuditAddOmitKeyLike =
-  | "createTimeUtc"
-  | "updaterId"
-  | "updateTimeUtc";
+  "createTimeUtc" | "updaterId" | "updateTimeUtc";
 /** @description 更新时省略的审计字段 */
 export type AuditUpdateOmitKeyLike = "creatorId" | "createTimeUtc";
 

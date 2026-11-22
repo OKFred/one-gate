@@ -12,17 +12,21 @@ describe("Hello World worker", () => {
     const request = new Request("http://localhost/healthCheck");
     // Create an empty context to pass to `app.fetch()`.
     const ctx = createExecutionContext();
-    const app = worker();
+    const app = worker({
+      resolveTotpGateCenter: () => {
+        throw new Error("TOTP gate center is not used by /healthCheck");
+      },
+    });
     const response = await app.fetch(request, env, ctx);
     // Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
     await waitOnExecutionContext(ctx);
-    const json = (await response.json()) as any;
+    const json = (await response.json()) as { message: string };
     expect(json.message).toBe("I am OK!");
   });
 
   it("responds with I am OK! (integration style)", async () => {
     const response = await SELF.fetch("https://example.com/healthCheck");
-    const json = (await response.json()) as any;
+    const json = (await response.json()) as { message: string };
     expect(json.message).toBe("I am OK!");
   });
 });

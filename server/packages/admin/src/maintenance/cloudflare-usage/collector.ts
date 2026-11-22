@@ -372,12 +372,7 @@ export interface CloudflareUsageMaintenanceResult {
   pendingCount: number;
   durationMs: number;
   state:
-    | "unconfigured"
-    | "idle"
-    | "pending"
-    | "complete"
-    | "partial"
-    | "fenced";
+    "unconfigured" | "idle" | "pending" | "complete" | "partial" | "fenced";
   retryTimeUtc: number | null;
 }
 export async function runCloudflareUsageMaintenance(

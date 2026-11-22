@@ -1,117 +1,25 @@
 # 后端开发规范指南 (Backend Guidance)
 
-本指南面向本项目后端模块 (`server/packages/`) 的架构与代码编写规范，以 `personal` 模块为例。
+面向 `server/packages/` 与 `server/apps/server/`（同时遵守 `server/AGENTS.md` 中的 Cloudflare Workers 准则）。
 
----
+## 1. 数据模型与默认值边界
 
-## 1. 声明数据表模型 (Model) 与默认值规范
+- **Schema 严禁写业务默认值**：Drizzle `model.ts` / `schema*.ts` 中禁止使用 `.default(...)`（仅允许 `createTimeUtc` 使用 `getCurrentTimestampUtcSql()` 或 `pgTimestampUtcSql()`），由 `pnpm run check:architecture` 自动校验。
+- **默认值分层**：交互类默认项放在契约 JSON / 前端表单初始值；系统字段与计数列（如 `status`、`permissionCount: 0`）必须在 `service.ts` 新增逻辑中显式赋值。
+- **双库模型与 DDL**：修改表结构后需同步更新并生成 SQLite（D1）及 PostgreSQL DDL/迁移产物（`pnpm --dir server run db:generate` 与对应业务生成器），严禁手改生成后的 SQL 契约产物。
 
-在对应的业务包内创建领域文件夹，并定义 Drizzle Schema。例如在 `packages/personal/src/profile/model.ts` 中：
+## 2. 路由装配、POST 约定与契约驱动
 
-- **数据库默认值严格禁令**：所有数据表结构（Drizzle Schema）中，**严禁添加任何 `.default(...)` 默认值**（除了创建时间 `create_time_utc` 允许使用 `.default(getCurrentTimestampUtcSql())` 外）。
-- **默认值分层治理策略**：
-  1. **优先前端表单赋值**：属于用户交互的配置项（如初始开关状态、单选默认选项、默认数值等），尽可能在前端 UI 表单初始化（State / Form Initial Values）中给予默认值。
-  2. **Service 层兜底与系统列控制**：不适合在前端设置或由系统自动计数的字段（如 `permissionCount: 0`、`runCount: 0`、`status` 等），必须在各个 `service.ts` 的插入接口逻辑中进行显式解构与默认值兜底。
+- **CRUD 优先使用共享契约**：在 `packages/contracts/src/resources/` 定义契约并在 `service.ts` 引入 `@hodor/contracts/resources` 的 `*BackendSchemas`，结合 `createCrudApis` 与 `buildPagedListResult` 自动装配标准端点。
+- **全部业务接口只用 `POST`**：`pathInfo.method` 必须为 `"post"`，确保统一经 JSON Body 解析与 OpenAPI/权限校验（由 `pnpm run check:architecture` 自动校验）。
+- **禁止在 `service.ts` 硬编码字段 Schema**：非契约定制接口的请求/响应 Schema 定义在 `model.ts` 并在 `service.ts` 引用。
+- **导出与挂载解耦**：`service.ts` 默认导出纯 `Record<string, API>` 对象（如 `export default createCrudApis(...)`），在同级 `index.ts` 通过 `encapsulation(service, "...")` 挂载并汇入子包 `index.ts`。
 
-```typescript
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
-import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
+## 3. 跨包解耦 (`ServiceRegistry`)
 
-export const profileTable = sqliteTable("personal_profile", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  realName: text("real_name").notNull(),
-  gender: text("gender"),
-  email: text("email"),
-  phone: text("phone"),
-  remark: text("remark"),
-  creatorId: integer("creator_id").notNull(),
-  updaterId: integer("updater_id"),
-  createTimeUtc: integer("create_time_utc")
-    .notNull()
-    .default(getCurrentTimestampUtcSql()),
-  updateTimeUtc: integer("update_time_utc"),
-});
-```
+- `admin` / `enterprise` / `personal` 之间严禁直接 `import` 其它业务包私有源码，必须通过 `@hodor/<domain>/common/registry.js` 注册中心暴露与调用（由 `pnpm run check:architecture` 硬拦截）。
 
----
+## 4. 变更同步与测试
 
-## 2. 自动生成并归类 SQL DDL 文件
-
-在定义好 Drizzle Schema 后，**无需手动编写 SQL 建表脚本**。直接在 `server` 根目录下运行 DDL 自动生成与归类工具：
-
-```bash
-pnpm run db:generate
-```
-
-该命令内部会调用 `drizzle-kit` 读取对应的 `model.ts` 并把解析出来的 DDL 语句拆分并全自动保存到 `@hodor/core` 包中的相应物理目录下（例如：`packages/core/src/db/sql/personal/personal_profile.sql`）。
-
----
-
-## 3. 数据库增量迁移 (Migration)
-
-在生产环境中，仅靠 DDL 文件重建数据表是危险的，必须使用 Migration 流程来处理 Schema 变更：
-
-1. **生成 Migration 脚本**：修改 `model.ts` 后，运行以下命令生成增量迁移 SQL 脚本：
-   ```bash
-   npx drizzle-kit generate
-   ```
-2. **应用 Migration 变更**：在本地开发或部署时，执行推送到数据库：
-   ```bash
-   npx drizzle-kit push
-   ```
-   或者使用 `drizzle-kit migrate` 通过 Node 脚本自动执行迁移逻辑以保证生产环境数据的完整性与安全。
-
----
-
-## 4. 实现业务持久层 (Repository & Service)
-
-在 `repository.ts` 中完成低级别的数据库查询：
-
-- 采用 Drizzle ORM 进行 DML 与单条/多条过滤。
-- 列表查询须支持动态 `orderBy` 列排序与降序。
-
-在 `service.ts` 中描述并暴露 REST 端点：
-
-- **优先采用顶层共享契约装配 CRUD 路由**：标准或扩展 CRUD 资源优先在 `packages/contracts/src/resources/<app>/.../<resource>.json` 中定义单份契约，并在 `service.ts` 中引入 `@hodor/contracts/resources` 导出的 `*BackendSchemas`，结合 `@hodor/core/middleware/encapsulation/crud` 提供的 `createCrudApis` 与 `buildPagedListResult` 自动装配标准端点（`list`、`listAll`、`add`、`update`、`delete`、`deleteWithUndo`、`get`），仅在存在额外定制端点（如 `extra`）或非标准外接接口（如 Docker Swarm 代理、KV 缓存）时补充独立 `API` 定义。
-- **所有业务接口设计必须且只能使用 POST 请求**：禁止使用 GET、PUT、DELETE 等其他方法，以保证高阶 `encapsulation` 中间件能正确且安全地从 JSON Body 中提取与校验数据。
-- **禁止在 `service.ts` 中硬编码请求或响应字段定义 (Properties)**：标准 CRUD 资源由 `@hodor/contracts` 的契约 JSON 编译提供闭合 Schema；定制扩展端点的字段属性必须定义在 `model.ts` 中（如 `[Domain]ReqVO`、`[Domain]ResVO`），并在 `service.ts` 中解构引用。
-- 返回的列表及详情应严格遵守 JSON Schema 规范进行类型声明。
-- **严禁在 `service.ts` 中直接调用 `encapsulation` 挂载**：`service.ts` 的默认导出必须是包含各个 API 定义的纯对象（即强制推导为 `Record<string, API>` 类型，如 `export default createCrudApis(S, { ... })`）。
-- **独立的路由挂载入口**：领域服务必须在同级目录新建的 `[module]/index.ts` 中调用 `encapsulation(service, "...")` 导出 `app`，并在子包的根 `index.ts` 下统一挂载路由，确保业务代码与挂载行为完全解耦。
-
----
-
-## 5. 跨领域/模块解耦规范 (Service Registry)
-
-为了保证后端 Monorepo 子包（如 `admin`、`enterprise` 与 `personal` 等）之间的绝对解耦，**禁止直接跨包 `import` 其它包的私有 `repository` 或 `service` 逻辑**。
-
-若需要调用其它领域提供的底层服务，必须通过 `ServiceRegistry` 注册中心进行交互：
-
-1. **服务提供方（如 `admin` 模块）**：
-   - 在 `packages/admin/src/register.ts` 中引入要暴露的方法，并在对应的领域注册对象（如 `rpaRegister`）中导出。
-   - 在 `initAdminRegistry()` 中通过 `reg.register('rpa', rpaRegister)` 将服务注册到服务总线。
-   - 在 `packages/admin/src/common/registry.ts` 的 `IAdminServices` 接口中，添加相应的类型定义，确保全局 TypeScript 类型提示的健壮性。
-2. **服务调用方（如 `enterprise` 模块）**：
-   - 引入 `@hodor/admin/common/registry.js` 中的 `registry` 代理。
-   - 通过 `registry.[domain].[method]`（例如 `registry.rpa.findDefaultActiveBrowser()`）进行解耦调用。
-
----
-
-## 6. 全局种子与配置数据初始化
-
-新增模块或接口路由后，必须同步执行以下流程以同步数据库及菜单：
-
-1. **`server/packages/core/src/db/initMenu.ts`**: 挂载侧边栏导航树。
-2. **`server/packages/core/src/db/initPermissions.ts`**: 新增对应的访问权限控制节点。
-3. **`server/packages/core/src/db/initTranslation.ts`**: 集中导入多语言翻译对象（中文/英文）。
-4. **`server/packages/core/src/types/business.ts`**: 可通过根目录一键同步命令自动推导更新 `BusinessKey` 联合类型与前端类型/权限。
-
-同步命令：
-
-```bash
-# 在仓库根目录执行离线全栈同步（契约生成与构建 + BusinessKey + 权限码 + openapi.d.ts + 契约全维校验）
-pnpm run sync:all
-
-# 在 server 目录下执行本地数据库初始化（刷新 local.db）
-pnpm --dir server run db:init node
-```
+- 修改后端路由、权限种子（`permissions.ts` / `initMenu.ts`）或契约后，执行 `pnpm run sync:all` 同步全栈类型与功能地图；如需刷新本地 SQLite，执行 `pnpm --dir server run db:init node`。
+- 新增接口或保留策略改动应补充对应 Node 单测或 `*.workers.spec.ts` / `*.postgresql.spec.ts` 回归测试。

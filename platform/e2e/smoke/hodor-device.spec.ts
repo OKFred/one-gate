@@ -3,6 +3,11 @@ import { readE2EEnvironment } from '../support/test-environment.js';
 
 const e2eEnvironment = readE2EEnvironment();
 
+test.skip(
+  e2eEnvironment.mockAuth,
+  'Smoke spec targets a live deployment with persistent auth.',
+);
+
 test('目标部署的设备管理页可使用持久化登录态只读访问', async ({ page }) => {
   await page.goto('/#/admin/mobile/device');
 

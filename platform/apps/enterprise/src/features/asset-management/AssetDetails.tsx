@@ -22,9 +22,8 @@ import * as MappingAPI from '@/api/enterprise/asset-mapping';
 import { showSnackbar } from '@/components/Notification';
 import { permissions, usePermission } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
+import { DataTable, QueryStatus } from './shared';
 import {
-  DataTable,
-  QueryStatus,
   formatTime,
   localNow,
   parseTime,
@@ -32,7 +31,7 @@ import {
   useScopedMutation,
   useScopedQuery,
   type QueryRefreshResult,
-} from './shared';
+} from './sharedHooks';
 import type { AssetRow } from './AssetPage';
 
 type Identifier = Awaited<

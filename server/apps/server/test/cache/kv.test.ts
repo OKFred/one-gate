@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * 缓存抽象层测试
  * 运行: npx tsx test/cache/kv.test.ts
