@@ -45,21 +45,16 @@ const Markdown = ({ content }: MarkdownProps) => {
             inline,
             className,
             children,
+            style: _style,
             ...props
           }: React.ComponentPropsWithoutRef<'code'> & { inline?: boolean }) {
             const match = /language-(\w+)/.exec(className || '');
             return !inline && match ? (
-              <SyntaxHighlighter
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                style={vscDarkPlus as any}
-                language={match[1]}
-                PreTag="div"
-                {...props}
-              >
+              <SyntaxHighlighter style={vscDarkPlus} language={match[1]} PreTag="div" {...props}>
                 {String(children).replace(/\n$/, '')}
               </SyntaxHighlighter>
             ) : (
-              <code className={className} {...props}>
+              <code className={className} style={_style} {...props}>
                 {children}
               </code>
             );

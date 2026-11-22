@@ -405,14 +405,12 @@ export async function inspectEnterpriseAssetRelease(
     }
   } else {
     checks.push(
-      ...metadataChecks.map(
-        (key): AssetReleaseCheck => ({
-          key,
-          category: "metadata",
-          status: "skipped",
-          code: "METADATA_UNAVAILABLE",
-        })
-      )
+      ...metadataChecks.map((key): AssetReleaseCheck => ({
+        key,
+        category: "metadata",
+        status: "skipped",
+        code: "METADATA_UNAVAILABLE",
+      }))
     );
   }
   return { ready: checks.every((check) => check.status === "pass"), checks };

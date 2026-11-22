@@ -21,16 +21,15 @@ import { showSnackbar } from '@/components/Notification';
 import { permissions, usePermission } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
 import { authUtils } from '@/utils/auth';
+import { DataTable, QueryStatus } from './shared';
 import {
-  DataTable,
-  QueryStatus,
   formatTime,
   useRequestScope,
   useScopedMutation,
   useScopedQuery,
   type QueryRefreshResult,
   type TenantRow,
-} from './shared';
+} from './sharedHooks';
 
 type Member = Awaited<ReturnType<typeof TenantAPI.memberListFn>>['data']['data']['list'][number];
 type Grant = Awaited<ReturnType<typeof TenantAPI.tokenGrantListFn>>['data']['data']['list'][number];

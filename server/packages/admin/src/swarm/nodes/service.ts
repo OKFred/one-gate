@@ -82,13 +82,9 @@ async function onList(
       hostname: desc.Hostname || spec.Name || nodeId,
       role: (spec.Role || "worker").toLowerCase() as "manager" | "worker",
       status: (status.State || "down").toLowerCase() as
-        | "ready"
-        | "down"
-        | "disconnected",
+        "ready" | "down" | "disconnected",
       availability: (spec.Availability || "active").toLowerCase() as
-        | "active"
-        | "drain"
-        | "pause",
+        "active" | "drain" | "pause",
       ip: status.Addr || "",
       engineVersion: desc.Engine?.EngineVersion || "",
       nanoCpus: nanoCpus / 1_000_000_000, // 转换成核心数展示

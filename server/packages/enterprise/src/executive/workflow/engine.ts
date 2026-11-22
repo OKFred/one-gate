@@ -30,7 +30,6 @@ class CDPClient {
           console.log(
             `[Workflow Engine] Fetching upgrade for WebSocket: ${fetchUrl}`
           );
-          // @ts-ignore
           globalThis
             .fetch(fetchUrl, {
               headers: {
@@ -57,7 +56,6 @@ class CDPClient {
             });
         } else {
           // 自托管模式，使用普通的 globalThis.WebSocket
-          // @ts-ignore
           this.ws = new globalThis.WebSocket(this.wsUrl);
           this.setupHandlers(resolve, reject, false);
         }

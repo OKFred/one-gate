@@ -137,7 +137,6 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  // @ts-ignore
   const insertedId = await repository.onWorkflowInsert({
     ...obj,
     creatorId,
@@ -176,7 +175,6 @@ async function onUpdate(
     updateTimeUtc: Date.now(),
   };
 
-  // @ts-ignore
   const row = await repository.onWorkflowUpdate(id as number, updateData);
   preventEmpty(row);
   return row.id;

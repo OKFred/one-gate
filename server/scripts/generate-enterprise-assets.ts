@@ -489,6 +489,14 @@ export function materializeAssetArtifacts(
 export function readCurrentAssetSchema(): { ddl: string; snapshot: unknown } {
   const temporaryRoot = realpathSync(tmpdir());
   const temporary = mkdtempSync(join(temporaryRoot, "one-gate-assets-"));
+  const isSafeTempDir = (dir: string): boolean =>
+    dirname(dir) === temporaryRoot &&
+    basename(dir).startsWith("one-gate-assets-") &&
+    !lstatSync(dir).isSymbolicLink() &&
+    realpathSync(dir) === dir;
+  if (!isSafeTempDir(temporary)) {
+    throw new Error("Refusing to use an unexpected temporary directory");
+  }
   try {
     const require = createRequire(import.meta.url);
     const drizzleBin = join(dirname(require.resolve("drizzle-kit")), "bin.cjs");
@@ -515,14 +523,9 @@ export function readCurrentAssetSchema(): { ddl: string; snapshot: unknown } {
       snapshot,
     };
   } finally {
-    if (
-      dirname(temporary) !== temporaryRoot ||
-      !basename(temporary).startsWith("one-gate-assets-") ||
-      lstatSync(temporary).isSymbolicLink() ||
-      realpathSync(temporary) !== temporary
-    )
-      throw new Error("Refusing to remove an unexpected temporary directory");
-    rmSync(temporary, { recursive: true, force: true });
+    if (isSafeTempDir(temporary)) {
+      rmSync(temporary, { recursive: true, force: true });
+    }
   }
 }
 

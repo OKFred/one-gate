@@ -25,7 +25,7 @@ export async function getTranslation(
   params?: Record<string, any>
 ): Promise<string> {
   const cacheKey = `i18n.translation:${langCode}.${key}`;
-  let template = key;
+  const template = key;
 
   try {
     // 1. 尝试从 KV 缓存获取

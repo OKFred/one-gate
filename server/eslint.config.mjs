@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import prettier from "eslint-plugin-prettier";
 import globals from "globals";
@@ -14,22 +15,27 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
+const anyBaselinePath = path.resolve(
+  __dirname,
+  "../scripts/any-ratchet-baseline.json"
+);
+const anyBaseline = JSON.parse(fs.readFileSync(anyBaselinePath, "utf8"));
+const legacyAnyFiles = Object.keys(anyBaseline)
+  .filter((file) => file.startsWith("server/"))
+  .map((file) => file.slice("server/".length));
+
 export default [
   {
     ignores: [
       "**/dist",
       "**/node_modules",
+      "**/.wrangler",
+      "**/.vitest",
+      "**/*.d.ts",
+      "**/swagger-ui-bundle.js",
       "**/public",
-      "**/.husky",
-      "**/.vscode",
-      "**/.idea",
       "**/*.sh",
       "**/*.md",
-      "**/openapi.d.ts",
-      "src/assets",
-      "**/.eslintrc.cjs",
-      "**/.prettierrc.cjs",
-      "**/.stylelintrc.cjs",
     ],
   },
   ...compat.extends(
@@ -45,10 +51,7 @@ export default [
 
     languageOptions: {
       globals: {
-        ...globals.browser,
         ...globals.node,
-        DialogOption: "readonly",
-        OptionType: "readonly",
       },
 
       ecmaVersion: "latest",
@@ -61,7 +64,12 @@ export default [
 
     rules: {
       "no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "warn",
+      "no-empty": ["error", { allowEmptyCatch: true }],
+      "@typescript-eslint/no-empty-object-type": [
+        "error",
+        { allowInterfaces: "always" },
+      ],
+      "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {
@@ -78,6 +86,24 @@ export default [
           endOfLine: "lf",
         },
       ],
+    },
+  },
+  {
+    files: legacyAnyFiles,
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
+  {
+    files: [
+      "**/*.spec.ts",
+      "**/*.test.ts",
+      "**/*.contract-tests.ts",
+      "**/__test/**",
+      "test/**",
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
 ];

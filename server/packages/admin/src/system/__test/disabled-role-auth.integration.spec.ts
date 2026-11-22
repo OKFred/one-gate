@@ -40,8 +40,7 @@ const cache = getKV();
 const cacheValues = new Map<string, string>();
 const backgroundTasks: Promise<unknown>[] = [];
 let beforeCacheWrite:
-  | ((key: string, value: string) => Promise<void>)
-  | undefined;
+  ((key: string, value: string) => Promise<void>) | undefined;
 let failVersionRead = false;
 
 type Probe = Pick<

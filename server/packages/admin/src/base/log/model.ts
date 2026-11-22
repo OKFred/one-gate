@@ -203,7 +203,9 @@ export const BizLogBasePO = {
 export type SysLogPOLike = InferSelectModel<typeof baseSysLogTable>;
 export type AuditLogPOLike = InferSelectModel<typeof baseAuditLogTable>;
 export type BizLogPOLike = InferSelectModel<typeof baseBizLogTable>;
-export type HttpRequestLogPOLike = InferSelectModel<typeof baseHttpRequestLogTable>;
+export type HttpRequestLogPOLike = InferSelectModel<
+  typeof baseHttpRequestLogTable
+>;
 
 export const HttpRequestLogBasePO = {
   ...BaseLogBasePO,
@@ -213,13 +215,43 @@ export const HttpRequestLogBasePO = {
   host: { type: ["string", "null"], nullable: true, description: "主机" },
   path: { type: ["string", "null"], nullable: true, description: "路径" },
   query: { type: ["string", "null"], nullable: true, description: "查询参数" },
-  requestHeaders: { type: ["object", "null"], nullable: true, additionalProperties: true, description: "请求头" },
-  requestBody: { type: ["object", "string", "null"], nullable: true, description: "请求体" },
-  responseStatus: { type: ["number", "null"], nullable: true, description: "响应状态码" },
-  responseHeaders: { type: ["object", "null"], nullable: true, additionalProperties: true, description: "响应头" },
-  responseBody: { type: ["object", "string", "null"], nullable: true, description: "响应体" },
-  durationMs: { type: ["number", "null"], nullable: true, description: "耗时(ms)" },
-  errorMessage: { type: ["string", "null"], nullable: true, description: "错误信息" },
+  requestHeaders: {
+    type: ["object", "null"],
+    nullable: true,
+    additionalProperties: true,
+    description: "请求头",
+  },
+  requestBody: {
+    type: ["object", "string", "null"],
+    nullable: true,
+    description: "请求体",
+  },
+  responseStatus: {
+    type: ["number", "null"],
+    nullable: true,
+    description: "响应状态码",
+  },
+  responseHeaders: {
+    type: ["object", "null"],
+    nullable: true,
+    additionalProperties: true,
+    description: "响应头",
+  },
+  responseBody: {
+    type: ["object", "string", "null"],
+    nullable: true,
+    description: "响应体",
+  },
+  durationMs: {
+    type: ["number", "null"],
+    nullable: true,
+    description: "耗时(ms)",
+  },
+  errorMessage: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "错误信息",
+  },
 } as const satisfies Partial<Record<keyof HttpRequestLogPOLike, JSONSchema>>;
 
 export { IndexVO };

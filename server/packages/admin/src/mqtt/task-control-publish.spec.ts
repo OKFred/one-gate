@@ -138,8 +138,7 @@ describe("secure task cancellation transport", () => {
     vi.useFakeTimers();
     state.brokerUrl = "wss://broker.example.test/mqtt";
     let resolveConnection:
-      | ((value: ReturnType<typeof client>) => void)
-      | undefined;
+      ((value: ReturnType<typeof client>) => void) | undefined;
     state.connect.mockImplementation(
       () =>
         new Promise((resolve) => {

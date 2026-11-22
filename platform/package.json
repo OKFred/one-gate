@@ -26,11 +26,6 @@
     "lint:check": "eslint .",
     "check:native-dialogs": "node ./scripts/check-native-dialogs.mjs"
   },
-  "lint-staged": {
-    "*.{js,ts,tsx,json,md}": [
-      "prettier --write"
-    ]
-  },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@playwright/test": "1.62.1",

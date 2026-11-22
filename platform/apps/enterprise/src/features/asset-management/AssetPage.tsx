@@ -19,20 +19,18 @@ import { showSnackbar } from '@/components/Notification';
 import { permissions, usePermission } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
 import { AssetDetails } from './AssetDetails';
+import { DataTable, QueryStatus, TenantChooser } from './shared';
 import {
-  DataTable,
-  QueryStatus,
-  TenantChooser,
   emptyToNull,
   formatTime,
   useRequestScope,
   useScopedMutation,
   useScopedQuery,
   type TenantRow,
-} from './shared';
+} from './sharedHooks';
 
 export type AssetRow = Awaited<ReturnType<typeof AssetAPI.getFn>>['data']['data'];
-export const categories = ['host', 'disk', 'gpu', 'board', 'sensor', 'meter', 'other'] as const;
+const categories = ['host', 'disk', 'gpu', 'board', 'sensor', 'meter', 'other'] as const;
 type AssetAction = { kind: 'add' } | { kind: 'edit' | 'retire' | 'activate'; row: AssetRow };
 
 export default function AssetPage() {

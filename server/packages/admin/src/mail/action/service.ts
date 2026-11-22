@@ -347,25 +347,19 @@ async function onVerify(
   const runtime = getRuntimeKey();
   if (runtime === "workerd") {
     // Cloudflare Workers 运行环境
-    try {
-      const { WorkerMailer } = await import("worker-mailer");
-      const mailer = await WorkerMailer.connect({
-        host: accountObj.host,
-        port: accountObj.port,
-        authType: "plain",
-        secure: [465, 587].includes(accountObj.port),
-        startTls: [587].includes(accountObj.port),
-        credentials: {
-          username: accountObj.mailAddress,
-          password: accountObj.password,
-        },
-      });
-      return true;
-    } catch (error: any) {
-      // cannot connect to the specified address
-      // 526 Authentication failure
-      throw error;
-    }
+    const { WorkerMailer } = await import("worker-mailer");
+    await WorkerMailer.connect({
+      host: accountObj.host,
+      port: accountObj.port,
+      authType: "plain",
+      secure: [465, 587].includes(accountObj.port),
+      startTls: [587].includes(accountObj.port),
+      credentials: {
+        username: accountObj.mailAddress,
+        password: accountObj.password,
+      },
+    });
+    return true;
   } else {
     // Node.js 运行环境
     const nodemailer = await import("nodemailer");

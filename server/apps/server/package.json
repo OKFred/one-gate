@@ -37,11 +37,6 @@
     "worker:dev:postgresql": "wrangler dev --config wrangler.postgresql.jsonc --ip 127.0.0.1 --var NODE_ENV:development",
     "worker:types:postgresql": "wrangler types --config wrangler.postgresql.jsonc --env-interface PostgresEnv --include-runtime=false worker-postgresql-configuration.d.ts"
   },
-  "lint-staged": {
-    "*.{js,ts,json,md}": [
-      "prettier --write"
-    ]
-  },
   "keywords": [],
   "author": "FZ",
   "license": "MIT",

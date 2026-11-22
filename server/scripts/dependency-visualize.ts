@@ -238,7 +238,7 @@ function findPossibleImports(dir: string, projectRoot: string): string[] {
 }
 
 function sanitizeId(str: string): string {
-  return str.replace(/[\/\\\.@\-:]/g, "_");
+  return str.replace(/[/\\.@:-]/g, "_");
 }
 
 export default function main() {

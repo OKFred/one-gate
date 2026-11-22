@@ -13,12 +13,10 @@ import createApp from "./index";
 const state = vi.hoisted(() => ({
   authenticated: true,
   resourceReadable: true,
-  list: vi.fn(
-    async (): Promise<{ total: number; list: RecycleBinItem[] }> => ({
-      total: 0,
-      list: [],
-    })
-  ),
+  list: vi.fn(async (): Promise<{ total: number; list: RecycleBinItem[] }> => ({
+    total: 0,
+    list: [],
+  })),
   restore: vi.fn(async () => "document/1"),
   purge: vi.fn(async () => "document/1"),
   undo: vi.fn(async () => "document/1"),

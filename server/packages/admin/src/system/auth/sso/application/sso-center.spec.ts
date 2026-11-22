@@ -133,8 +133,7 @@ class FakeRepository implements SsoRepositoryPort {
 class FakeProvider implements SsoOidcProviderPort {
   principal: VerifiedSsoPrincipal;
   lastAuthorizationInput:
-    | Parameters<SsoOidcProviderPort["createAuthorizationUrl"]>[0]
-    | null = null;
+    Parameters<SsoOidcProviderPort["createAuthorizationUrl"]>[0] | null = null;
   lastExchangeInput: Parameters<SsoOidcProviderPort["exchangeCode"]>[0] | null =
     null;
 
