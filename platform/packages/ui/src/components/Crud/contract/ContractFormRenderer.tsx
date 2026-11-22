@@ -1,121 +1,21 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type Dispatch,
-  type ReactNode,
-  type SetStateAction,
-} from 'react';
-import {
-  Box,
-  Chip,
-  CircularProgress,
-  Divider,
-  FormControl,
-  FormHelperText,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  Checkbox,
-  ListItemText,
-  Stack,
-  TextField as MuiTextField,
-  Typography,
-} from '@mui/material';
-import { Add as AddIcon, Visibility, VisibilityOff } from '@mui/icons-material';
-import dayjs from 'dayjs';
+import { useState, type ChangeEvent, type Dispatch, type ReactNode, type SetStateAction } from 'react';
+import { Divider, Grid, IconButton, InputAdornment, Stack } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import type { ProjectedFormField } from '@hodor/contracts/frontend';
-import type { CrudResourceContract, OptionsSourceSpec } from '@hodor/contracts/types';
-import { postCrudEndpoint } from '@/api/crud';
-import { DynamicForm, Field } from '@/components/Form';
+import type { CrudResourceContract } from '@hodor/contracts/types';
+import { Field } from '@/components/Form';
 import { useFormErrorContext } from '@/hooks/useFormError';
 import type { CrudExtensions } from './types';
+import { evaluateCondition } from './utils';
 import {
-  evaluateCondition,
-  getValueByPath,
-  interpolateTemplate,
-  parseJsonNumberArray,
-  parseJsonStringArray,
-} from './utils';
-
-interface NormalizedOption {
-  value: string | number | boolean;
-  label: string;
-  level: number;
-}
-
-function buildOptionsSourceKey(source: OptionsSourceSpec): string {
-  return `${source.url}::${JSON.stringify(source.params ?? {})}`;
-}
-
-function normalizeRemoteOptions(rawData: unknown, source: OptionsSourceSpec): NormalizedOption[] {
-  const arrSource = source.listPath ? getValueByPath(rawData, source.listPath) : rawData;
-  if (!Array.isArray(arrSource)) return [];
-
-  const getOptionLabel = (item: Record<string, unknown>): string => {
-    if (source.labelTemplate) return interpolateTemplate(source.labelTemplate, item);
-    if (source.labelField) return String(getValueByPath(item, source.labelField) ?? '');
-    return String(getValueByPath(item, source.valueField) ?? '');
-  };
-
-  if (!source.parentIdField && !source.childrenField) {
-    return arrSource.map((rawItem) => {
-      const item = (rawItem ?? {}) as Record<string, unknown>;
-      return {
-        value: getValueByPath(item, source.valueField) as string | number | boolean,
-        label: getOptionLabel(item),
-        level: 0,
-      };
-    });
-  }
-
-  // 构建树形并扁平化为带 level 缩进的选项列表
-  type TreeNode = Record<string, unknown> & { __children?: TreeNode[] };
-  const flatten = (nodes: TreeNode[], level: number): NormalizedOption[] => {
-    const out: NormalizedOption[] = [];
-    for (const node of nodes) {
-      out.push({
-        value: getValueByPath(node, source.valueField) as string | number | boolean,
-        label: getOptionLabel(node),
-        level,
-      });
-      const children =
-        node.__children ??
-        (source.childrenField ? (node[source.childrenField] as TreeNode[] | undefined) : undefined);
-      if (Array.isArray(children) && children.length > 0) {
-        out.push(...flatten(children, level + 1));
-      }
-    }
-    return out;
-  };
-
-  if (source.childrenField && !source.parentIdField) {
-    return flatten(arrSource as TreeNode[], 0);
-  }
-
-  const map = new Map<unknown, TreeNode>();
-  const cloned: TreeNode[] = arrSource.map((raw) => {
-    const item = { ...(raw as Record<string, unknown>), __children: [] as TreeNode[] };
-    map.set(getValueByPath(item, source.valueField), item);
-    return item;
-  });
-
-  const roots: TreeNode[] = [];
-  for (const node of cloned) {
-    const pid = source.parentIdField ? getValueByPath(node, source.parentIdField) : undefined;
-    if (pid !== undefined && pid !== null && map.has(pid)) {
-      map.get(pid)!.__children!.push(node);
-    } else {
-      roots.push(node);
-    }
-  }
-  return flatten(roots, 0);
-}
+  DynamicSubFormWidget,
+  MultiSelectWidget,
+  TagInputWidget,
+  TemporalWidget,
+  TreeFlatMultiSelectWidget,
+} from './form/ContractComplexWidgets';
+import { buildOptionsSourceKey, useRemoteOptions } from './form/remoteOptions';
+import { useDynamicSubSchemas } from './form/useDynamicSubSchemas';
 
 interface ContractFormRendererProps<TRecord extends Record<string, unknown>> {
   contract: CrudResourceContract;
@@ -129,6 +29,12 @@ interface ContractFormRendererProps<TRecord extends Record<string, unknown>> {
   extensions?: CrudExtensions<TRecord>;
 }
 
+function resolveGridSize(span?: number | { xs?: number; sm?: number; md?: number }) {
+  if (!span) return { xs: 12 };
+  if (typeof span === 'number') return { xs: 12, sm: span };
+  return { xs: span.xs ?? 12, sm: span.sm ?? 12, md: span.md ?? span.sm ?? 12 };
+}
+
 export function ContractFormRenderer<TRecord extends Record<string, unknown>>({
   fields,
   form,
@@ -140,148 +46,14 @@ export function ContractFormRenderer<TRecord extends Record<string, unknown>>({
   extensions,
 }: ContractFormRendererProps<TRecord>) {
   const errorContext = useFormErrorContext();
-  const [remoteOptions, setRemoteOptions] = useState<Record<string, NormalizedOption[]>>({});
   const [passwordVisible, setPasswordVisible] = useState<Record<string, boolean>>({});
-  const [tagDrafts, setTagDrafts] = useState<Record<string, string>>({});
-  const [subSchemas, setSubSchemas] = useState<
-    Record<string, { loading: boolean; schema: Record<string, unknown> | null; loadedNs: string }>
-  >({});
-  const loadedSubNsRef = useRef<Record<string, string>>({});
 
   const allFields = extensions?.extraFormFields
     ? [...fields, ...extensions.extraFormFields()]
     : [...fields];
 
-  // 拉取所有声明了 optionsSource 的远程下拉数据源
-  const optionsSourcesSerialized = JSON.stringify(
-    allFields
-      .map((f) => f.ui.optionsSource)
-      .filter((src): src is OptionsSourceSpec => Boolean(src)),
-  );
-
-  useEffect(() => {
-    let active = true;
-    const rawList = JSON.parse(optionsSourcesSerialized) as OptionsSourceSpec[];
-    const sourcesToFetch: Array<{ key: string; spec: OptionsSourceSpec }> = [];
-    const seenKeys = new Set<string>();
-
-    for (const src of rawList) {
-      const key = buildOptionsSourceKey(src);
-      if (!seenKeys.has(key)) {
-        seenKeys.add(key);
-        sourcesToFetch.push({ key, spec: src });
-      }
-    }
-
-    if (sourcesToFetch.length === 0) return;
-
-    void Promise.all(
-      sourcesToFetch.map(async ({ key, spec }) => {
-        try {
-          const res = await postCrudEndpoint<unknown>(spec.url, {
-            data: (spec.params ?? {}) as Record<string, unknown>,
-          });
-          if (!active) return;
-          const normalized = normalizeRemoteOptions(res.data?.data, spec);
-          setRemoteOptions((prev) => ({ ...prev, [key]: normalized }));
-        } catch {
-          // 远程下拉请求异常由全局拦截器统一提示
-        }
-      }),
-    );
-
-    return () => {
-      active = false;
-    };
-  }, [optionsSourcesSerialized]);
-
-  // 拉取 dynamicSubForm 对应的后端动态表单 Schema
-  const dynamicSubFormSerialized = JSON.stringify(
-    allFields
-      .filter((f) => f.ui.widget === 'dynamicSubForm' && f.ui.dynamicSubForm)
-      .map((f) => {
-        const cfg = f.ui.dynamicSubForm!;
-        const ns = cfg.fixedNamespace || String(form[cfg.namespaceField || 'namespace'] || '');
-        return {
-          fieldName: f.name,
-          schemaUrl: cfg.schemaUrl,
-          paramKey: cfg.namespaceParamKey || 'namespace',
-          valueField: cfg.valueField || f.name || 'configValue',
-          ns,
-        };
-      }),
-  );
-
-  useEffect(() => {
-    let active = true;
-    const targets = JSON.parse(dynamicSubFormSerialized) as Array<{
-      fieldName: string;
-      schemaUrl: string;
-      paramKey: string;
-      valueField: string;
-      ns: string;
-    }>;
-
-    for (const target of targets) {
-      if (!target.ns) continue;
-      if (loadedSubNsRef.current[target.fieldName] === target.ns) continue;
-      loadedSubNsRef.current[target.fieldName] = target.ns;
-
-      setSubSchemas((prev) => ({
-        ...prev,
-        [target.fieldName]: {
-          loading: true,
-          schema: prev[target.fieldName]?.schema ?? null,
-          loadedNs: target.ns,
-        },
-      }));
-
-      void postCrudEndpoint<{
-        schema?: Record<string, unknown>;
-        defaultValues?: Record<string, unknown>;
-      }>(target.schemaUrl, { data: { [target.paramKey]: target.ns } })
-        .then((res) => {
-          if (!active) {
-            delete loadedSubNsRef.current[target.fieldName];
-            return;
-          }
-          const data = res.data?.data;
-          setSubSchemas((prev) => ({
-            ...prev,
-            [target.fieldName]: {
-              loading: false,
-              schema: data?.schema ?? null,
-              loadedNs: target.ns,
-            },
-          }));
-          if (!isEdit && data?.defaultValues) {
-            setForm((prev) => {
-              const current = prev[target.valueField as keyof TRecord];
-              if (
-                current &&
-                typeof current === 'object' &&
-                Object.keys(current as Record<string, unknown>).length > 0
-              ) {
-                return prev;
-              }
-              return { ...prev, [target.valueField]: data.defaultValues };
-            });
-          }
-        })
-        .catch(() => {
-          delete loadedSubNsRef.current[target.fieldName];
-          if (!active) return;
-          setSubSchemas((prev) => ({
-            ...prev,
-            [target.fieldName]: { loading: false, schema: null, loadedNs: target.ns },
-          }));
-        });
-    }
-
-    return () => {
-      active = false;
-    };
-  }, [dynamicSubFormSerialized, isEdit, setForm]);
+  const remoteOptions = useRemoteOptions(allFields);
+  const subSchemas = useDynamicSubSchemas({ allFields, form, setForm, isEdit });
 
   const setFieldValue = (name: string, value: unknown) => {
     errorContext?.clearFieldError(name);
@@ -289,12 +61,6 @@ export function ContractFormRenderer<TRecord extends Record<string, unknown>>({
   };
 
   const extContext = { form, setForm, isEdit, isMobile, t, disabled };
-
-  const resolveGridSize = (span?: number | { xs?: number; sm?: number; md?: number }) => {
-    if (!span) return { xs: 12 };
-    if (typeof span === 'number') return { xs: 12, sm: span };
-    return { xs: span.xs ?? 12, sm: span.sm ?? 12, md: span.md ?? span.sm ?? 12 };
-  };
 
   const renderSingleField = (field: ProjectedFormField): ReactNode => {
     const ui = field.ui;
@@ -335,32 +101,22 @@ export function ContractFormRenderer<TRecord extends Record<string, unknown>>({
     let control: ReactNode = null;
 
     switch (widget) {
-      case 'switch': {
-        control = (
-          <Field
-            type="switch"
-            name={field.name}
-            label={label}
-            value={Boolean(value)}
-            onChange={(checked: boolean) => setFieldValue(field.name, checked)}
-            disabled={isFieldDisabled}
-            schema={field.schema}
-          />
-        );
-        break;
-      }
+      case 'switch':
       case 'checkbox': {
-        control = (
-          <Field
-            type="checkbox"
-            name={field.name}
-            label={label}
-            value={Boolean(value)}
-            onChange={(checked: boolean) => setFieldValue(field.name, checked)}
-            disabled={isFieldDisabled}
-            schema={field.schema}
-          />
-        );
+        const booleanProps = {
+          name: field.name,
+          label,
+          value: Boolean(value),
+          onChange: (checked: boolean) => setFieldValue(field.name, checked),
+          disabled: isFieldDisabled,
+          schema: field.schema,
+        };
+        control =
+          widget === 'switch' ? (
+            <Field type="switch" {...booleanProps} />
+          ) : (
+            <Field type="checkbox" {...booleanProps} />
+          );
         break;
       }
       case 'select': {
@@ -407,220 +163,65 @@ export function ContractFormRenderer<TRecord extends Record<string, unknown>>({
         break;
       }
       case 'multiSelect': {
-        const opts: Array<{ label: string; value: string }> = ui.optionsSource
-          ? (remoteOptions[buildOptionsSourceKey(ui.optionsSource)] ?? []).map((o) => ({
-              label: o.label,
-              value: String(o.value),
-            }))
-          : (ui.options ?? []).map((o) => ({
-              label: o.labelKey ? t(o.labelKey) : (o.label ?? String(o.value ?? '')),
-              value: String(o.value ?? ''),
-            }));
-
-        const selectedArr = parseJsonStringArray(value);
         control = (
-          <FormControl fullWidth error={!!fieldError} required={field.required}>
-            <InputLabel id={`${field.name}-multi-label`}>{label}</InputLabel>
-            <Select
-              labelId={`${field.name}-multi-label`}
-              multiple
-              value={selectedArr}
-              disabled={isFieldDisabled}
-              onChange={(e) => {
-                const next = e.target.value as string[];
-                const serialized =
-                  ui.jsonStringArrayOptions?.nullWhenEmpty && next.length === 0
-                    ? null
-                    : JSON.stringify(next);
-                setFieldValue(field.name, serialized);
-              }}
-              input={<OutlinedInput label={label} />}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {(selected as string[]).map((v) => {
-                    const found = opts.find((o) => o.value === v);
-                    return <Chip key={v} label={found?.label ?? v} size="small" />;
-                  })}
-                </Box>
-              )}
-            >
-              {opts.map((opt) => (
-                <MenuItem key={opt.value} value={opt.value}>
-                  <Checkbox checked={selectedArr.includes(opt.value)} />
-                  <ListItemText primary={opt.label} />
-                </MenuItem>
-              ))}
-            </Select>
-            {(fieldError || helperText) && (
-              <FormHelperText>{fieldError || helperText}</FormHelperText>
-            )}
-          </FormControl>
+          <MultiSelectWidget
+            field={field}
+            label={label}
+            value={value}
+            disabled={isFieldDisabled}
+            fieldError={fieldError}
+            helperText={helperText}
+            remoteOptions={remoteOptions}
+            t={t}
+            onChangeValue={(nextVal) => setFieldValue(field.name, nextVal)}
+          />
         );
         break;
       }
       case 'treeFlatMultiSelect': {
-        const opts = ui.optionsSource
-          ? (remoteOptions[buildOptionsSourceKey(ui.optionsSource)] ?? [])
-          : [];
-        const selectedIds = parseJsonNumberArray(value);
         control = (
-          <FormControl fullWidth error={!!fieldError} required={field.required}>
-            <InputLabel id={`${field.name}-tree-label`}>{label}</InputLabel>
-            <Select
-              labelId={`${field.name}-tree-label`}
-              multiple
-              value={selectedIds}
-              disabled={isFieldDisabled}
-              onChange={(e) => {
-                const next = (e.target.value as number[]).map(Number);
-                const serialized = next.length > 0 ? JSON.stringify(next) : null;
-                setFieldValue(field.name, serialized);
-              }}
-              input={<OutlinedInput label={label} />}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {(selected as number[]).map((idVal) => {
-                    const matched = opts.find((o) => Number(o.value) === idVal);
-                    return (
-                      <Chip key={idVal} label={matched?.label ?? String(idVal)} size="small" />
-                    );
-                  })}
-                </Box>
-              )}
-            >
-              {opts.map((opt) => {
-                const numVal = Number(opt.value);
-                return (
-                  <MenuItem key={String(opt.value)} value={numVal}>
-                    <Checkbox checked={selectedIds.includes(numVal)} />
-                    <ListItemText
-                      primary={
-                        <span style={{ paddingLeft: `${opt.level * 16}px` }}>{opt.label}</span>
-                      }
-                    />
-                  </MenuItem>
-                );
-              })}
-            </Select>
-            {(fieldError || helperText) && (
-              <FormHelperText>{fieldError || helperText}</FormHelperText>
-            )}
-          </FormControl>
+          <TreeFlatMultiSelectWidget
+            field={field}
+            label={label}
+            value={value}
+            disabled={isFieldDisabled}
+            fieldError={fieldError}
+            helperText={helperText}
+            remoteOptions={remoteOptions}
+            onChangeValue={(nextVal) => setFieldValue(field.name, nextVal)}
+          />
         );
         break;
       }
       case 'tagInput': {
-        const tags = parseJsonStringArray(value);
-        const draft = tagDrafts[field.name] ?? '';
-        const addTag = () => {
-          const trimmed = draft.trim();
-          if (!trimmed || tags.includes(trimmed)) {
-            setTagDrafts((prev) => ({ ...prev, [field.name]: '' }));
-            return;
-          }
-          const next = [...tags, trimmed];
-          setFieldValue(field.name, JSON.stringify(next));
-          setTagDrafts((prev) => ({ ...prev, [field.name]: '' }));
-        };
         control = (
-          <Box>
-            <MuiTextField
-              fullWidth
-              label={label}
-              value={draft}
-              placeholder={placeholder}
-              disabled={isFieldDisabled}
-              error={!!fieldError}
-              helperText={fieldError || helperText}
-              onChange={(e) => setTagDrafts((prev) => ({ ...prev, [field.name]: e.target.value }))}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addTag();
-                }
-              }}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        onClick={addTag}
-                        disabled={isFieldDisabled || !draft.trim()}
-                        aria-label={t('common.add')}
-                      >
-                        <AddIcon fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-            {tags.length > 0 && (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
-                {tags.map((tag) => (
-                  <Chip
-                    key={tag}
-                    label={tag}
-                    size="small"
-                    onDelete={
-                      isFieldDisabled
-                        ? undefined
-                        : () => {
-                            const next = tags.filter((item) => item !== tag);
-                            setFieldValue(
-                              field.name,
-                              next.length > 0 ? JSON.stringify(next) : null,
-                            );
-                          }
-                    }
-                  />
-                ))}
-              </Box>
-            )}
-          </Box>
+          <TagInputWidget
+            field={field}
+            label={label}
+            value={value}
+            disabled={isFieldDisabled}
+            fieldError={fieldError}
+            helperText={helperText}
+            placeholder={placeholder}
+            t={t}
+            onChangeValue={(nextVal) => setFieldValue(field.name, nextVal)}
+          />
         );
         break;
       }
       case 'date':
       case 'time':
       case 'datetime': {
-        const inputType = widget === 'datetime' ? 'datetime-local' : widget;
-        const usesEpochMs =
-          ui.valueTransform === 'epochMs' ||
-          (Array.isArray(ui.valueTransform) && ui.valueTransform.includes('epochMs'));
-        let displayVal = '';
-        if (usesEpochMs && typeof value === 'number' && Number.isFinite(value)) {
-          displayVal = dayjs(value).format(
-            widget === 'date' ? 'YYYY-MM-DD' : widget === 'time' ? 'HH:mm' : 'YYYY-MM-DDTHH:mm',
-          );
-        } else if (typeof value === 'string') {
-          displayVal = value;
-        }
         control = (
-          <MuiTextField
-            fullWidth
-            type={inputType}
+          <TemporalWidget
+            field={field}
             label={label}
-            value={displayVal}
+            value={value}
             disabled={isFieldDisabled}
-            required={field.required}
-            error={!!fieldError}
-            helperText={fieldError || helperText}
-            slotProps={{ inputLabel: { shrink: true } }}
-            onChange={(e) => {
-              const raw = e.target.value;
-              if (!raw) {
-                setFieldValue(field.name, usesEpochMs ? null : '');
-                return;
-              }
-              if (usesEpochMs) {
-                const ms = dayjs(raw).valueOf();
-                setFieldValue(field.name, Number.isFinite(ms) ? ms : null);
-              } else {
-                setFieldValue(field.name, raw);
-              }
-            }}
+            fieldError={fieldError}
+            helperText={helperText}
+            widget={widget}
+            onChangeValue={(nextVal) => setFieldValue(field.name, nextVal)}
           />
         );
         break;
@@ -653,39 +254,16 @@ export function ContractFormRenderer<TRecord extends Record<string, unknown>>({
         break;
       }
       case 'dynamicSubForm': {
-        const subState = subSchemas[field.name];
-        if (subState?.loading) {
-          control = (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-              <CircularProgress size={24} />
-            </Box>
-          );
-        } else if (subState?.schema) {
-          const titleKey = ui.dynamicSubForm?.titleKey;
-          control = (
-            <Box
-              sx={{
-                p: 2,
-                border: 1,
-                borderColor: 'divider',
-                borderRadius: 1,
-                bgcolor: 'background.default',
-              }}
-            >
-              {titleKey && (
-                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>
-                  {t(titleKey)}
-                </Typography>
-              )}
-              <DynamicForm
-                schema={subState.schema}
-                value={(value as Record<string, unknown>) || {}}
-                onChange={(nextVal) => setFieldValue(field.name, nextVal)}
-                disabled={isFieldDisabled}
-              />
-            </Box>
-          );
-        }
+        control = (
+          <DynamicSubFormWidget
+            field={field}
+            value={value}
+            disabled={isFieldDisabled}
+            subState={subSchemas[field.name]}
+            t={t}
+            onChangeValue={(nextVal) => setFieldValue(field.name, nextVal)}
+          />
+        );
         break;
       }
       case 'password': {
